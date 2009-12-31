@@ -14,7 +14,13 @@ LibPlaybackWrapper::~LibPlaybackWrapper()
 bool LibPlaybackWrapper::initialize()
 {
     DBusError dbusError;
+    dbus_error_init(&dbusError);
     dbusConnection = dbus_bus_get(DBUS_BUS_SESSION, &dbusError);
+    if (dbus_error_is_set(&dbusError)) {
+	qDebug("D-Bus Connection Error (%s)\n", dbusError.message);
+	dbus_error_free(&dbusError);
+	return false;
+    }
     if(dbusConnection == NULL) {
 	return false;
     }

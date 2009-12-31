@@ -11,10 +11,6 @@ void TestResource::initTestCase()
 {
     resource = new Resource(MediaClass, RP_FLAGS_AUDIO|RP_FLAGS_VIDEO, this);
     resourceLibrary = new MockResourceLibrary(resource, false);
-}
-
-void TestResource::testConstructor()
-{
     QVERIFY(resource != NULL);
     QVERIFY(resource->resourceClass == MediaClass);
     QVERIFY(resource->flags == (RP_FLAGS_AUDIO|RP_FLAGS_VIDEO));

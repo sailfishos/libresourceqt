@@ -16,12 +16,11 @@ HEADERS += $$PUBLIC_HEADERS \
 SOURCES += src/libplayback-wrapper.cpp \
            src/resource.cpp \
            src/resource-factory.cpp
-	   
 
 OBJECTS_DIR = build
 MOC_DIR = build
 
-CONFIG  += qt link_pkgconfig
+CONFIG  += qt link_pkgconfig dll
 QT = core dbus
 PKGCONFIG += dbus-1 libplayback-1
 

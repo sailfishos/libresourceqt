@@ -17,7 +17,6 @@ public:
 private slots:
    void initTestCase();
 
-   void testConstructor();
    void testInitializeSucceeds();
    void testInitializeFails();
 };

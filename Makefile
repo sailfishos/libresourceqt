@@ -5,15 +5,14 @@ LIB = build/libresourceqt.so.1.0.0
 %.make: %.pro
 	$(QMAKE) -o $@ $<
 
-clean: $(MAKEFILE)
-	$(MAKE) -f $(MAKEFILE) clean
-	cd tests; $(MAKE) clean
-	$(RM) $(MAKEFILE)
-	$(RM) -r build
-
 all: $(MAKEFILE)
 	$(MAKE) -f $(MAKEFILE) all
 	cd tests; $(MAKE) all
+
+clean:
+	$(RM) $(MAKEFILE)
+	$(RM) -r build	
+	cd tests; $(MAKE) clean
 
 install: $(MAKEFILE)
 	$(MAKE) -f $(MAKEFILE) install
