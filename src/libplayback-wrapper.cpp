@@ -22,9 +22,14 @@ bool LibPlaybackWrapper::initialize()
 	return false;
     }
     if(dbusConnection == NULL) {
+	qDebug("Unable to connect to dbus, dbusConnection == NULL!");
 	return false;
     }
-    
+    return true;
+}
+
+bool LibPlaybackWrapper::connectToServer()
+{
     enum pb_class_e libPlaybackClass = resourceClassToLibPlaybackClass(resource->getResourceClass());
     quint16 libPlaybackFlags = resourceFlagToLibPlaybackFlags(resource->getResourceFlags());
     libPlaybackHandle = pb_playback_new_2(dbusConnection, libPlaybackClass, libPlaybackFlags,

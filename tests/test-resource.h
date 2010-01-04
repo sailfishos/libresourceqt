@@ -15,10 +15,13 @@ public:
    TestResource();
    ~TestResource();
 private slots:
-   void initTestCase();
+   void init();
 
    void testInitializeSucceeds();
    void testInitializeFails();
+
+   void testConnectToServerSucceeds();
+   void testConnectToServerFails();
 };
 
 #endif

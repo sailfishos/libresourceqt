@@ -9,6 +9,7 @@
 class Resource: public QObject
 {
    Q_OBJECT
+   Q_DISABLE_COPY( Resource );
    friend class ResourceFactory;
    friend class TestResource;
 private:
@@ -23,6 +24,8 @@ public:
 
    enum ResourceClass getResourceClass();
    quint16 getResourceFlags();
+
+   bool connectToServer();
 
    virtual bool requestExclusiveAccess();
    virtual bool releaseExclusiveAccess();

@@ -9,11 +9,15 @@ class MockResourceLibrary: public QObject, public ResourceLibrary
    Q_OBJECT
 private:
    bool initializeFails;
+   bool connectToServerFails;
 public:
-   MockResourceLibrary(QObject *parent=0,bool makeInitFail=false);
+   MockResourceLibrary(QObject *parent=0,bool makeInitializationFail=false,
+		       bool makeConnectingToServerFail=false);
    virtual ~MockResourceLibrary();
    void makeInitializeFail();
+   void makeServerConnectFail();
    bool initialize();
+   bool connectToServer();
 };
 
 #endif

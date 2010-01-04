@@ -1,7 +1,10 @@
 #include "mock-resource-library.h"
 
-MockResourceLibrary::MockResourceLibrary(QObject *parent, bool makeInitFail)
-    : QObject(parent), initializeFails(makeInitFail)
+MockResourceLibrary::MockResourceLibrary(QObject *parent,
+					 bool makeInitializationFail,
+					 bool makeConnectingToServerFail)
+    : QObject(parent), initializeFails(makeInitializationFail),
+      connectToServerFails(makeConnectingToServerFail)
 {
 }
 
@@ -11,10 +14,26 @@ MockResourceLibrary::~MockResourceLibrary()
 
 void MockResourceLibrary::makeInitializeFail()
 {
-    initializeFails=true;
+    initializeFails = true;
 }
 
 bool MockResourceLibrary::initialize()
 {
-    return !initializeFails;
+    if(initializeFails==false)
+	return true;
+    else
+	return false;
+}
+
+void MockResourceLibrary::makeServerConnectFail()
+{
+    connectToServerFails = true;
+}
+
+bool MockResourceLibrary::connectToServer()
+{
+    if(connectToServerFails == false)
+	return true;
+    else
+	return false;
 }

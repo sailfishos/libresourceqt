@@ -8,6 +8,7 @@
 class LibPlaybackWrapper: public QObject, public ResourceLibrary
 {
    Q_OBJECT
+   Q_DISABLE_COPY( LibPlaybackWrapper );
 private:
    DBusConnection *dbusConnection;
    pb_playback_t *libPlaybackHandle;
@@ -16,6 +17,7 @@ public:
    LibPlaybackWrapper(Resource *resource);
    ~LibPlaybackWrapper();
    bool initialize();
+   bool connectToServer();
 };
 
 void libPlaybackStateHandler(pb_playback_t *libPlaybackHandle, enum pb_state_e requestedState,

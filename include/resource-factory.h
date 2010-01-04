@@ -5,12 +5,12 @@
 #include <QDBusConnection>
 #include "resource-types.h"
 
-class ResourceLibrary;
 class Resource;
 
 class ResourceFactory: public QObject
 {
    Q_OBJECT
+   Q_DISABLE_COPY( ResourceFactory );
 private:
    QDBusConnection sessionBusConnection;
 public:

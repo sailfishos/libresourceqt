@@ -15,6 +15,10 @@ bool Resource::initialize(ResourceLibrary *library)
     return resourceLibrary->initialize();
 }
 
+bool Resource::connectToServer()
+{
+    return resourceLibrary->connectToServer();
+}
 
 quint16 Resource::getResourceFlags()
 {

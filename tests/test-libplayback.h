@@ -3,20 +3,21 @@
 
 #include <QtTest/QTest>
 #include "resource-factory.h"
+#include "resource.h"
 
 class TestLibplayback: public QObject
 {
    Q_OBJECT
 private:
-   ResourceLibrary *resourceLibrary;
    ResourceFactory *resourceFactory;
+   Resource *resource;
 public:
    TestLibplayback();
    ~TestLibplayback();
 private slots:
    void initTestCase();
 
-   void testCreateResource();
+   void testConnectToServer();
 };
 
 #endif

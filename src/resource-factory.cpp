@@ -20,6 +20,7 @@ Resource * ResourceFactory::createResource(enum ResourceClass type, quint16 usag
 	return resource;
     }
     else {
+	qDebug("Failed to initialize Resource. Returning NULL!");
 	delete resource;
 	return NULL;
     }
