@@ -1,5 +1,12 @@
 #include "libplayback-wrapper.h"
 
+using namespace ResourceTypes;
+static inline enum pb_class_e resourceClassToLibPlaybackClass(enum ResourceClass resourceClass);
+static inline quint16 resourceFlagsToLibPlaybackFlags(quint16 resourceFlags);
+static inline enum ResourceState libPlaybackStateToResourceState(enum pb_state_e libPlaybackState);
+static void libPlaybackStateHandler(pb_playback_t *libPlaybackHandler, enum pb_state_e newState,
+				    pb_req_t* playbackRequest, void *data);
+
 LibPlaybackWrapper::LibPlaybackWrapper(Resource *res)
     : QObject(res), dbusConnection(NULL), libPlaybackHandle(NULL)
 {
@@ -30,8 +37,8 @@ bool LibPlaybackWrapper::initialize()
 
 bool LibPlaybackWrapper::connectToServer()
 {
-    enum pb_class_e libPlaybackClass = resourceClassToLibPlaybackClass(resource->getResourceClass());
-    quint16 libPlaybackFlags = resourceFlagToLibPlaybackFlags(resource->getResourceFlags());
+    enum pb_class_e libPlaybackClass = resourceClassToLibPlaybackClass(resource->applicationClass());
+    quint16 libPlaybackFlags = resourceFlagsToLibPlaybackFlags(resource->resources());
     libPlaybackHandle = pb_playback_new_2(dbusConnection, libPlaybackClass, libPlaybackFlags,
 					  PB_STATE_STOP, libPlaybackStateHandler, this);
     if(libPlaybackHandle == NULL) {
@@ -40,7 +47,7 @@ bool LibPlaybackWrapper::connectToServer()
     return true;
 }
 
-enum pb_class_e resourceClassToLibPlaybackClass(enum ResourceClass resourceClass)
+inline enum pb_class_e resourceClassToLibPlaybackClass(enum ResourceClass resourceClass)
 {
     switch(resourceClass) {
     case InvalidClass:
@@ -72,22 +79,22 @@ enum pb_class_e resourceClassToLibPlaybackClass(enum ResourceClass resourceClass
     }
 }
 
-quint16 resourceFlagToLibPlaybackFlags(quint16 resourceFlags)
+inline quint16 resourceFlagsToLibPlaybackFlags(quint16 resourceFlags)
 {
     quint16 libPlaybackFlags = 0;
-    for (int flag=RP_FLAGS_AUDIO;flag<RP_FLAGS_VIDEO_RECORDING;flag=flag<<1) {
+    for (int flag=AudioResource;flag<VideoRecorderResource;flag=flag<<1) {
 	if((resourceFlags & flag) == flag) {
 	    switch(flag) {
-	    case RP_FLAGS_AUDIO:
+	    case AudioResource:
 		libPlaybackFlags += PB_FLAG_AUDIO;
 		break;
-	    case RP_FLAGS_VIDEO:
+	    case VideoResource:
 		libPlaybackFlags += PB_FLAG_VIDEO;
 		break;
-	    case RP_FLAGS_AUDIO_RECORDING:
+	    case AudioRecorderResource:
 		libPlaybackFlags += PB_FLAG_AUDIO_RECORDING;
 		break;
-	    case RP_FLAGS_VIDEO_RECORDING:
+	    case VideoRecorderResource:
 		libPlaybackFlags += PB_FLAG_VIDEO_RECORDING;
 		break;
 	    }
@@ -96,12 +103,33 @@ quint16 resourceFlagToLibPlaybackFlags(quint16 resourceFlags)
     return libPlaybackFlags;
 }
 
-void libPlaybackStateHandler(pb_playback_t *libPlaybackHandle, enum pb_state_e requestedState,
+void libPlaybackStateHandler(pb_playback_t *libPlaybackHandler, enum pb_state_e newState,
 			     pb_req_t* playbackRequest, void *data)
 {
-//    LibPlaybackWrapper *libPlaybackWrapper = (LibPlaybackWrapper*)data;
+    LibPlaybackWrapper *libPlaybackWrapper = static_cast<LibPlaybackWrapper*>(data);
 
-//    libPlaybackWrapper->handleNewState(requestedState);
+    libPlaybackWrapper->stateChanged(newState);
 
-    pb_playback_req_completed(libPlaybackHandle, playbackRequest);
+    pb_playback_req_completed(libPlaybackHandler, playbackRequest);
+}
+
+
+void LibPlaybackWrapper::stateChanged(enum pb_state_e newState)
+{
+    enum ResourceState resourceState;
+    resourceState = libPlaybackStateToResourceState(newState);
+    
+    resource->handleStateChange(resourceState);
+}
+
+inline enum ResourceState libPlaybackStateToResourceState(enum pb_state_e libPlaybackState)
+{
+    switch(libPlaybackState) {
+    case PB_STATE_STOP:
+	return NotOwnedState;
+    case PB_STATE_PLAY:
+	return OwnedState;
+    default:
+	return UnknownState;
+    }	
 }

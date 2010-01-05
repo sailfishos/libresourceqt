@@ -1,5 +1,7 @@
 #include "test-libplayback.h"
 
+using namespace ResourceTypes;
+
 TestLibplayback::TestLibplayback()
 {
     resourceFactory=NULL;
@@ -14,7 +16,7 @@ void TestLibplayback::initTestCase()
 {
     resourceFactory = new ResourceFactory(this);
     QVERIFY(resourceFactory != NULL);
-    Resource *resource = resourceFactory->createResource(MediaClass, RP_FLAGS_AUDIO|RP_FLAGS_VIDEO);
+    Resource *resource = resourceFactory->createResource(MediaClass, AudioResource|VideoResource);
     QVERIFY(resource != NULL);
 }
 

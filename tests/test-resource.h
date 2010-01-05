@@ -22,6 +22,9 @@ private slots:
 
    void testConnectToServerSucceeds();
    void testConnectToServerFails();
+
+   void testApplicationClass();
+   void testResources();
 };
 
 #endif

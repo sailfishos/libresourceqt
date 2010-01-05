@@ -1,6 +1,8 @@
 #include "resource-factory.h"
 #include "libplayback-wrapper.h"
 
+using namespace ResourceTypes;
+
 ResourceFactory::ResourceFactory(QObject *parent)
     : QObject(parent), sessionBusConnection(QDBusConnection::sessionBus())
 {
@@ -10,9 +12,10 @@ ResourceFactory::~ResourceFactory()
 {
 }
 
-Resource * ResourceFactory::createResource(enum ResourceClass type, quint16 usageFlags)
+Resource * ResourceFactory::createResource(enum ResourceClass applicationClass,
+					   quint16 requestedResources)
 {
-    Resource *resource = new Resource(type, usageFlags, this);
+    Resource *resource = new Resource(applicationClass, requestedResources, this);
     ResourceLibrary *libPlayback = new LibPlaybackWrapper(resource);
 
     bool resourceProperlyInitialized = resource->initialize(libPlayback);

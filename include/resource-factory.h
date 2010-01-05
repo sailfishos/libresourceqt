@@ -16,7 +16,8 @@ private:
 public:
    ResourceFactory(QObject *parent = 0);
    ~ResourceFactory();
-   Resource * createResource(enum ResourceClass type, quint16 usageFlags=RP_FLAGS_AUDIO);
+   Resource * createResource(enum ResourceTypes::ResourceClass applicationClass,
+			     quint16 requestedResources=ResourceTypes::AudioResource);
 };
 
 #endif

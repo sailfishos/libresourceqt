@@ -1,4 +1,7 @@
 #include "test-resource.h"
+
+using namespace ResourceTypes;
+
 TestResource::TestResource()
 {
 }
@@ -9,12 +12,34 @@ TestResource::~TestResource()
 
 void TestResource::init()
 {
-    resource = new Resource(MediaClass, RP_FLAGS_AUDIO|RP_FLAGS_VIDEO, this);
+    resource = new Resource(MediaClass, AudioResource|VideoResource, this);
     resourceLibrary = new MockResourceLibrary(resource, false, false);
     QVERIFY(resource != NULL);
-    QVERIFY(resource->resourceClass == MediaClass);
-    QVERIFY(resource->flags == (RP_FLAGS_AUDIO|RP_FLAGS_VIDEO));
-    qDebug("INIT!");
+    QVERIFY(resource->applicationClass() == MediaClass);
+    QVERIFY(resource->resources() == (AudioResource|VideoResource));
+    QVERIFY(resource->hasExclusiveAccess() == false);
+    QVERIFY(resource->hasResource(AudioResource));
+    QVERIFY(resource->hasResource(VideoResource));
+}
+
+void TestResource::testApplicationClass()
+{
+    enum ResourceClass expected, actual;
+
+    expected = MediaClass;
+    actual = resource->applicationClass();
+
+    QVERIFY(actual == expected);
+}
+
+void TestResource::testResources()
+{
+    quint16 expected, actual;
+
+    expected = AudioResource|VideoResource;
+    actual = resource->resources();
+
+    QVERIFY(actual == expected);
 }
 
 void TestResource::testInitializeSucceeds()

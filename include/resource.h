@@ -6,6 +6,8 @@
 #include "resource-library.h"
 #include "resource-types.h"
 
+using namespace ResourceTypes;
+
 class Resource: public QObject
 {
    Q_OBJECT
@@ -14,18 +16,24 @@ class Resource: public QObject
    friend class TestResource;
 private:
    enum ResourceClass resourceClass;
-   quint16 flags;
+   quint16 resourceType;
    ResourceLibrary *resourceLibrary;
+   enum ResourceState resourceState;
 
+   Resource(enum ResourceClass requestedClass, quint16 requestedResources, QObject *parent=0);
    bool initialize(ResourceLibrary *library);
-   Resource(enum ResourceClass type, quint16 resourceFlags, QObject *parent=0);
 public:
    virtual ~Resource();
 
-   enum ResourceClass getResourceClass();
-   quint16 getResourceFlags();
+   bool hasExclusiveAccess() const;
+   bool hasResource(enum ResourceType resourceType) const;
+
+   enum ResourceClass applicationClass() const;
+   quint16 resources() const;
 
    bool connectToServer();
+
+   void handleStateChange(enum ResourceState newState);
 
    virtual bool requestExclusiveAccess();
    virtual bool releaseExclusiveAccess();
@@ -47,6 +55,9 @@ public:
    virtual bool setStreamName(const QString & name);
 */
    // completed and discarded from libplayback? what are those?
+signals:
+   void connectedToServer();
+   void stateChanged(enum ResourceState newState);
 };
 
 #endif
