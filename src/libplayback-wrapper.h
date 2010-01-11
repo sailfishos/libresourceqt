@@ -19,7 +19,9 @@ public:
    ~LibPlaybackWrapper();
    bool initialize();
    bool connectToServer();
+
    void stateChanged(enum pb_state_e newState);
+   void hintReceived(const int allowedStates[]);
 };
 
 #endif

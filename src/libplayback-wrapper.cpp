@@ -137,5 +137,17 @@ static void libPlaybackStateHintHandler(pb_playback_t *libPlaybackHandler, const
 {
     LibPlaybackWrapper *libPlaybackWrapper = static_cast<LibPlaybackWrapper*>(data);
 
-//    libPlaybackWrapper->hintReceived(newStates);
+    libPlaybackWrapper->hintReceived(allowedStates);
+}
+
+void LibPlaybackWrapper::hintReceived(const int allowedStates[])
+{
+    if(allowedStates[PB_STATE_PLAY]) {
+	resource->emitReservable();
+    }
+    // Ignore PB_STATE_STOP
+/*    else if(allowedStates[PB_STATE_STOP]) {
+	
+    }
+*/
 }

@@ -62,7 +62,7 @@ void Resource::handleStateChange(enum ResourceState newState)
 
 void Resource::emitReservable()
 {
-    return;
+    emit reservable();
 }
 
 bool Resource::reserve()

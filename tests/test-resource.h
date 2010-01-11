@@ -16,6 +16,10 @@ private:
 public:
    TestResource();
    ~TestResource();
+
+public slots:
+   void handleReservable();
+
 private slots:
    void init();
 
@@ -29,7 +33,6 @@ private slots:
    void testResources();
 
    void testReservable();
-   void handleReservable();
 };
 
 #endif
