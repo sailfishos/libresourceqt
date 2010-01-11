@@ -3,6 +3,7 @@
 using namespace ResourceTypes;
 
 TestResource::TestResource()
+    : isReservable(false)
 {
 }
 
@@ -17,7 +18,7 @@ void TestResource::init()
     QVERIFY(resource != NULL);
     QVERIFY(resource->applicationClass() == MediaClass);
     QVERIFY(resource->resources() == (AudioResource|VideoResource));
-    QVERIFY(resource->hasExclusiveAccess() == false);
+    QVERIFY(resource->isReserved() == false);
     QVERIFY(resource->hasResource(AudioResource));
     QVERIFY(resource->hasResource(VideoResource));
 }
@@ -88,6 +89,25 @@ void TestResource::testConnectToServerFails()
 
     QEXPECT_FAIL("", "Expecting resourceLibrary->connectToServer() to fail", Continue);
     QVERIFY(connectToServerSucceeded);
+}
+
+// testStateChanged
+
+void TestResource::testReservable()
+{
+    resource->initialize(resourceLibrary);
+    resource->connectToServer();
+
+    QObject::connect(resource, SIGNAL(reservable()), this, SLOT(handleReservable()));
+
+    resource->emitReservable();
+
+    QVERIFY(isReservable);
+}
+
+void TestResource::handleReservable()
+{
+    isReservable = true;
 }
 
 QTEST_MAIN(TestResource)

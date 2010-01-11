@@ -40,7 +40,7 @@ bool Resource::hasResource(enum ResourceType resourceType) const
 	return false;
 }
 
-bool Resource::hasExclusiveAccess() const
+bool Resource::isReserved() const
 {
     if(resourceState == OwnedState)
 	return true;
@@ -60,17 +60,77 @@ void Resource::handleStateChange(enum ResourceState newState)
     }
 }
 
-bool Resource::requestExclusiveAccess()
+void Resource::emitReservable()
+{
+    return;
+}
+
+bool Resource::reserve()
 {
     return false;
 }
  
-bool Resource::releaseExclusiveAccess()
+bool Resource::release()
 {
     return false;
 }
 
-bool Resource::getExclusiveAccessState()
+bool Resource::requestState()
+{
+    return false;
+}
+
+bool Resource::setMute()
+{
+    return false;
+}
+
+bool Resource::unsetMute()
+{
+    return false;
+}
+
+bool Resource::requestMute()
+{
+    return false;
+}
+
+bool Resource::setPrivacyOverride()
+{
+    return false;
+}
+
+bool Resource::unsetPrivacyOverride()
+{
+    return false;
+}
+
+bool Resource::requestPrivacyOverride()
+{
+    return false;
+}
+
+bool Resource::setBluetoothOverride()
+{
+    return false;
+}
+
+bool Resource::unsetBluetoothOverride()
+{
+    return false;
+}
+
+bool Resource::requestBluetoothOverride()
+{
+    return false;
+}
+
+bool Resource::setPid(quint32 pid)
+{
+    return false;
+}
+
+bool Resource::setStreamName(const QString & name)
 {
     return false;
 }

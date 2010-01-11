@@ -11,6 +11,8 @@ class TestResource: public QObject
 private:
    ResourceLibrary *resourceLibrary;
    Resource *resource;
+
+   bool isReservable;
 public:
    TestResource();
    ~TestResource();
@@ -25,6 +27,9 @@ private slots:
 
    void testApplicationClass();
    void testResources();
+
+   void testReservable();
+   void handleReservable();
 };
 
 #endif

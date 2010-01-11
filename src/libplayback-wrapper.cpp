@@ -6,6 +6,7 @@ static inline quint16 resourceFlagsToLibPlaybackFlags(quint16 resourceFlags);
 static inline enum ResourceState libPlaybackStateToResourceState(enum pb_state_e libPlaybackState);
 static void libPlaybackStateHandler(pb_playback_t *libPlaybackHandler, enum pb_state_e newState,
 				    pb_req_t* playbackRequest, void *data);
+static void libPlaybackStateHintHandler(pb_playback_t *libPlaybackHandler, const int allowedStates[], void *data);
 
 LibPlaybackWrapper::LibPlaybackWrapper(Resource *res)
     : QObject(res), dbusConnection(NULL), libPlaybackHandle(NULL)
@@ -108,11 +109,9 @@ void libPlaybackStateHandler(pb_playback_t *libPlaybackHandler, enum pb_state_e 
 {
     LibPlaybackWrapper *libPlaybackWrapper = static_cast<LibPlaybackWrapper*>(data);
 
-    libPlaybackWrapper->stateChanged(newState);
-
     pb_playback_req_completed(libPlaybackHandler, playbackRequest);
+    libPlaybackWrapper->stateChanged(newState);
 }
-
 
 void LibPlaybackWrapper::stateChanged(enum pb_state_e newState)
 {
@@ -132,4 +131,11 @@ inline enum ResourceState libPlaybackStateToResourceState(enum pb_state_e libPla
     default:
 	return UnknownState;
     }	
+}
+
+static void libPlaybackStateHintHandler(pb_playback_t *libPlaybackHandler, const int allowedStates[], void *data)
+{
+    LibPlaybackWrapper *libPlaybackWrapper = static_cast<LibPlaybackWrapper*>(data);
+
+//    libPlaybackWrapper->hintReceived(newStates);
 }
