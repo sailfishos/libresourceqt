@@ -20,6 +20,8 @@ public:
    bool initialize();
    bool connectToServer();
 
+   bool reserve();
+
    void stateChanged(enum pb_state_e newState);
    void hintReceived(const int allowedStates[]);
 };

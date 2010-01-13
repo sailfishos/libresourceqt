@@ -156,3 +156,8 @@ void LibPlaybackWrapper::hintReceived(const int allowedStates[])
     }
 */
 }
+
+bool LibPlaybackWrapper::reserve()
+{
+    return false;
+}

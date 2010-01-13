@@ -3,7 +3,7 @@
 using namespace ResourceTypes;
 
 TestResource::TestResource()
-    : isReservable(false)
+    : isReservable(false), isReserved(false)
 {
 }
 
@@ -14,13 +14,15 @@ TestResource::~TestResource()
 void TestResource::init()
 {
     resource = new Resource(MediaClass, AudioResource|VideoResource, this);
-    resourceLibrary = new MockResourceLibrary(resource, false, false);
+    resourceLibrary = new MockResourceLibrary(resource);
     QVERIFY(resource != NULL);
     QVERIFY(resource->applicationClass() == MediaClass);
     QVERIFY(resource->resources() == (AudioResource|VideoResource));
     QVERIFY(resource->isReserved() == false);
     QVERIFY(resource->hasResource(AudioResource));
     QVERIFY(resource->hasResource(VideoResource));
+    isReservable =false;
+    isReserved = false;
 }
 
 void TestResource::testApplicationClass()
@@ -108,6 +110,50 @@ void TestResource::testReservable()
 void TestResource::handleReservable()
 {
     isReservable = true;
+}
+
+void TestResource::testReserve()
+{
+    resource->initialize(resourceLibrary);
+    QObject::connect(resource, SIGNAL(stateChanged(enum ResourceState)),
+		     this, SLOT(handleStateChanged(enum ResourceState)));
+    resource->connectToServer();
+
+    bool reserveSucceeds = resource->reserve();
+
+    QVERIFY(resource->isReserved());
+    QVERIFY(reserveSucceeds);
+    QVERIFY(isReserved);
+}
+
+void TestResource::testReserveExpectFail()
+{
+    MockResourceLibrary *mockResourceLibrary =
+	static_cast<MockResourceLibrary *>(resourceLibrary);
+
+    resource->initialize(resourceLibrary);
+    QObject::connect(resource, SIGNAL(stateChanged(enum ResourceState)),
+		     this, SLOT(handleStateChanged(enum ResourceState)));
+    resource->connectToServer();
+
+    mockResourceLibrary->makeReserveFail();
+    bool reserveSucceeds = resource->reserve();
+
+    QVERIFY(reserveSucceeds);
+    QEXPECT_FAIL("", "Expecting resourceLibrary->reserve() to fail", Continue);
+    QVERIFY(isReserved);
+}
+
+void TestResource::handleStateChanged(enum ResourceState newState)
+{
+    switch(newState) {
+    case OwnedState:
+	isReserved = true;
+	break;
+    default:
+	isReserved = false;
+	break;
+    }
 }
 
 QTEST_MAIN(TestResource)

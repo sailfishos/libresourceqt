@@ -1,11 +1,14 @@
 #include "mock-resource-library.h"
 
-MockResourceLibrary::MockResourceLibrary(QObject *parent,
+MockResourceLibrary::MockResourceLibrary(Resource *resource,
 					 bool makeInitializationFail,
-					 bool makeConnectingToServerFail)
-    : QObject(parent), initializeFails(makeInitializationFail),
-      connectToServerFails(makeConnectingToServerFail)
+					 bool makeConnectingToServerFail,
+					 bool makeReserveFail)
+    : QObject(resource), initializeFails(makeInitializationFail),
+      connectToServerFails(makeConnectingToServerFail),
+      reserveFails(makeReserveFail)
 {
+    this->resource = resource;
 }
 
 MockResourceLibrary::~MockResourceLibrary()
@@ -36,4 +39,19 @@ bool MockResourceLibrary::connectToServer()
 	return true;
     else
 	return false;
+}
+
+bool MockResourceLibrary::reserve()
+{
+    if(!reserveFails) {
+	resource->handleStateChange(OwnedState);
+    }
+    else {
+	resource->handleStateChange(NotOwnedState);
+    }
+}
+
+void MockResourceLibrary::makeReserveFail()
+{
+    reserveFails = true;
 }

@@ -13,12 +13,14 @@ private:
    Resource *resource;
 
    bool isReservable;
+   bool isReserved;
 public:
    TestResource();
    ~TestResource();
 
 public slots:
    void handleReservable();
+   void handleStateChanged(enum ResourceState newState);
 
 private slots:
    void init();
@@ -33,6 +35,9 @@ private slots:
    void testResources();
 
    void testReservable();
+
+   void testReserve();
+   void testReserveExpectFail();
 };
 
 #endif
