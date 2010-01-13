@@ -15,6 +15,7 @@ ResourceFactory::~ResourceFactory()
 Resource * ResourceFactory::createResource(enum ResourceClass applicationClass,
 					   quint16 requestedResources)
 {
+    qDebug("We %s connected to DBus",sessionBusConnection.isConnected()?"are":"are not");
     Resource *resource = new Resource(applicationClass, requestedResources, this);
     ResourceLibrary *libPlayback = new LibPlaybackWrapper(resource);
 

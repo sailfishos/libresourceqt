@@ -13,12 +13,15 @@ Resource::~Resource()
 
 bool Resource::initialize(ResourceLibrary *library)
 {
+    qDebug("Resource::initialize");
     resourceLibrary = library;
     return resourceLibrary->initialize();
 }
 
 bool Resource::connectToServer()
 {
+    if(resourceLibrary == NULL)
+	return false;
     return resourceLibrary->connectToServer();
 }
 

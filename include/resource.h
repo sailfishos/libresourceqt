@@ -98,7 +98,7 @@ public:
 
    //! \internal Stores the new state and emits a stateChanged() signal.
    void handleStateChange(enum ResourceState newState);
-   //! \internal Emits the exclusiveAccessIsAvailable() signal.
+   //! \internal Emits the reservable() signal.
    void emitReservable();
 
    //! Reserve exclusive access to our resources.

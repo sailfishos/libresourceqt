@@ -2,6 +2,8 @@
 #define TEST_RESOURCE_FACTORY_H
 
 #include <QtTest/QTest>
+#include <QEventLoop>
+#include <QTimer>
 #include "resource-factory.h"
 #include "resource.h"
 
@@ -11,11 +13,15 @@ class TestLibplayback: public QObject
 private:
    ResourceFactory *resourceFactory;
    Resource *resource;
+   QEventLoop *loop;
+   QTimer *timer;
 public:
    TestLibplayback();
    ~TestLibplayback();
+public slots:
+   void timeout();
 private slots:
-   void initTestCase();
+   void init();
 
    void testConnectToServer();
 };
