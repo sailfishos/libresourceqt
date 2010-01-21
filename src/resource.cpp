@@ -1,6 +1,8 @@
 #include "resource.h"
 
-Resource::Resource() : name(QString()), optional(false), shared(false)
+using namespace ResourcePolicy;
+
+Resource::Resource() : resourceType(InvalidResource), optional(false), shared(false)
 {
     identifier = (quint32)this;
 }
@@ -10,14 +12,14 @@ Resource::~Resource()
 }
 
 Resource::Resource(const Resource &other)
-    : name(other.name), optional(other.optional),
+    : resourceType(other.resourceType), optional(other.optional),
       shared(other.shared), identifier(other.identifier)
 {
 }
 
 Resource & Resource::operator=(const Resource &other)
 {
-    name = other.name;
+    resourceType = other.resourceType;
     optional = other.optional;
     shared = other.shared;
     identifier = other.identifier;
@@ -25,14 +27,20 @@ Resource & Resource::operator=(const Resource &other)
     return *this;
 }
 
-QString Resource::type() const
+ResourceType Resource::type() const
 {
-    return name;
+    return resourceType;
 }
 
-void Resource::setType(const QString type)
+bool Resource::setType(ResourceType type)
 {
-    name = type;
+    if(type != InvalidResource) {
+	resourceType = type;
+	return true;
+    }
+    else {
+	return false;
+    }
 }
 
 bool Resource::isOptional() const
@@ -67,7 +75,7 @@ void Resource::setId(quint32 newId)
 
 bool Resource::operator==(const Resource &other)
 {
-    if(name != other.name) {
+    if(resourceType != other.resourceType) {
 	return false;
     }
     if((identifier != other.identifier) or

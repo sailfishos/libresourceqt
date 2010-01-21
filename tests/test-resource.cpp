@@ -1,5 +1,7 @@
 #include "test-resource.h"
 
+using namespace ResourcePolicy;
+
 TestResource::TestResource()
 {
 }
@@ -20,24 +22,27 @@ void TestResource::cleanup()
 
 void TestResource::testType_data()
 {
-    QTest::addColumn<QString>("type");
-    QTest::addColumn<QString>("expected");
+    QTest::addColumn<ResourceType>("type");
+    QTest::addColumn<ResourceType>("expected");
 
-    QTest::newRow("AudioPlayback") << "AudioPlayback"  << "AudioPlayback";
-    QTest::newRow("VideoPlayback") << "VideoPlayback" << "VideoPlayback";
-    QTest::newRow("AudioRecording") << "AudioRecording" << "AudioRecording";
-    QTest::newRow("VideoRecording") << "VideoRecording" << "VideoRecording";
-    QTest::newRow("Invalid") << "Invalid" << "Invalid";
-    QTest::newRow("Empty") << "" << "";
-    QTest::newRow("Null") << QString() << QString();
+    QTest::newRow("AudioPlayback") << AudioPlaybackResource << AudioPlaybackResource;
+    QTest::newRow("VideoPlayback") << VideoPlaybackResource << VideoPlaybackResource;
+    QTest::newRow("AudioRecorder") << AudioRecorderResource << AudioRecorderResource;
+    QTest::newRow("VideoRecorder") << VideoRecorderResource << VideoRecorderResource;
+    QTest::newRow("Invalid") << InvalidResource << InvalidResource;
 }
+
 void TestResource::testType()
 {
-    QFETCH(QString, type);
-    QFETCH(QString, expected);
-    resource->setType(type);
-    QString result = resource->type();
+    QFETCH(ResourceType, type);
+    QFETCH(ResourceType, expected);
+    bool setWasSuccessfull = resource->setType(type);
+    ResourceType result = resource->type();
 
+    if(expected == InvalidResource) {
+	QEXPECT_FAIL("", "Expecting to fail since type == InvalidResource", Continue);
+    }
+    QVERIFY(setWasSuccessfull);
     QCOMPARE(result, expected);
 }
 

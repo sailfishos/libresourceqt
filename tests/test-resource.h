@@ -2,7 +2,12 @@
 #define TEST_RESOURCE_H
 
 #include <QtTest/QTest>
+#include <QMetaType>
 #include "resource.h"
+
+Q_DECLARE_METATYPE(ResourcePolicy::ResourceType)
+
+using namespace ResourcePolicy;
 
 class TestResource: public QObject
 {
