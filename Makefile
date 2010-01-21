@@ -7,19 +7,19 @@ LIB = build/libresourceqt.so.1.0.0
 
 all: $(MAKEFILE)
 	$(MAKE) -f $(MAKEFILE) all
-	cd tests; $(MAKE) all
+	$(MAKE) -C tests all
 
 clean:
 	$(RM) $(MAKEFILE)
 	$(RM) -r build	
-	cd tests; $(MAKE) clean
+	$(MAKE) -C tests clean
 
 install: $(MAKEFILE)
 	$(MAKE) -f $(MAKEFILE) install
-	cd tests; $(MAKE) install
+	$(MAKE) -C tests install
 	
 tests: force
-	cd tests; $(MAKE) tests
+	$(MAKE) -C tests tests
 
 force: ;
 

@@ -3,41 +3,39 @@
 
 #include <QtTest/QTest>
 #include "resource.h"
-#include "mock-resource-library.h"
 
 class TestResource: public QObject
 {
    Q_OBJECT
 private:
-   ResourceLibrary *resourceLibrary;
    Resource *resource;
 
-   bool isReservable;
-   bool isReserved;
 public:
    TestResource();
    ~TestResource();
 
-public slots:
-   void handleReservable();
-   void handleStateChanged(enum ResourceState newState);
 
 private slots:
+
    void init();
+   void cleanup();
 
-   void testInitializeSucceeds();
-   void testInitializeFails();
+   void testType_data();
+   void testType();
+   
+   void testOptional_data();
+   void testOptional();
 
-   void testConnectToServerSucceeds();
-   void testConnectToServerFails();
+   void testShared_data();
+   void testShared();
 
-   void testApplicationClass();
-   void testResources();
+   void testIdentifier_data();
+   void testIdentifier();
 
-   void testReservable();
+   void testCopy();
+   void testCopyConstructor();
 
-   void testReserve();
-   void testReserveExpectFail();
+   void testEqualsOperator();
 };
 
 #endif

@@ -6,23 +6,18 @@ DEPENDPATH += include src
 INCLUDEPATH += src include
 
 # Input
-PUBLIC_HEADERS = include/resource.h \
-           include/resource-factory.h \
-           include/resource-types.h
-HEADERS += $$PUBLIC_HEADERS \
-           src/libplayback-wrapper.h \
-           src/resource-library.h
+PUBLIC_HEADERS = include/resource.h
 
-SOURCES += src/libplayback-wrapper.cpp \
-           src/resource.cpp \
-           src/resource-factory.cpp
+HEADERS += $$PUBLIC_HEADERS
+
+SOURCES += src/resource.cpp
 
 OBJECTS_DIR = build
 MOC_DIR = build
 
 CONFIG  += qt link_pkgconfig dll
 QT = core dbus
-PKGCONFIG += dbus-1 libplayback-1
+PKGCONFIG += dbus-1
 
 # Install directives
 headers.files  = $$PUBLIC_HEADERS

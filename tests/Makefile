@@ -1,5 +1,6 @@
 QMAKE = qmake
 MAKEFILES = $(patsubst %.pro,%.make,$(wildcard *.pro))
+MAKEOVERRIDES =
 
 %.make: %.pro
 	$(QMAKE) -o $@ $<

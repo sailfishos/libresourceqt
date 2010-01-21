@@ -1,9 +1,6 @@
 #include "test-resource.h"
 
-using namespace ResourceTypes;
-
 TestResource::TestResource()
-    : isReservable(false), isReserved(false)
 {
 }
 
@@ -13,147 +10,129 @@ TestResource::~TestResource()
 
 void TestResource::init()
 {
-    resource = new Resource(MediaClass, AudioResource|VideoResource, this);
-    resourceLibrary = new MockResourceLibrary(resource);
-    QVERIFY(resource != NULL);
-    QVERIFY(resource->applicationClass() == MediaClass);
-    QVERIFY(resource->resources() == (AudioResource|VideoResource));
-    QVERIFY(resource->isReserved() == false);
-    QVERIFY(resource->hasResource(AudioResource));
-    QVERIFY(resource->hasResource(VideoResource));
-    isReservable =false;
-    isReserved = false;
+    resource = new Resource();
 }
 
-void TestResource::testApplicationClass()
+void TestResource::cleanup()
 {
-    enum ResourceClass expected, actual;
-
-    expected = MediaClass;
-    actual = resource->applicationClass();
-
-    QVERIFY(actual == expected);
+    delete resource;
 }
 
-void TestResource::testResources()
+void TestResource::testType_data()
 {
-    quint16 expected, actual;
+    QTest::addColumn<QString>("type");
+    QTest::addColumn<QString>("expected");
 
-    expected = AudioResource|VideoResource;
-    actual = resource->resources();
+    QTest::newRow("AudioPlayback") << "AudioPlayback"  << "AudioPlayback";
+    QTest::newRow("VideoPlayback") << "VideoPlayback" << "VideoPlayback";
+    QTest::newRow("AudioRecording") << "AudioRecording" << "AudioRecording";
+    QTest::newRow("VideoRecording") << "VideoRecording" << "VideoRecording";
+    QTest::newRow("Invalid") << "Invalid" << "Invalid";
+    QTest::newRow("Empty") << "" << "";
+    QTest::newRow("Null") << QString() << QString();
+}
+void TestResource::testType()
+{
+    QFETCH(QString, type);
+    QFETCH(QString, expected);
+    resource->setType(type);
+    QString result = resource->type();
 
-    QVERIFY(actual == expected);
+    QCOMPARE(result, expected);
 }
 
-void TestResource::testInitializeSucceeds()
+void TestResource::testOptional_data()
 {
-    bool initializeSucceeded = resource->initialize(resourceLibrary);
-
-    QVERIFY(resource->resourceLibrary == resourceLibrary);
-    QVERIFY(initializeSucceeded);
+    QTest::addColumn<bool>("optional");
+    QTest::addColumn<bool>("expected");
+    
+    QTest::newRow("Resource is optional") << true << true;
+    QTest::newRow("Resource is not optional") << false << false;
 }
 
-void TestResource::testInitializeFails()
+void TestResource::testOptional()
 {
-    MockResourceLibrary *mockResourceLibrary =
-	static_cast<MockResourceLibrary *>(resourceLibrary);
-    mockResourceLibrary->makeInitializeFail();
+    QFETCH(bool, optional);
+    QFETCH(bool, expected);
 
-    bool initializeSucceeded = resource->initialize(resourceLibrary);
+    resource->setOptional(optional);
+    bool result = resource->isOptional();
 
-    QEXPECT_FAIL("", "Expecting resourceLibrary->initialize() to fail", Continue);
-    QVERIFY(initializeSucceeded);
+    QCOMPARE(result, expected);
 }
 
-void TestResource::testConnectToServerSucceeds()
+void TestResource::testShared_data()
 {
-    bool initializeSucceeded = resource->initialize(resourceLibrary);
-
-    QVERIFY(resource->resourceLibrary == resourceLibrary);
-    QVERIFY(initializeSucceeded);
-
-    bool connectToServerSucceeded = resource->connectToServer();
-    QVERIFY(connectToServerSucceeded);
+    QTest::addColumn<bool>("optional");
+    QTest::addColumn<bool>("expected");
+    
+    QTest::newRow("Resource is shared") << true << true;
+    QTest::newRow("Resource is not hhared") << false << false;
 }
 
-void TestResource::testConnectToServerFails()
+void TestResource::testShared()
 {
-    MockResourceLibrary *mockResourceLibrary =
-	static_cast<MockResourceLibrary *>(resourceLibrary);
+    QFETCH(bool, optional);
+    QFETCH(bool, expected);
 
-    bool initializeSucceeded = resource->initialize(resourceLibrary);
+    resource->setShared(optional);
+    bool result = resource->isShared();
 
-    QVERIFY(resource->resourceLibrary == resourceLibrary);
-    QVERIFY(initializeSucceeded);
-
-    mockResourceLibrary->makeServerConnectFail();
-    bool connectToServerSucceeded = resource->connectToServer();
-
-    QEXPECT_FAIL("", "Expecting resourceLibrary->connectToServer() to fail", Continue);
-    QVERIFY(connectToServerSucceeded);
+    QCOMPARE(result, expected);
 }
 
-// testStateChanged
-
-void TestResource::testReservable()
+void TestResource::testIdentifier_data()
 {
-    resource->initialize(resourceLibrary);
-    resource->connectToServer();
-
-    QObject::connect(resource, SIGNAL(reservable()), this, SLOT(handleReservable()));
-
-    resource->emitReservable();
-
-    QVERIFY(isReservable);
+    QTest::addColumn<quint32>("identifier");
+    QTest::addColumn<quint32>("expected");
+    
+    QTest::newRow("Set identifier") << (quint32)this << (quint32)this;
+    QTest::newRow("Set to 0") << 0U << 0U;
 }
 
-void TestResource::handleReservable()
+void TestResource::testIdentifier()
 {
-    isReservable = true;
+    QFETCH(quint32, identifier);
+    QFETCH(quint32, expected);
+
+    resource->setId(identifier);
+    quint32 result = resource->id();
+
+    QCOMPARE(result, expected);
 }
 
-void TestResource::testReserve()
+void TestResource::testCopy()
 {
-    resource->initialize(resourceLibrary);
-    QObject::connect(resource, SIGNAL(stateChanged(enum ResourceState)),
-		     this, SLOT(handleStateChanged(enum ResourceState)));
-    resource->connectToServer();
+    Resource copy;
+    resource->setOptional();
 
-    bool reserveSucceeds = resource->reserve();
+    copy = *resource;
 
-    QVERIFY(resource->isReserved());
-    QVERIFY(reserveSucceeds);
-    QVERIFY(isReserved);
+    QCOMPARE(copy.id(), resource->id());
+    QCOMPARE(copy.isOptional(), resource->isOptional());
+    QCOMPARE(copy.isShared(), resource->isShared());
+    QCOMPARE(copy.type(), resource->type());
 }
 
-void TestResource::testReserveExpectFail()
+void TestResource::testCopyConstructor()
 {
-    MockResourceLibrary *mockResourceLibrary =
-	static_cast<MockResourceLibrary *>(resourceLibrary);
+    resource->setOptional();
+    Resource copy(*resource);
 
-    resource->initialize(resourceLibrary);
-    QObject::connect(resource, SIGNAL(stateChanged(enum ResourceState)),
-		     this, SLOT(handleStateChanged(enum ResourceState)));
-    resource->connectToServer();
-
-    mockResourceLibrary->makeReserveFail();
-    bool reserveSucceeds = resource->reserve();
-
-    QVERIFY(reserveSucceeds);
-    QEXPECT_FAIL("", "Expecting resourceLibrary->reserve() to fail", Continue);
-    QVERIFY(isReserved);
+    QCOMPARE(copy.id(), resource->id());
+    QCOMPARE(copy.isOptional(), resource->isOptional());
+    QCOMPARE(copy.isShared(), resource->isShared());
+    QCOMPARE(copy.type(), resource->type());
 }
 
-void TestResource::handleStateChanged(enum ResourceState newState)
+void TestResource::testEqualsOperator()
 {
-    switch(newState) {
-    case OwnedState:
-	isReserved = true;
-	break;
-    default:
-	isReserved = false;
-	break;
-    }
+    Resource copy;
+    resource->setOptional();
+
+    copy = *resource;
+
+    QVERIFY(copy == *resource);
 }
 
 QTEST_MAIN(TestResource)

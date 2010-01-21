@@ -1,140 +1,80 @@
 #include "resource.h"
 
-Resource::Resource(enum ResourceClass requestedClass, quint16 requestedResources,
-		   QObject *parent)
-    : QObject(parent), resourceClass(requestedClass),
-      resourceType(requestedResources), resourceState(UnknownState)
+Resource::Resource() : name(QString()), optional(false), shared(false)
 {
+    identifier = (quint32)this;
 }
 
 Resource::~Resource()
 {
 }
 
-bool Resource::initialize(ResourceLibrary *library)
+Resource::Resource(const Resource &other)
+    : name(other.name), optional(other.optional),
+      shared(other.shared), identifier(other.identifier)
 {
-    qDebug("Resource::initialize");
-    resourceLibrary = library;
-    return resourceLibrary->initialize();
 }
 
-bool Resource::connectToServer()
+Resource & Resource::operator=(const Resource &other)
 {
-    if(resourceLibrary == NULL)
+    name = other.name;
+    optional = other.optional;
+    shared = other.shared;
+    identifier = other.identifier;
+
+    return *this;
+}
+
+QString Resource::type() const
+{
+    return name;
+}
+
+void Resource::setType(const QString type)
+{
+    name = type;
+}
+
+bool Resource::isOptional() const
+{
+    return optional;
+}
+
+void Resource::setOptional(bool resourceIsOptional)
+{
+    optional = resourceIsOptional;
+}
+
+bool Resource::isShared() const
+{
+    return shared;
+}
+
+void Resource::setShared(bool shared)
+{
+    this->shared = shared;
+}
+
+quint32 Resource::id() const
+{
+    return identifier;
+}
+
+void Resource::setId(quint32 newId)
+{
+    identifier = newId;
+}
+
+bool Resource::operator==(const Resource &other)
+{
+    if(name != other.name) {
 	return false;
-    return resourceLibrary->connectToServer();
-}
-
-quint16 Resource::resources() const
-{
-    return resourceType;
-}
-
-enum ResourceClass Resource::applicationClass() const
-{
-    return resourceClass;
-}
-
-bool Resource::hasResource(enum ResourceType resourceType) const
-{
-    if((this->resourceType & resourceType) == resourceType)
-	return true;
-    else
-	return false;
-}
-
-bool Resource::isReserved() const
-{
-    if(resourceState == OwnedState)
-	return true;
-    else
-	return false;
-}
-
-void Resource::handleStateChange(enum ResourceState newState)
-{
-    if(resourceState == UnknownState) {
-	resourceState = newState;
-	emit connectedToServer();
     }
-    else {
-	resourceState = newState;
-	emit stateChanged(resourceState);
+    if((identifier != other.identifier) or
+       (shared != other.shared) or 
+       (optional != other.optional))
+    {
+	return false;
     }
+    return true;
 }
-
-void Resource::emitReservable()
-{
-    emit reservable();
-}
-
-bool Resource::reserve()
-{
-    return false;
-}
- 
-bool Resource::release()
-{
-    return false;
-}
-
-bool Resource::requestState()
-{
-    return false;
-}
-
-bool Resource::setMute()
-{
-    return false;
-}
-
-bool Resource::unsetMute()
-{
-    return false;
-}
-
-bool Resource::requestMute()
-{
-    return false;
-}
-
-bool Resource::setPrivacyOverride()
-{
-    return false;
-}
-
-bool Resource::unsetPrivacyOverride()
-{
-    return false;
-}
-
-bool Resource::requestPrivacyOverride()
-{
-    return false;
-}
-
-bool Resource::setBluetoothOverride()
-{
-    return false;
-}
-
-bool Resource::unsetBluetoothOverride()
-{
-    return false;
-}
-
-bool Resource::requestBluetoothOverride()
-{
-    return false;
-}
-
-bool Resource::setPid(quint32 pid)
-{
-    return false;
-}
-
-bool Resource::setStreamName(const QString & name)
-{
-    return false;
-}
-

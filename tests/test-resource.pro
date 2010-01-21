@@ -6,8 +6,8 @@ DEPENDPATH += $${BASE}/include $${BASE}/src .
 INCLUDEPATH += $${BASE}/src $${BASE}/include
 
 # Input
-HEADERS +=  $${BASE}/include/resource.h test-resource.h mock-resource-library.h
-SOURCES +=  $${BASE}/src/resource.cpp test-resource.cpp mock-resource-library.cpp
+HEADERS +=  $${BASE}/include/resource.h test-resource.h
+SOURCES +=  $${BASE}/src/resource.cpp test-resource.cpp
 
 OBJECTS_DIR = build
 MOC_DIR = build
