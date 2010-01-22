@@ -1,7 +1,8 @@
 #ifndef RESOURCE_H
 #define RESOURCE_H
 
-#include <QtGlobal>
+#include <QtCore>
+
 
 namespace ResourcePolicy {
    /**
@@ -40,7 +41,7 @@ namespace ResourcePolicy {
       quint32 id() const;
       void setId(quint32 newId);
 
-      bool operator==(const Resource &other);
+      bool operator==(const Resource &other) const;
   private:
       ResourceType resourceType;
       bool optional;
@@ -48,5 +49,7 @@ namespace ResourcePolicy {
       quint32 identifier;
    };
    
+   uint qHash(const ResourcePolicy::Resource &key);
 }
+
 #endif

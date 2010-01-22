@@ -19,7 +19,6 @@ public:
    TestResource();
    ~TestResource();
 
-
 private slots:
 
    void init();
@@ -41,6 +40,14 @@ private slots:
    void testCopyConstructor();
 
    void testEqualsOperator();
+
+   void testHashFunctionWithCopies();
+   void testHashFunctionWithDifferentResources();
+   void testHashFunctionWithDifferentOptionality();
+   void testHashFunctionWithDifferentSharedness();
+   void testHashFunctionWithIdentical();
+
+   void testQSetOfResource();
 };
 
 #endif

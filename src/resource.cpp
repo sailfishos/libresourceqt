@@ -73,16 +73,20 @@ void Resource::setId(quint32 newId)
     identifier = newId;
 }
 
-bool Resource::operator==(const Resource &other)
+bool Resource::operator==(const Resource &other) const
 {
     if(resourceType != other.resourceType) {
 	return false;
     }
-    if((identifier != other.identifier) or
-       (shared != other.shared) or 
+    if((shared != other.shared) or 
        (optional != other.optional))
     {
 	return false;
     }
     return true;
+}
+
+uint ResourcePolicy::qHash(const Resource & key)
+{
+    return (((key.type()<<1) + key.isShared()) << 1) + key.isOptional();
 }
