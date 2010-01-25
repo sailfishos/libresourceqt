@@ -41,44 +41,75 @@ void TestResourceSet::testAddResource()
 
     resourceSet->addResource(resource);
 
-    QSet<Resource> resourcesInSet = resourceSet->resources();
+    QList<Resource> resourcesInSet = resourceSet->resources();
     QVERIFY(resourcesInSet.contains(resource));
 }
 
 void TestResourceSet::testAddResources()
 {
-    QSet<Resource> resources;
+    QList<Resource> resources;
 
     resources << audioPlayback << videoPlayback;
 
     resourceSet->addResources(resources);
 
-    QSet<Resource> resourcesInSet = resourceSet->resources();
-    QVERIFY(resourcesInSet == resources);
+    QList<Resource> resourcesInSet = resourceSet->resources();
+    bool resultContainsAllItems = false;
+    for(int i=0; i<resourcesInSet.size(); i++) {
+	resultContainsAllItems = resources.contains(resourcesInSet.at(i));
+	if(!resultContainsAllItems) {
+	    qDebug("resources doesn't contain Resource 0x%02x", resourcesInSet.at(i).type());
+	    break;
+	}
+    }
+    QVERIFY(resultContainsAllItems);
+    for(int i=0; i<resources.size(); i++) {
+	resultContainsAllItems = resourcesInSet.contains(resources.at(i));
+	if(!resultContainsAllItems) {
+	    break;
+	}
+    }
+    QVERIFY(resultContainsAllItems);
 }
 
 void TestResourceSet::testSetResources()
 {
-    QSet<Resource> resources, newResources;
+    QList<Resource> resources, newResources;
 
     newResources << audioPlayback << videoPlayback;
     resources << audioPlayback << videoPlayback << audioRecorder << videoRecorder;
     resourceSet->setResources(resources);
-    QSet<Resource> resourcesInSet = resourceSet->resources();
+    QList<Resource> resourcesInSet = resourceSet->resources();
 
     resourceSet->setResources(newResources);
 
-    QSet<Resource> resourcesInNewSet = resourceSet->resources();
-    QVERIFY(resourcesInNewSet == newResources);
+    QList<Resource> resourcesInNewSet = resourceSet->resources();
+    bool resultContainsAllItems = false;
+    for(int i=0; i<resourcesInNewSet.size(); i++) {
+	resultContainsAllItems = newResources.contains(resourcesInNewSet.at(i));
+	if(!resultContainsAllItems) {
+	    qDebug("newResources doesn't contain Resource 0x%02x", resourcesInNewSet.at(i).type());
+	    break;
+	}
+    }
+    QVERIFY(resultContainsAllItems);
+    for(int i=0; i<newResources.size(); i++) {
+	resultContainsAllItems = resourcesInNewSet.contains(newResources.at(i));
+	if(!resultContainsAllItems) {
+	    qDebug("newResources doesn't contain Resource 0x%02x", resourcesInNewSet.at(i).type());
+	    break;
+	}
+    }
+    QVERIFY(resultContainsAllItems);
 }
 
 void TestResourceSet::testContainsSingle()
 {
-    QSet<Resource> resources;
+    QList<Resource> resources;
 
     resources << audioPlayback << videoPlayback << audioRecorder;
     resourceSet->setResources(resources);
-    QSet<Resource> resourcesInSet = resourceSet->resources();
+    QList<Resource> resourcesInSet = resourceSet->resources();
     resourceSet->setResources(resources);
 
     bool containsVideoPlayback = resourceSet->contains(videoPlayback);
@@ -87,11 +118,11 @@ void TestResourceSet::testContainsSingle()
 
 void TestResourceSet::testDoesNotContainSingle()
 {
-    QSet<Resource> resources;
+    QList<Resource> resources;
 
     resources << audioPlayback << videoPlayback;
     resourceSet->setResources(resources);
-    QSet<Resource> resourcesInSet = resourceSet->resources();
+    QList<Resource> resourcesInSet = resourceSet->resources();
     resourceSet->setResources(resources);
 
     bool containsVideoRecorder = resourceSet->contains(videoRecorder);
@@ -102,13 +133,13 @@ void TestResourceSet::testDoesNotContainSingle()
 
 void TestResourceSet::testContainsSet()
 {
-    QSet<Resource> resources, subset;
+    QList<Resource> resources, subset;
 
     resources << audioPlayback << videoPlayback << audioRecorder << videoRecorder;
     subset << audioPlayback << videoPlayback;
 
     resourceSet->setResources(resources);
-    QSet<Resource> resourcesInSet = resourceSet->resources();
+    QList<Resource> resourcesInSet = resourceSet->resources();
     resourceSet->setResources(resources);
 
     bool containsSubset = resourceSet->contains(subset);

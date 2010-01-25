@@ -1,48 +1,71 @@
 #include "resource-set.h"
+using namespace ResourcePolicy;
 
 
-ResourcePolicy::ResourceSet::ResourceSet(const QString &applicationClass)
-    : applicationClass(applicationClass), resourceSet()
+ResourceSet::ResourceSet(const QString &applicationClass)
+    : applicationClass(applicationClass), resourceSet(ResourceGuard)
 {
     identifier = (quint32)this;
 }
 
-ResourcePolicy::ResourceSet::~ResourceSet()
+ResourceSet::~ResourceSet()
 {
 }
 
-void ResourcePolicy::ResourceSet::addResource(const ResourcePolicy::Resource &resource)
+void ResourceSet::addResource(const Resource &resource)
 {
-    resourceSet.insert(resource);
+    resourceSet.insert(resource.type(), resource);
 }
 
-void ResourcePolicy::ResourceSet::addResources(const QSet<ResourcePolicy::Resource> &resources)
+void ResourceSet::addResources(const QList<Resource> &resources)
 {
-    resourceSet.unite(resources);
+    for(int i=0; i < resources.size(); i++) {
+	addResource(resources.at(i));
+    }
 }
 
-void ResourcePolicy::ResourceSet::setResources(const QSet<ResourcePolicy::Resource> &resources)
+void ResourceSet::setResources(const QList<Resource> &resources)
 {
+    Resource invalidResource;
     resourceSet.clear();
-    resourceSet = resources;
+    resourceSet.resize(ResourceGuard);
+    for(int i=0; i < resources.size(); i++) {
+	addResource(resources.at(i));
+    }
 }
 
-bool ResourcePolicy::ResourceSet::contains(const ResourcePolicy::Resource &resource) const
+bool ResourceSet::contains(const Resource &resource) const
 {
-    return resourceSet.contains(resource);
+    if(resourceSet.at(resource.type()) == resource)
+	return true;
+    else
+	return false;
 }
 
-bool ResourcePolicy::ResourceSet::contains(const QSet<ResourcePolicy::Resource> &resources) const
+bool ResourceSet::contains(const QList<Resource> &resources) const
 {
-    return resourceSet.contains(resources);
+    bool containsAll=false;
+    for(int i=0; i<resources.size(); i++) {
+	containsAll = contains(resources.at(i));
+	if(!containsAll) {
+	    break;
+	}
+    }
+    return containsAll;
 }
 
-quint32 ResourcePolicy::ResourceSet::id() const
+quint32 ResourceSet::id() const
 {
     return identifier;
 }
 
-QSet<ResourcePolicy::Resource> ResourcePolicy::ResourceSet::resources()
+QList<Resource> ResourceSet::resources()
 {
-    return resourceSet;
+    QList<Resource> listOfResources;
+    for(int i=0; i < resourceSet.size(); i++) {
+	if(resourceSet.at(i).type() != InvalidResource) {
+	    listOfResources.append(resourceSet.at(i));
+	}
+    }
+    return listOfResources;
 }

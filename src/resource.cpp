@@ -2,9 +2,9 @@
 
 using namespace ResourcePolicy;
 
-Resource::Resource() : resourceType(InvalidResource), optional(false), shared(false)
+Resource::Resource(enum ResourceType type)
+    : resourceType(type), optional(false), shared(false)
 {
-    identifier = (quint32)this;
 }
 
 Resource::~Resource()
@@ -13,7 +13,7 @@ Resource::~Resource()
 
 Resource::Resource(const Resource &other)
     : resourceType(other.resourceType), optional(other.optional),
-      shared(other.shared), identifier(other.identifier)
+      shared(other.shared)
 {
 }
 
@@ -22,7 +22,6 @@ Resource & Resource::operator=(const Resource &other)
     resourceType = other.resourceType;
     optional = other.optional;
     shared = other.shared;
-    identifier = other.identifier;
 
     return *this;
 }
@@ -63,30 +62,10 @@ void Resource::setShared(bool shared)
     this->shared = shared;
 }
 
-quint32 Resource::id() const
-{
-    return identifier;
-}
-
-void Resource::setId(quint32 newId)
-{
-    identifier = newId;
-}
-
 bool Resource::operator==(const Resource &other) const
 {
     if(resourceType != other.resourceType) {
 	return false;
     }
-    if((shared != other.shared) or 
-       (optional != other.optional))
-    {
-	return false;
-    }
     return true;
-}
-
-uint ResourcePolicy::qHash(const Resource & key)
-{
-    return (((key.type()<<1) + key.isShared()) << 1) + key.isOptional();
 }

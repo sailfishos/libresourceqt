@@ -33,21 +33,11 @@ private slots:
    void testShared_data();
    void testShared();
 
-   void testIdentifier_data();
-   void testIdentifier();
-
    void testCopy();
    void testCopyConstructor();
 
    void testEqualsOperator();
-
-   void testHashFunctionWithCopies();
-   void testHashFunctionWithDifferentResources();
-   void testHashFunctionWithDifferentOptionality();
-   void testHashFunctionWithDifferentSharedness();
-   void testHashFunctionWithIdentical();
-
-   void testQSetOfResource();
+   void testEqualsOperatorWithDifferentTypes();
 };
 
 #endif
