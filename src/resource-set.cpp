@@ -2,8 +2,9 @@
 using namespace ResourcePolicy;
 
 
-ResourceSet::ResourceSet(const QString &applicationClass)
-    : applicationClass(applicationClass), resourceSet(ResourceGuard)
+ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
+    : QObject(parent), applicationClass(applicationClass),
+      resourceSet(ResourceGuard)
 {
     identifier = (quint32)this;
 }
@@ -68,4 +69,33 @@ QList<Resource> ResourceSet::resources()
 	}
     }
     return listOfResources;
+}
+
+bool ResourceSet::connectToManager(bool reconnectOnDisconnect)
+{
+    return false;
+}
+
+void ResourceSet::disconnectFromManager()
+{
+}
+
+bool ResourceSet::isConnectedToManager()
+{
+    return false;
+}
+
+bool ResourceSet::acquire()
+{
+    return false;
+}
+
+bool ResourceSet::release()
+{
+    return false;
+}
+
+bool ResourceSet::update()
+{
+    return false;
 }
