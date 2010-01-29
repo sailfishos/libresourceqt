@@ -10,12 +10,22 @@ class TestResourceSet: public QObject
 {
    Q_OBJECT
 private:
-   ResourceSet *resourceSet;
-   Resource audioPlayback;
-   Resource videoPlayback;
-   Resource videoRecorder;
-   Resource audioRecorder;
+    ResourceSet *resourceSet;    
 
+    AudioResource *audioResource;
+    AudioRecorderResource *audioRecorderResource;
+    Resource *videoResource;
+    Resource *videoRecorderResource;
+    Resource *vibraResource;
+    Resource *ledsResource;
+    Resource *backlightResource;
+    Resource *systemButtonResource;
+    Resource *lockButtonResource;
+    Resource *scaleButtonResource;
+    Resource *snapButtonResource;
+    Resource *lensCoverResource;
+
+    Resource * resourceFromType(ResourceType type);
 public:
    TestResourceSet();
    ~TestResourceSet();
@@ -30,7 +40,7 @@ private slots:
 
    void testAddResource();
    void testAddResources();
-   void testSetResources();
+   void testDelResource();
 
    void testContainsSingle();
    void testDoesNotContainSingle();

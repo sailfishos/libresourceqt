@@ -3,7 +3,7 @@
 
 #include <QtTest/QTest>
 #include <QMetaType>
-#include "resource.h"
+#include "resources.h"
 
 Q_DECLARE_METATYPE(ResourcePolicy::ResourceType)
 
@@ -11,33 +11,44 @@ using namespace ResourcePolicy;
 
 class TestResource: public QObject
 {
-   Q_OBJECT
+    Q_OBJECT
 private:
-   Resource *resource;
+    AudioResource *audioResource;
+    AudioRecorderResource *audioRecorderResource;
+    Resource *videoResource;
+    Resource *videoRecorderResource;
+    Resource *vibraResource;
+    Resource *ledsResource;
+    Resource *backlightResource;
+    Resource *systemButtonResource;
+    Resource *lockButtonResource;
+    Resource *scaleButtonResource;
+    Resource *snapButtonResource;
+    Resource *lensCoverResource;
 
+    Resource * resourceFromType(ResourceType type);
+    const char * stringFromType(ResourceType type);
 public:
-   TestResource();
-   ~TestResource();
+    TestResource();
+    ~TestResource();
 
 private slots:
 
-   void init();
-   void cleanup();
+    void init();
+    void cleanup();
 
-   void testType_data();
-   void testType();
-   
-   void testOptional_data();
-   void testOptional();
+    void testType();
 
-   void testShared_data();
-   void testShared();
+    void testOptional_data();
+    void testOptional();
 
-   void testCopy();
-   void testCopyConstructor();
+    void testShared_data();
+    void testShared();
 
-   void testEqualsOperator();
-   void testEqualsOperatorWithDifferentTypes();
+    void testGranted_data();
+    void testGranted();
+
+    void testClone();
 };
 
 #endif

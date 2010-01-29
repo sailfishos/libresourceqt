@@ -2,44 +2,21 @@
 
 using namespace ResourcePolicy;
 
-Resource::Resource(enum ResourceType type)
-    : resourceType(type), optional(false), shared(false)
+Resource::Resource()
+    :   optional(false), shared(false),
+        identifier(0), granted(false)
+{
+    identifier = (quint32)this;
+}
+
+Resource::Resource(const Resource &other)
+    :   optional(other.optional), shared(other.shared),
+        identifier(other.identifier), granted(other.granted)
 {
 }
 
 Resource::~Resource()
 {
-}
-
-Resource::Resource(const Resource &other)
-    : resourceType(other.resourceType), optional(other.optional),
-      shared(other.shared)
-{
-}
-
-Resource & Resource::operator=(const Resource &other)
-{
-    resourceType = other.resourceType;
-    optional = other.optional;
-    shared = other.shared;
-
-    return *this;
-}
-
-ResourceType Resource::type() const
-{
-    return resourceType;
-}
-
-bool Resource::setType(ResourceType type)
-{
-    if(type != InvalidResource) {
-	resourceType = type;
-	return true;
-    }
-    else {
-	return false;
-    }
 }
 
 bool Resource::isOptional() const
@@ -62,10 +39,19 @@ void Resource::setShared(bool shared)
     this->shared = shared;
 }
 
-bool Resource::operator==(const Resource &other) const
+bool Resource::isGranted() const
 {
-    if(resourceType != other.resourceType) {
-	return false;
-    }
-    return true;
+    return granted;
 }
+
+void Resource::setGranted()
+{
+    granted = true;
+}
+
+void Resource::unsetGranted()
+{
+    granted = false;
+}
+
+

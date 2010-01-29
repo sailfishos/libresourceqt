@@ -3,20 +3,23 @@ VERSION = 1.0.0
 TARGET = resourceqt
 DESTDIR = build
 DEPENDPATH += include src
-INCLUDEPATH += src include
+INCLUDEPATH += src include ../libresource/src
 
 # Input
-PUBLIC_HEADERS = include/resource.h
+PUBLIC_HEADERS = include/resource.h include/resource-set.h include/resources.h
 
-HEADERS += $$PUBLIC_HEADERS
+HEADERS += $$PUBLIC_HEADERS src/resource-engine.h
 
-SOURCES += src/resource.cpp
+SOURCES += src/resource.cpp \
+           src/resource-set.cpp \
+           src/resource-engine.cpp \
+           src/resources.cpp
 
 OBJECTS_DIR = build
 MOC_DIR = build
 
 CONFIG  += qt link_pkgconfig dll
-QT = core dbus
+QT = core
 PKGCONFIG += dbus-1
 
 # Install directives
@@ -26,3 +29,4 @@ target.path    = $$INSTALLBASE/lib
 headers.path   = $$INSTALLBASE/include/resource/qt4
 
 INSTALLS       = target headers
+

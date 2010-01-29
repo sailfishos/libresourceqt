@@ -3,55 +3,47 @@ using namespace ResourcePolicy;
 
 
 ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
-    : QObject(parent), applicationClass(applicationClass),
-      resourceSet(ResourceGuard)
+    : QObject(parent), applicationClass(applicationClass)
 {
     identifier = (quint32)this;
+    memset(resourceSet, 0, sizeof(QPointer<Resource>)*NumberOfTypes);
 }
 
 ResourceSet::~ResourceSet()
 {
-}
-
-void ResourceSet::addResource(const Resource &resource)
-{
-    resourceSet.insert(resource.type(), resource);
-}
-
-void ResourceSet::addResources(const QList<Resource> &resources)
-{
-    for(int i=0; i < resources.size(); i++) {
-	addResource(resources.at(i));
+    for(int i=0;i<NumberOfTypes;i++) {
+        delete resourceSet[i];
     }
 }
 
-void ResourceSet::setResources(const QList<Resource> &resources)
+void ResourceSet::addResource(const Resource *resource)
 {
-    Resource invalidResource;
-    resourceSet.clear();
-    resourceSet.resize(ResourceGuard);
+    resourceSet[resource->type()] = resource->clone();
+}
+
+void ResourceSet::addResources(const QList<Resource *>resources)
+{
     for(int i=0; i < resources.size(); i++) {
-	addResource(resources.at(i));
+        addResource(resources.at(i));
     }
 }
 
-bool ResourceSet::contains(const Resource &resource) const
+bool ResourceSet::contains(ResourceType type) const
 {
-    if(resourceSet.at(resource.type()) == resource)
-	return true;
+    if((type < NumberOfTypes) && (resourceSet[type] != NULL))
+        return true;
     else
-	return false;
+        return false;
 }
 
-bool ResourceSet::contains(const QList<Resource> &resources) const
+bool ResourceSet::contains(const QList<ResourceType> &types) const
 {
-    bool containsAll=false;
-    for(int i=0; i<resources.size(); i++) {
-	containsAll = contains(resources.at(i));
-	if(!containsAll) {
-	    break;
-	}
-    }
+    bool containsAll=true;
+    int i=0;
+    do {
+        containsAll = contains(types.at(i));
+        i++;
+    } while((i < NumberOfTypes) && containsAll);
     return containsAll;
 }
 
@@ -60,15 +52,24 @@ quint32 ResourceSet::id() const
     return identifier;
 }
 
-QList<Resource> ResourceSet::resources()
+QList<Resource *> ResourceSet::resources()
 {
-    QList<Resource> listOfResources;
-    for(int i=0; i < resourceSet.size(); i++) {
-	if(resourceSet.at(i).type() != InvalidResource) {
-	    listOfResources.append(resourceSet.at(i));
-	}
+    QList<Resource *> listOfResources;
+    for(int i=0; i < NumberOfTypes; i++) {
+        if(resourceSet[i] != NULL) {
+            Resource *clone = resourceSet[i]->clone();
+            listOfResources.append(clone);
+        }
     }
     return listOfResources;
+}
+
+Resource * ResourceSet::resource(ResourceType type) const
+{
+    if(contains(type))
+        return resourceSet[type]->clone();
+    else
+        return NULL;
 }
 
 bool ResourceSet::connectToManager(bool reconnectOnDisconnect)
@@ -99,3 +100,4 @@ bool ResourceSet::update()
 {
     return false;
 }
+
