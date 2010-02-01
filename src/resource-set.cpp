@@ -28,6 +28,14 @@ void ResourceSet::addResources(const QList<Resource *>resources)
     }
 }
 
+void ResourceSet::delResource(ResourceType type)
+{
+    if(contains(type)) {
+        delete resourceSet[type];
+        resourceSet[type] = NULL;
+    }
+}
+
 bool ResourceSet::contains(ResourceType type) const
 {
     if((type < NumberOfTypes) && (resourceSet[type] != NULL))

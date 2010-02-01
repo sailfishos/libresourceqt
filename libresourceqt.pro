@@ -8,11 +8,10 @@ INCLUDEPATH += src include ../libresource/src
 # Input
 PUBLIC_HEADERS = include/resource.h include/resource-set.h include/resources.h
 
-HEADERS += $$PUBLIC_HEADERS src/resource-engine.h
+HEADERS += $$PUBLIC_HEADERS
 
 SOURCES += src/resource.cpp \
            src/resource-set.cpp \
-           src/resource-engine.cpp \
            src/resources.cpp
 
 OBJECTS_DIR = build
