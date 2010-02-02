@@ -28,4 +28,3 @@ target.path    = $$INSTALLBASE/lib
 headers.path   = $$INSTALLBASE/include/resource/qt4
 
 INSTALLS       = target headers
-
