@@ -1,4 +1,4 @@
-BASE = ..
+BASE = ../../libresourceqt
 TEMPLATE = app
 TARGET = test-resource-engine
 DESTDIR = build
@@ -25,5 +25,5 @@ PKGCONFIG += dbus-1
 
 # Install directives
 INSTALLBASE    = /usr
-target.path    = $${INSTALLBASE}/share/libresourceqt/tests
+target.path    = $${INSTALLBASE}/lib/libresourceqt-tests/
 INSTALLS       = target
