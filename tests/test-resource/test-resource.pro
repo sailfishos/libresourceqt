@@ -1,4 +1,4 @@
-BASE = ..
+BASE = ../../libresourceqt
 TEMPLATE = app
 TARGET = test-resource
 DESTDIR = build
@@ -17,5 +17,5 @@ QT -= gui
 
 # Install directives
 INSTALLBASE    = /usr
-target.path    = $$INSTALLBASE/share/libresourceqt/tests
+target.path    = $$INSTALLBASE/lib/libresourceqt-tests/
 INSTALLS       = target
