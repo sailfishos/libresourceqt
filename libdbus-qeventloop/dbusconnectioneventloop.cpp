@@ -4,7 +4,6 @@
 #include <QTimerEvent>
 
 #include "dbusconnectioneventloop.h"
-#include <stdio.h>
 
 DBUSConnectionEventLoop::DBUSConnectionEventLoop() : QObject()
 {
@@ -17,6 +16,8 @@ DBUSConnectionEventLoop::~DBUSConnectionEventLoop()
 // Handle a socket being ready to read.
 void DBUSConnectionEventLoop::readSocket(int fd)
 {
+	MYDEBUG();
+
     Watchers::const_iterator it = watchers.find(fd);
 
     while( it != watchers.end() && it.key() == fd )
@@ -40,6 +41,8 @@ void DBUSConnectionEventLoop::readSocket(int fd)
 // Handle a socket being ready to write.
 void DBUSConnectionEventLoop::writeSocket(int fd)
 {
+	MYDEBUG();
+
     Watchers::const_iterator it = watchers.find(fd);
 
     while( it != watchers.end() && it.key() == fd )
@@ -60,6 +63,8 @@ void DBUSConnectionEventLoop::writeSocket(int fd)
 
 void DBUSConnectionEventLoop::dispatch()
 {
+	MYDEBUG();
+
     for( Connections::const_iterator it = connections.constBegin(); it != connections.constEnd(); ++it )
         while( dbus_connection_dispatch(*it) == DBUS_DISPATCH_DATA_REMAINS )
             ;
@@ -68,6 +73,9 @@ void DBUSConnectionEventLoop::dispatch()
 // Handle timer events.
 void DBUSConnectionEventLoop::timerEvent(QTimerEvent *e)
 {
+	MYDEBUG();
+	MYDEBUGC("TimerID: %d", e->timerId());
+
     DBusTimeout *timeout = timeouts.value(e->timerId());
 
     if( timeout )
@@ -76,6 +84,8 @@ void DBUSConnectionEventLoop::timerEvent(QTimerEvent *e)
 
 dbus_bool_t DBUSConnectionEventLoop::addWatch(DBusWatch *watch, void *data)
 {
+	MYDEBUG();
+
 	DBUSConnectionEventLoop *loop = reinterpret_cast<DBUSConnectionEventLoop *>(data);
 
     int fd = dbus_watch_get_unix_fd(watch);
@@ -106,6 +116,8 @@ dbus_bool_t DBUSConnectionEventLoop::addWatch(DBusWatch *watch, void *data)
 
 void DBUSConnectionEventLoop::removeWatch(DBusWatch *watch, void *data)
 {
+	MYDEBUG();
+
 	DBUSConnectionEventLoop *loop = reinterpret_cast<DBUSConnectionEventLoop *>(data);
 
     int fd = dbus_watch_get_unix_fd(watch);
@@ -135,7 +147,9 @@ void DBUSConnectionEventLoop::removeWatch(DBusWatch *watch, void *data)
 
 void DBUSConnectionEventLoop::toggleWatch(DBusWatch *watch, void *data)
 {
-	DBUSConnectionEventLoop *loop = reinterpret_cast<DBUSConnectionEventLoop *>(data);
+	MYDEBUG();
+
+	DBUSConnectionEventLoop *loop = reinterpret_cast<DBUSConnectionEventLoop*>(data);
 
     int fd = dbus_watch_get_unix_fd(watch);
     unsigned int flags = dbus_watch_get_flags(watch);
@@ -164,6 +178,8 @@ void DBUSConnectionEventLoop::toggleWatch(DBusWatch *watch, void *data)
 
 dbus_bool_t DBUSConnectionEventLoop::addTimeout(DBusTimeout *timeout, void *data)
 {
+	MYDEBUG();
+
     // Nothing to do if the timeout is disabled.
     if( !dbus_timeout_get_enabled(timeout) )
         return true;
@@ -174,7 +190,10 @@ dbus_bool_t DBUSConnectionEventLoop::addTimeout(DBusTimeout *timeout, void *data
 
     DBUSConnectionEventLoop *loop = reinterpret_cast<DBUSConnectionEventLoop *>(data);
 
-    int id = loop->startTimer(dbus_timeout_get_interval(timeout));
+    int timerInterval = dbus_timeout_get_interval(timeout);
+    int id = loop->startTimer(timerInterval);
+
+    MYDEBUGC("Adding timeout %d with interval %d!", id, timerInterval);
 
     if( !id )
         return false;
@@ -186,6 +205,8 @@ dbus_bool_t DBUSConnectionEventLoop::addTimeout(DBusTimeout *timeout, void *data
 
 void DBUSConnectionEventLoop::removeTimeout(DBusTimeout *timeout, void *data)
 {
+	MYDEBUG();
+
 	DBUSConnectionEventLoop *loop = reinterpret_cast<DBUSConnectionEventLoop *>(data);
 
 	DBUSConnectionEventLoop::Timeouts::iterator it = loop->timeouts.begin();
@@ -204,12 +225,16 @@ void DBUSConnectionEventLoop::removeTimeout(DBusTimeout *timeout, void *data)
 
 void DBUSConnectionEventLoop::toggleTimeout(DBusTimeout *timeout, void *data)
 {
+	MYDEBUG();
+
 	DBUSConnectionEventLoop::removeTimeout(timeout, data);
 	DBUSConnectionEventLoop::addTimeout(timeout, data);
 }
 
 void DBUSConnectionEventLoop::wakeupMain(void *data)
 {
+	MYDEBUG();
+
 	DBUSConnectionEventLoop *loop = reinterpret_cast<DBUSConnectionEventLoop *>(data);
 
     QTimer::singleShot(0, loop, SLOT(dispatch()));
@@ -256,4 +281,3 @@ bool DBUSConnectionEventLoop::initConnection(DBusConnection* conn)
 
     return rc;
 }
-

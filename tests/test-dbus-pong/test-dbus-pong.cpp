@@ -7,35 +7,52 @@
 
 #include "pong.h"
 
-#define SERVICE_NAME            "com.nokia.dbusqeventloop.test"
-
 QString Pong::ping(const QString &arg)
 {
+	// Just return back
+	return QString("%1").arg(arg);
+}
+
+unsigned int Pong::quit()
+{
+	// Quit application
 	QMetaObject::invokeMethod(QCoreApplication::instance(), "quit");
-	return QString("ping(\"%1\") got called").arg(arg);
+	// Magic number
+	return 12345;
+}
+
+unsigned int Pong::timeout()
+{
+	// Timeout in testing application should be set to less than 2 seconds!
+	sleep(2);
+	// Just to suppress warning
+	return 54321;
 }
 
 int main(int argc, char **argv)
 {
 	QCoreApplication app(argc, argv);
 
+	// Check system bus connection
 	if( !QDBusConnection::systemBus().isConnected() )
 	{
-		fprintf(stderr, "Cannot connect to the D-Bus system bus.\n"
-			"To start it, run:\n"
-			"\teval `dbus-launch --auto-syntax`\n");
+		qDebug("Cannot connect to the D-Bus system bus.");
 		return 1;
 	}
 
-	if( !QDBusConnection::systemBus().registerService(SERVICE_NAME) )
+	// Create listener service
+	if( !QDBusConnection::systemBus().registerService("com.nokia.dbusqeventloop.test") )
 	{
-		fprintf(stderr, "%s\n", qPrintable(QDBusConnection::systemBus().lastError().message()));
+		qDebug("%s", qPrintable(QDBusConnection::systemBus().lastError().message()));
 		exit(2);
 	}
 
 	Pong pong;
+	// Register all slots as dbus methods
 	QDBusConnection::systemBus().registerObject("/", &pong, QDBusConnection::ExportAllSlots);
 
+	// Let's go!
 	app.exec();
+
 	return 0;
 }

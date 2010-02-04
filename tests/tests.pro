@@ -6,7 +6,6 @@ CONFIG  += ordered
 TEMPLATE = subdirs
 
 SUBDIRS = test-dbus-qeventloop	\
-          test-dbus-ping		\
           test-dbus-pong		\
           test-resource			\
 #          test-resource-engine	\

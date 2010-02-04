@@ -20,6 +20,7 @@ LIBS += -L../../libdbus-qeventloop/build -ldbus-qeventloop
 
 # Input 
 SOURCES += test-dbus-qeventloop.cpp 
+HEADERS = ../../libdbus-qeventloop/dbusconnectioneventloop.h
 
 QMAKE_DISTCLEAN += -r .moc .obj
 
