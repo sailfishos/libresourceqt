@@ -41,6 +41,11 @@
 class QSocketNotifier;
 class QTimerEvent;
 
+/**
+* This class is handling dbus notifications with QT events. QEventLoop must
+*  be handled in order to handle dbus events.
+* Usage: DBUSConnectionEventLoop myLoop; myLoop.addConnection(bus);
+*/
 class DBUSConnectionEventLoop : public QObject
 {
 	Q_OBJECT
@@ -52,8 +57,15 @@ public:
     virtual ~DBUSConnectionEventLoop();
 
 public:
+    /**
+     * Add new dbus connection into handler.
+     * \return true if everything went well.
+     */
 	bool addConnection(DBusConnection* conn);
 
+    /**
+     * Helper class for dbus watcher
+     */
     class Watcher
     {
     public:
@@ -68,8 +80,19 @@ public:
     typedef QHash<int, DBusTimeout*> 	Timeouts;
     typedef QList<DBusConnection*>		Connections;
 
+    /**
+     * DBusWatcher objects
+     */
     Watchers 	watchers;
+
+    /**
+     * DBusTimeout objects
+     */
     Timeouts 	timeouts;
+
+    /**
+     * DBusConnection objects
+     */
     Connections	connections;
 
 public slots:
