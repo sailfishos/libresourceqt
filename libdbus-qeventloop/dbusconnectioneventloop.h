@@ -52,7 +52,7 @@ public:
     virtual ~DBUSConnectionEventLoop();
 
 public:
-	bool initConnection(DBusConnection* conn);
+	bool addConnection(DBusConnection* conn);
 
     class Watcher
     {

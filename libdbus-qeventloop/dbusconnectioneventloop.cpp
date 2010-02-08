@@ -241,7 +241,7 @@ void DBUSConnectionEventLoop::wakeupMain(void *data)
 }
 
 // The initialization point
-bool DBUSConnectionEventLoop::initConnection(DBusConnection* conn)
+bool DBUSConnectionEventLoop::addConnection(DBusConnection* conn)
 {
     bool rc;
 

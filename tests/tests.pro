@@ -12,6 +12,8 @@ SUBDIRS = test-dbus-qeventloop	\
           test-resource-set
 
 # Install options
-testsxml.path  = /usr/share/libresourceqt-tests/
-testsxml.files = tests.xml
-INSTALLS       = testsxml
+testsxml.path    = /usr/share/libresourceqt-tests/
+testsxml.files   = tests.xml
+testrunner.path  = /usr/lib/libresourceqt-tests/
+testrunner.files = test-dbus-qeventloop-runner.sh
+INSTALLS         = testsxml testrunner
