@@ -61,8 +61,8 @@ static void handleUnregisterMessage(resmsg_t *, resset_t *, void *data)
 void ResourceEngine::disconnected()
 {
     qDebug("disconnected");
-
     connected = false;
+    emit disconnectedFromManager();
 }
 
 static void handleGrantMessage(resmsg_t *msg, resset_t *, void *data)
@@ -124,6 +124,39 @@ bool ResourceEngine::connect()
     return true;
 }
 
+bool ResourceEngine::disconnect()
+{
+    resmsg_t resourceMessage;
+    resourceMessage.record.type = RESMSG_UNREGISTER;
+    resourceMessage.record.id = resourceSet->id();
+    resourceMessage.record.reqno = ++requestId;
+
+    messageMap.insert(requestId, RESMSG_UNREGISTER);
+
+    uint32_t allResources, optionalResources, sharedResources;
+    allResources = allResourcesToBitmask(resourceSet);
+    optionalResources = optionalResourcesToBitmask(resourceSet);
+    sharedResources = sharedResourcesToBitmask(resourceSet);
+
+    resourceMessage.record.rset.all = allResources;
+    resourceMessage.record.rset.opt = optionalResources;
+    resourceMessage.record.rset.share = sharedResources;
+    resourceMessage.record.rset.mask = 0; //find out what it is
+
+    QByteArray ba = resourceSet->applicationClass().toLatin1();
+    resourceMessage.record.klass = ba.data();
+
+    resourceMessage.record.mode = 0; //No auto release
+
+    int r = resconn_disconnect(libresourceSet, &resourceMessage,
+                               statusCallbackHandler);
+    connected = false;
+    if(r)
+        return true;
+    else
+        return false;
+}
+
 static inline quint32 allResourcesToBitmask(const ResourceSet *resourceSet)
 {
     QList<Resource *> resourceList = resourceSet->resources();
@@ -161,6 +194,7 @@ static inline quint32 resourceTypeToLibresourceType(ResourceType type)
             break;
         case SystemButtonType:
             bitmask += RESMSG_SYSTEM_BUTTON;
+            break;
         case LockButtonType:
             bitmask += RESMSG_LOCK_BUTTON;
             break;
@@ -203,14 +237,32 @@ static inline quint32 sharedResourcesToBitmask(const ResourceSet *resourceSet)
     return bitmask;
 }
 
-static void statusCallbackHandler(resset_t *rset, resmsg_t *msg)
+static void statusCallbackHandler(resset_t *libresourceSet, resmsg_t *message)
 {
+    ResourceEngine *resourceEngine = reinterpret_cast<ResourceEngine *>(libresourceSet->userdata);
     qDebug("Received a status notification");
+    resourceEngine->handleStatusMessage(message->status.reqno);
+}
+
+void ResourceEngine::handleStatusMessage(quint32 requestNo)
+{
+    resmsg_type_t messageType = messageMap.take(requestNo);
+    if(messageType == RESMSG_REGISTER) {
+        qDebug("connected!");
+        connected = true;
+        emit connectedToManager();
+    }
+    else if(messageType == RESMSG_UNREGISTER) {
+        qDebug("disconnected!");
+        connected = false;
+        emit disconnectedFromManager();
+    }
+
 }
 
 bool ResourceEngine::isConnected()
 {
-    return false;
+    return connected;
 }
 
 bool ResourceEngine::acquireResources()
@@ -237,7 +289,7 @@ static void connectionIsUp(resconn_t *connection)
 {
     ResourceEngine *resourceEngine;
 
-    resourceEngine = (ResourceEngine *)(connection->dbus.rsets->userdata);
+    resourceEngine = reinterpret_cast<ResourceEngine *>(connection->dbus.rsets->userdata);
 
     resourceEngine->handleConnectionIsUp();
 }

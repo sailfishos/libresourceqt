@@ -32,7 +32,7 @@
  * resources->addResource(audioResource);
  * resources->addResource(videoResource);
  * resources->initialize();
- * QObject::connect(resources, SIGNAL(connectedToManager), this, SLOT(connectedHandler()));
+ * QObject::connect(resources, SIGNAL(connectedToManager()), this, SLOT(connectedHandler()));
  * resources->connectToManager();
  * \endcode
  * Then the when you want to acquire the \ref ResourcePolicy::ResourceSet you simply use the

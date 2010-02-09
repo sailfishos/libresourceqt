@@ -4,29 +4,34 @@
 #include <QtTest/QTest>
 #include "resource-engine.h"
 
-using namespace ResourcePolicy;
+namespace ResourcePolicy
+{
 
 class TestResourceEngine: public QObject
 {
-   Q_OBJECT
+    Q_OBJECT
 private:
-   ResourceEngine *resourceEngine;
-   AudioResource *audioPlayback;
-   VideoResource *videoPlayback;
-   AudioRecorderResource *audioRecorder;
-   VideoRecorderResource *videoRecorder;
-   bool libresourceInitialized;
+    ResourceEngine *resourceEngine;
+    AudioResource *audioPlayback;
+    VideoResource *videoPlayback;
+    AudioRecorderResource *audioRecorder;
+    VideoRecorderResource *videoRecorder;
+    bool libresourceInitialized;
 public:
-   ResourceSet *resourceSet;
+    ResourceSet *resourceSet;
 
-   TestResourceEngine();
-   ~TestResourceEngine();
+    TestResourceEngine();
+    ~TestResourceEngine();
 public slots:
+    void connectedHandler();
 
 private slots:
-   void init();
+    void init();
 
-   void testConnect();
+    void testConnect();
+    void testDisconnect();
+    
+    void testStatusMessage();
 };
-
+}
 #endif

@@ -3,6 +3,9 @@
 
 using namespace ResourcePolicy;
 quint32 theID = 0;
+resset_t *libresourceSet = NULL;
+
+void statusCallbackHandler(resset_t *libresourceSet, resmsg_t *message);
 
 static void verify_resproto_init(resproto_role_t role,
                                  resproto_transport_t transport,
@@ -11,6 +14,8 @@ static void verify_resproto_init(resproto_role_t role,
 
 static void verify_resconn_connect(resconn_t *connection, resmsg_t *message,
                                    resproto_status_t callbackFunction);
+static void verify_resconn_disconnect(resset_t *resourceSet, resmsg_t *message,
+                                      resproto_status_t callbackFunction);
 
 TestResourceEngine::TestResourceEngine()
     : resourceEngine(NULL), resourceSet(NULL)
@@ -52,6 +57,27 @@ void TestResourceEngine::testConnect()
 {
     bool connectIsSuccessful = resourceEngine->connect();
     QVERIFY(connectIsSuccessful);
+}
+
+void TestResourceEngine::testDisconnect()
+{
+    resourceEngine->connect();
+    bool disconnectIsSuccessful = resourceEngine->disconnect();
+    QVERIFY(disconnectIsSuccessful);
+}
+
+void TestResourceEngine::testStatusMessage()
+{
+    resourceEngine->connect();
+    libresourceSet = resourceEngine->libresourceSet;
+    resourceEngine->messageMap.insert(1, RESMSG_REGISTER);
+    QObject::connect(resourceEngine, SIGNAL(connectedToManager()), this, SLOT(connectedHandler()));
+    resourceEngine->handleStatusMessage(1);
+}
+
+void TestResourceEngine::connectedHandler()
+{
+    QVERIFY(resourceEngine->isConnected());
 }
 
 QTEST_MAIN(TestResourceEngine)
@@ -130,5 +156,23 @@ char *resmsg_res_str(uint32_t res, char *buf, int len)
 int resproto_set_handler(union resconn_u *, resmsg_type_t, resproto_handler_t)
 {
     return 1;
+}
+
+int resconn_disconnect(resset_t *resSet, resmsg_t *message,
+                       resproto_status_t callbackFunction)
+{
+    verify_resconn_disconnect(resSet, message, callbackFunction);
+
+    return 1;
+}
+
+static void verify_resconn_disconnect(resset_t *resourceSet, resmsg_t *message,
+                                      resproto_status_t callbackFunction)
+{
+    QVERIFY(resourceSet == libresourceSet);
+    QVERIFY(message->record.type == RESMSG_UNREGISTER);
+    QVERIFY(message->record.id == theID);
+    QVERIFY(message->record.reqno > 1);
+    QVERIFY(callbackFunction != NULL);
 }
 

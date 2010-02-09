@@ -13,6 +13,10 @@ class ResourceEngine: public QObject
 {
     Q_OBJECT
     Q_DISABLE_COPY( ResourceEngine )
+#ifndef QT_NO_DEBUG
+    friend class TestResourceEngine;
+#endif
+
 public:
     ResourceEngine(ResourceSet *resourceSet);
     ~ResourceEngine();
@@ -34,6 +38,8 @@ public:
     void disconnected();
     void receivedGrant(resmsg_notify_t *notifyMessage);
     void receivedAdvice(resmsg_notify_t *notifyMessage);
+
+    void handleStatusMessage(quint32 requestNo);
 
 signals:
     void resourcesBecameAvailable(QList<Resource *> availableResources);
