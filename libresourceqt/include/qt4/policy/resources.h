@@ -1,7 +1,7 @@
 #ifndef RESOURCES_H
 #define RESOURCES_H
 
-#include "resource.h"
+#include <policy/resource.h>
 #include <QObject>
 #include <QString>
 

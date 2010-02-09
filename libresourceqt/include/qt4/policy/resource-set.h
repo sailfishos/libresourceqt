@@ -1,7 +1,7 @@
 #ifndef RESOURCE_SET_H
 #define RESOURCE_SET_H
 
-#include "resources.h"
+#include <policy/resources.h>
 #include <QString>
 #include <QObject>
 #include <QVector>
@@ -18,12 +18,12 @@
  * 
  * \section library_use_section Library Usage
  * 
- * To use the Resource Policy Library, you first need to create a set of
+ * To use the Resource Policy Library, you first need to create a number of
  * \ref Resource objects like this (given as an example of what a media player
  * might want/need):
  * \code
  * ResourcePolicy::AudioResource *audioResource = new ResourcePolicy::AudioResource();
- * ResourcePolicy::VideoResource *audioResource = new ResourcePolicy::AudioResource();
+ * ResourcePolicy::VideoResource *audioResource = new ResourcePolicy::VideoResource();
  * videoResource->setOptional();
  * \endcode
  * Then you need to create a \ref ResourcePolicy::ResourceSet like this:
@@ -106,7 +106,7 @@ namespace ResourcePolicy
          * This method returns a list of all resource in the set.
          * \return a QList of all resources in the set.
          */
-        QList<Resource *> resources();
+        QList<Resource *> resources() const;
         /**
          * This method returns a const pointer to a resource of a specific type.
          * \type The type of resource we are interested in.
@@ -128,6 +128,7 @@ namespace ResourcePolicy
         bool contains(const QList<ResourceType> &types) const;
 
         quint32 id() const;
+        QString applicationClass();
 
         /**
          * Connects to the Resource Policy Manager. The connected() signal is sent
@@ -168,12 +169,12 @@ namespace ResourcePolicy
          * the given resources have become available.
          * \param availableResources A list of available resources.
          */
-        void resourcesBecameAvailable(QList<Resource *> availableResources);
+        void resourcesBecameAvailable(QList<ResourceType> availableResources);
         /**
          * This signal is emited as a response to the acquire() request.
-         * \param grantedResources The list of granted optional resources.
+         * \param grantedOptionalResources The list of granted optional resources.
          */
-        void resourcesGranted(QList<Resource *> grantedOptionalResources);
+        void resourcesGranted(QList<ResourceType> grantedOptionalResources);
         /**
          * This signal is emited as a response to the acquire() request, in the
          * case where we are not granted any requests.
@@ -197,7 +198,7 @@ namespace ResourcePolicy
 
     private:
         quint32 identifier;
-        const QString applicationClass;
+        const QString resourceClass;
         Resource* resourceSet[NumberOfTypes];
     };
 }

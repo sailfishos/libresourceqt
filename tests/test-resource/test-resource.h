@@ -3,7 +3,7 @@
 
 #include <QtTest/QTest>
 #include <QMetaType>
-#include "resources.h"
+#include <policy/resources.h>
 
 Q_DECLARE_METATYPE(ResourcePolicy::ResourceType)
 

@@ -1,19 +1,21 @@
-BASE = ../../libresourceqt
+include(../../common.pri)
 TEMPLATE = app
 TARGET = test-resource-engine
 DESTDIR = build
-DEPENDPATH += $${BASE}/include $${BASE}/src .
-INCLUDEPATH += $${BASE}/src $${BASE}/include $${BASE}/../libresource/src
+DEPENDPATH += $${POLICY} $${LIBRESOURCEQT}/src .
+INCLUDEPATH += $${LIBRESOURCEQT}/src $${LIBRESOURCEINC} /usr/include/resource
 
 # Input
-HEADERS +=  $${BASE}/include/resource.h \
-            $${BASE}/include/resource-set.h \
-            $${BASE}/src/resource-engine.h \
+HEADERS +=  $${POLICY}/resource.h \
+            $${POLICY}/resources.h \
+            $${POLICY}/resource-set.h \
+            $${LIBRESOURCEQT}/src/resource-engine.h \
             test-resource-engine.h
 
-SOURCES +=  $${BASE}/src/resource.cpp \
-            $${BASE}/src/resource-set.cpp \
-            $${BASE}/src/resource-engine.cpp \
+SOURCES +=  $${LIBRESOURCEQT}/src/resource.cpp \
+            $${LIBRESOURCEQT}/src/resources.cpp \
+            $${LIBRESOURCEQT}/src/resource-set.cpp \
+            $${LIBRESOURCEQT}/src/resource-engine.cpp \
             test-resource-engine.cpp
 
 OBJECTS_DIR = build
@@ -27,3 +29,4 @@ PKGCONFIG += dbus-1
 INSTALLBASE    = /usr
 target.path    = $${INSTALLBASE}/lib/libresourceqt-tests/
 INSTALLS       = target
+

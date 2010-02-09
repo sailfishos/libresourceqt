@@ -9,16 +9,16 @@ using namespace ResourcePolicy;
 class TestResourceEngine: public QObject
 {
    Q_OBJECT
-   friend resconn_t* resproto_init(resproto_role_t, resproto_transport_t, ...);
 private:
    ResourceEngine *resourceEngine;
-   ResourceSet *resourceSet;
-   Resource audioPlayback;
-   Resource videoPlayback;
-   Resource audioRecorder;
-   Resource videoRecorder;
+   AudioResource *audioPlayback;
+   VideoResource *videoPlayback;
+   AudioRecorderResource *audioRecorder;
+   VideoRecorderResource *videoRecorder;
    bool libresourceInitialized;
 public:
+   ResourceSet *resourceSet;
+
    TestResourceEngine();
    ~TestResourceEngine();
 public slots:

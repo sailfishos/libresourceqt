@@ -1,0 +1,8 @@
+LIBDBUSQEVENTLOOP = $${PWD}/libdbus-qeventloop
+LIBRESOURCEQT = $${PWD}/libresourceqt
+
+LIBRESOURCEINC = $${LIBRESOURCEQT}/include/qt4
+POLICY = $${LIBRESOURCEINC}/policy
+
+VERSION = 1.0.0
+

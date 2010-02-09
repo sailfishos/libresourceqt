@@ -2,7 +2,7 @@
 #define TEST_RESOURCE_SET_H
 
 #include <QtTest/QTest>
-#include "resource-set.h"
+#include <policy/resource-set.h>
 
 using namespace ResourcePolicy;
 

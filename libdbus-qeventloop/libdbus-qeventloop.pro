@@ -1,13 +1,7 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2010-01-18T16:28:34
-#
-#-------------------------------------------------
 
-
+include(../common.pri)
 TARGET      = dbus-qeventloop
 TEMPLATE    = lib
-VERSION     = 0.1
 DESTDIR     = build
 MOC_DIR     = .moc
 OBJECTS_DIR = .obj

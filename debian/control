@@ -1,43 +1,44 @@
 Source: libresourceqt
 Priority: extra
 Maintainer: Martin Wolf <ext-martin.2.wolf@nokia.com>
-Build-Depends: debhelper (>= 5), libqt4-dev (>= 4.5), libdbus-1-dev
+Build-Depends: debhelper (>= 5), libqt4-dev (>= 4.5), libdbus-1-dev, libresource0-dev
 Standards-Version: 3.8.0
 Section: libs
 
-Package: libresourceqt-dev
-Section: libdevel
-Architecture: any
-Depends: libresourceqt0 (= ${binary:Version})
-Description: Development package for libresourceqt
- Includes development files for libresourceqt.
-
-Package: libresourceqt0
-Section: libs
-Architecture: any
-Depends: libdbus-qeventloop0, ${shlibs:Depends}, ${misc:Depends}
-Description: libresourceqt library
- Contains library files for the application that use libresourceqt
-
-Package: libdbus-qeventloop-dev
-Section: libdevel
-Architecture: any
-Depends: libdbus-qeventloop0 (= ${binary:Version})
-Description: Development package for libdbus-qeventloop
- Includes development files for libdbus-qeventloop.
-
-Package: libdbus-qeventloop0
+Package: libdbus-qeventloop1
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: libdbus-qeventloop library
  Contains library files for the application that use libdbus-qeventloop
 
+Package: libresourceqt1
+Section: libs
+Architecture: any
+Depends: libdbus-qeventloop1, ${shlibs:Depends}, ${misc:Depends}
+Description: libresourceqt library
+ Contains library files for the application that use libresourceqt
+
+Package: libresourceqt-dev
+Section: libdevel
+Architecture: any
+Depends: libresourceqt1 (= ${binary:Version}), libresource0-dev, libdbus-1-dev, libdbus-qeventloop-dev
+Description: Development package for libresourceqt
+ Includes development files for libresourceqt.
+
+Package: libdbus-qeventloop-dev
+Section: libdevel
+Architecture: any
+Depends: libdbus-qeventloop1 (= ${binary:Version}), libdbus-1-dev
+Description: Development package for libdbus-qeventloop
+ Includes development files for libdbus-qeventloop.
+
 Package: libresourceqt-tests
 Section: misc
-Depends: testrunner, libresourceqt0, libdbus-qeventloop0, ${shlibs:Depends}
-XB-Maemo-CI-Packages: libresourceqt0, libdbus-qeventloop0
+Depends: testrunner, libdbus-qeventloop1, libresourceqt1, ${shlibs:Depends}
+XB-Maemo-CI-Packages: libdbus-qeventloop1, libresourceqt1
 XB-Maemo-CI-Stage: fast, staging, acceptance
 Architecture: any
-Description: libresourceqt0 and libdbus-qeventloop test package
+Description: libresourceqt1 and libdbus-qeventloop test package
  This package contains tests which can be used in CI environment
+

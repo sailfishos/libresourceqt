@@ -1,4 +1,4 @@
-#include "resources.h"
+#include <policy/resources.h>
 
 using namespace ResourcePolicy;
 

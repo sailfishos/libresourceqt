@@ -8,8 +8,8 @@ TEMPLATE = subdirs
 SUBDIRS = test-dbus-qeventloop	\
           test-dbus-pong		\
           test-resource			\
-#          test-resource-engine	\
-          test-resource-set
+          test-resource-set     \
+          test-resource-engine
 
 # Install options
 testsxml.path  = /usr/share/libresourceqt-tests/

@@ -5,18 +5,16 @@
 #include <QMap>
 #include <dbus/dbus.h>
 #include <res-conn.h>
-#include "resource-set.h"
+#include <policy/resource-set.h>
 
 namespace ResourcePolicy {
-
-class ResourceEngineData;
 
 class ResourceEngine: public QObject
 {
     Q_OBJECT
     Q_DISABLE_COPY( ResourceEngine )
 public:
-    ResourceEngine(ResourceSet *resourceSet=NULL);
+    ResourceEngine(ResourceSet *resourceSet);
     ~ResourceEngine();
 
     bool initialize();
@@ -33,9 +31,13 @@ public:
 
     void handleConnectionIsUp();
 
+    void disconnected();
+    void receivedGrant(resmsg_notify_t *notifyMessage);
+    void receivedAdvice(resmsg_notify_t *notifyMessage);
+
 signals:
-    void resourcesBecameAvailable(QList<Resource> availableResources);
-    void resourcesAcquired(QList<Resource> grantedResources);
+    void resourcesBecameAvailable(QList<Resource *> availableResources);
+    void resourcesAcquired(QList<Resource *> grantedResources);
     void resourcesDenied();
     void lostResources();
     void connectedToManager();

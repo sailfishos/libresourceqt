@@ -1,9 +1,9 @@
-#include "resource-set.h"
+#include <policy/resource-set.h>
 using namespace ResourcePolicy;
 
 
 ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
-    : QObject(parent), applicationClass(applicationClass)
+    : QObject(parent), resourceClass(applicationClass)
 {
     identifier = (quint32)this;
     memset(resourceSet, 0, sizeof(QPointer<Resource>)*NumberOfTypes);
@@ -60,7 +60,7 @@ quint32 ResourceSet::id() const
     return identifier;
 }
 
-QList<Resource *> ResourceSet::resources()
+QList<Resource *> ResourceSet::resources() const
 {
     QList<Resource *> listOfResources;
     for(int i=0; i < NumberOfTypes; i++) {
@@ -109,3 +109,7 @@ bool ResourceSet::update()
     return false;
 }
 
+QString ResourceSet::applicationClass()
+{
+    return this->resourceClass;
+}

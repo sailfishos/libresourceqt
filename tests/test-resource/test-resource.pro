@@ -1,13 +1,13 @@
-BASE = ../../libresourceqt
+include(../../common.pri)
 TEMPLATE = app
 TARGET = test-resource
 DESTDIR = build
-DEPENDPATH += $${BASE}/include $${BASE}/src .
-INCLUDEPATH += $${BASE}/src $${BASE}/include
+DEPENDPATH += $${POLICY} $${LIBRESOURCEQT}/src .
+INCLUDEPATH += $${LIBRESOURCEQT}/src $${LIBRESOURCEINC}
 
 # Input
-HEADERS +=  $${BASE}/include/resource.h $${BASE}/include/resources.h test-resource.h
-SOURCES +=  $${BASE}/src/resource.cpp $${BASE}/src/resources.cpp test-resource.cpp
+HEADERS +=  $${POLICY}/resource.h $${POLICY}/resources.h test-resource.h
+SOURCES +=  $${LIBRESOURCEQT}/src/resource.cpp $${LIBRESOURCEQT}/src/resources.cpp test-resource.cpp
 
 OBJECTS_DIR = build
 MOC_DIR = build
@@ -17,5 +17,5 @@ QT -= gui
 
 # Install directives
 INSTALLBASE    = /usr
-target.path    = $$INSTALLBASE/lib/libresourceqt-tests/
+target.path    = $${INSTALLBASE}/lib/libresourceqt-tests/
 INSTALLS       = target
