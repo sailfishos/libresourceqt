@@ -3,7 +3,6 @@
 
 using namespace ResourcePolicy;
 quint32 theID = 0;
-resset_t *libresourceSet = NULL;
 
 void statusCallbackHandler(resset_t *libresourceSet, resmsg_t *message);
 
@@ -69,7 +68,6 @@ void TestResourceEngine::testDisconnect()
 void TestResourceEngine::testStatusMessage()
 {
     resourceEngine->connect();
-    libresourceSet = resourceEngine->libresourceSet;
     resourceEngine->messageMap.insert(1, RESMSG_REGISTER);
     QObject::connect(resourceEngine, SIGNAL(connectedToManager()), this, SLOT(connectedHandler()));
     resourceEngine->handleStatusMessage(1);
@@ -169,7 +167,8 @@ int resconn_disconnect(resset_t *resSet, resmsg_t *message,
 static void verify_resconn_disconnect(resset_t *resourceSet, resmsg_t *message,
                                       resproto_status_t callbackFunction)
 {
-    QVERIFY(resourceSet == libresourceSet);
+    qDebug("resourceSet = %p resSet = %p", resourceSet, resSet);
+    QVERIFY(resourceSet == resSet);
     QVERIFY(message->record.type == RESMSG_UNREGISTER);
     QVERIFY(message->record.id == theID);
     QVERIFY(message->record.reqno > 1);

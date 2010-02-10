@@ -6,7 +6,7 @@ ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
     : QObject(parent), resourceClass(applicationClass)
 {
     identifier = (quint32)this;
-    memset(resourceSet, 0, sizeof(QPointer<Resource>)*NumberOfTypes);
+    memset(resourceSet, 0, sizeof(QPointer<Resource *>)*NumberOfTypes);
 }
 
 ResourceSet::~ResourceSet()
@@ -51,7 +51,7 @@ bool ResourceSet::contains(const QList<ResourceType> &types) const
     do {
         containsAll = contains(types.at(i));
         i++;
-    } while((i < NumberOfTypes) && containsAll);
+    } while((i < types.size()) && containsAll);
     return containsAll;
 }
 
