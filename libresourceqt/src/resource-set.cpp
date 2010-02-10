@@ -3,7 +3,9 @@ using namespace ResourcePolicy;
 
 
 ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
-    : QObject(parent), resourceClass(applicationClass)
+    : QObject(parent), resourceClass(applicationClass), autoRelease(false),
+      alwaysReply(false)
+
 {
     identifier = (quint32)this;
     memset(resourceSet, 0, sizeof(QPointer<Resource *>)*NumberOfTypes);
@@ -16,8 +18,16 @@ ResourceSet::~ResourceSet()
     }
 }
 
+bool ResourceSet::finalize()
+{
+    return false;
+}
+
 void ResourceSet::addResource(const Resource *resource)
 {
+    if((resource->type() == AudioPlaybackType) || (resource->type() == AudioRecorderType)) {
+        qDebug("audioResource...");
+    }
     resourceSet[resource->type()] = resource->clone();
 }
 
@@ -80,20 +90,6 @@ Resource * ResourceSet::resource(ResourceType type) const
         return NULL;
 }
 
-bool ResourceSet::connectToManager(bool reconnectOnDisconnect)
-{
-    return false;
-}
-
-void ResourceSet::disconnectFromManager()
-{
-}
-
-bool ResourceSet::isConnectedToManager()
-{
-    return false;
-}
-
 bool ResourceSet::acquire()
 {
     return false;
@@ -113,3 +109,24 @@ QString ResourceSet::applicationClass()
 {
     return this->resourceClass;
 }
+
+void ResourceSet::setAutoRelease()
+{
+    autoRelease = true;
+}
+
+void ResourceSet::unsetAutoRelease()
+{
+    autoRelease = false;
+}
+
+void ResourceSet::setAlwaysReply()
+{
+    alwaysReply = true;
+}
+
+void ResourceSet::unsetAlwaysReply()
+{
+    alwaysReply = false;
+}
+

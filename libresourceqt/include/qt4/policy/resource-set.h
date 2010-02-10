@@ -74,10 +74,11 @@ namespace ResourcePolicy
          */
         ~ResourceSet();
         /**
-         * Initializes the underlaying communications library.
-         * \return true if initialization is successful.
+         * Finalizes the ResourceSet. This method should be called after all
+         * resources have been added to the set.
+         * \return true if the finalization was successful.
          */
-        bool initialize();
+        bool finalize();
 
         /**
          * This method adds a resource to the set. A set contains only a single
@@ -127,31 +128,21 @@ namespace ResourcePolicy
          */
         bool contains(const QList<ResourceType> &types) const;
 
+        /**
+         * Returns the unique identifier for this ResourceSet.
+         * @return the unique identifier for this ResourceSet.
+         */
         quint32 id() const;
+
+        /**
+         * Returns the registered application class (given in the constructor).
+         */
         QString applicationClass();
 
         /**
-         * Connects to the Resource Policy Manager. The connected() signal is sent
-         * when the connection has been established. Acquiring the ResourceSet can
-         * be attempted at any time after this, but not before.
-         * \return true if the connection request was successfully sent.
-         * \param reconnectOnDisconnect. Set to true to automatically reconnect on
-         * lost connection to the Policy Resource Manager. This optional parameter
-         * defaults to true.
-         */
-        bool connectToManager(bool reconnectOnDisconnect);
-        /**
-         * Disconnects from the Resource Policy Manager. Further attempts at acquiring
-         * the \ref ResourceSet will fail.
-         */
-        void disconnectFromManager();
-        /**
-         * Checks whether the ResourceSet is connected or not.
-         */
-        bool isConnectedToManager();
-        /**
-         * Attempt to acquire the ResourceSet. The response is returned as the
-         * resourcesAcquired() signal.
+         * Try to acquire the \ref ResourceSet. The resourcesGranted() or
+         * resourcesDenied() signal will be emited depending on whether the
+         * requested resources could be acquired or not.
          */
         bool acquire();
         /**
@@ -159,25 +150,52 @@ namespace ResourcePolicy
          */
         bool release();
         /**
-         * Commit changes to the \ref ResourceSet to the Manager.
+         * Commit changes to the \ref ResourceSet. Remember to call update()
+         * after adding and/or removing resources.
          */
         bool update();
 
-        signals:
+        /**
+         * Stes the auto-release. When loosing the resources doue to another
+         * application with a higher priority the default is that we automatically 
+         * re-gain our resources without having to re-request them. However if
+         * the AutoRelease is set we release the resources and need to re-acquire
+         * them, when the pre-emting application releases it s resources.
+         * This feature is by default disabled.
+         * Remember to call update() when changing this.
+         */
+        void setAutoRelease();
+        /**
+         * see \ref setAutoRelease().
+         */
+        void unsetAutoRelease();
+        /**
+         * Sets that the resourcesGranted() signal is emited even if we already 
+         * have the requested resources granted. By default this feature is off.
+         */
+        void setAlwaysReply();
+        /**
+         * Unsets the always reply flag (see \ref setAlwaysReply())
+         */
+        void unsetAlwaysReply();
+
+    signals:
         /**
          * This signal is emited when the Resource Policy Manager notifies that
          * the given resources have become available.
-         * \param availableResources A list of available resources.
+         * \param availableResources A list of available resources. The list of
+         * available resources contains only available resource which we have in the set.
          */
         void resourcesBecameAvailable(QList<ResourceType> availableResources);
         /**
          * This signal is emited as a response to the acquire() request.
          * \param grantedOptionalResources The list of granted optional resources.
+         * All the mandatory resources have also been aquired.
          */
         void resourcesGranted(QList<ResourceType> grantedOptionalResources);
         /**
          * This signal is emited as a response to the acquire() request, in the
-         * case where we are not granted any requests.
+         * case where one or more of the mandatroy resources were not availalble.
          */
         void resourcesDenied();
         /**
@@ -185,21 +203,14 @@ namespace ResourcePolicy
          * superseeds us, and as a result we loose our resources.
          */
         void lostResources();
-        /**
-         * This signal is emited when we have successfully connected to the manager.
-         */
-        void connectedToManager();
-        /**
-         * This signal is emited when we loose the connection to the manager.
-         * A reconnect is automatically attempted.
-         */
-        void disconnectedFromManager();
-
 
     private:
         quint32 identifier;
         const QString resourceClass;
         Resource* resourceSet[NumberOfTypes];
+        bool connected;
+        bool autoRelease;
+        bool alwaysReply;
     };
 }
 

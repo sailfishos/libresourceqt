@@ -29,16 +29,6 @@ void Resource::setOptional(bool resourceIsOptional)
     optional = resourceIsOptional;
 }
 
-bool Resource::isShared() const
-{
-    return shared;
-}
-
-void Resource::setShared(bool shared)
-{
-    this->shared = shared;
-}
-
 bool Resource::isGranted() const
 {
     return granted;

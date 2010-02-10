@@ -17,7 +17,7 @@ static void handleAdviceMessage(resmsg_t *msg, resset_t *rs, void *data);
 ResourceEngine::ResourceEngine(ResourceSet *resourceSet)
     : QObject(resourceSet), connected(false), resourceSet(resourceSet),
       libresourceConnection(NULL), libresourceSet(NULL), requestId(0),
-      messageMap()
+      messageMap(), mode(0)
 {
 }
 
@@ -105,17 +105,16 @@ bool ResourceEngine::connect()
     uint32_t allResources, optionalResources, sharedResources;
     allResources = allResourcesToBitmask(resourceSet);
     optionalResources = optionalResourcesToBitmask(resourceSet);
-    sharedResources = sharedResourcesToBitmask(resourceSet);
 
     resourceMessage.record.rset.all = allResources;
     resourceMessage.record.rset.opt = optionalResources;
-    resourceMessage.record.rset.share = sharedResources;
-    resourceMessage.record.rset.mask = 0; //find out what it is
+    resourceMessage.record.rset.share = 0;
+    resourceMessage.record.rset.mask = 0;
 
     QByteArray ba = resourceSet->applicationClass().toLatin1();
     resourceMessage.record.klass = ba.data();
 
-    resourceMessage.record.mode = 0; //No auto release
+    resourceMessage.record.mode = mode;
 
     libresourceSet = resconn_connect(libresourceConnection, &resourceMessage,
                                      statusCallbackHandler);
@@ -297,5 +296,10 @@ static void connectionIsUp(resconn_t *connection)
 void ResourceEngine::handleConnectionIsUp()
 {
     emit connectedToManager();
+}
+
+void ResourceEngine::setMode(quint32 newMode)
+{
+    mode = newMode;
 }
 

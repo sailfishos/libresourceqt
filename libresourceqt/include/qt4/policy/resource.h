@@ -45,21 +45,7 @@ namespace ResourcePolicy {
          * programs are allowed to share this resource.
          * \return true when this resource is shared.
          */
-        bool isShared() const;
-        /**
-         * Sets the resource to be shared/private.
-         * \param resourceIsShared This optional parameter defaults to true.
-         * When it is set to true (de default) the resource is shared with
-         * other programs. Setting it to false makes this resource exclusive.
-         */
-        void setShared(bool resourceIsShared=true);
-        /**
-         * Whether or not this resource has been granted.
-         * \return true if this resource has been granted.
-         */
         bool isGranted() const;
-        void setGranted();
-        void unsetGranted();
 
         virtual ResourceType type() const = 0;
         virtual Resource * clone() const = 0;
@@ -70,9 +56,12 @@ namespace ResourcePolicy {
 
         ResourceType resourceType;
         bool optional;
-        bool shared;
         quint32 identifier;
+    private:
+        void setGranted();
+        void unsetGranted();
         bool granted;
+
     };
 }
 

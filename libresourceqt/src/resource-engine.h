@@ -41,6 +41,8 @@ public:
 
     void handleStatusMessage(quint32 requestNo);
 
+    void setMode(quint32 newMode);
+
 signals:
     void resourcesBecameAvailable(QList<Resource *> availableResources);
     void resourcesAcquired(QList<Resource *> grantedResources);
@@ -57,6 +59,7 @@ private:
     resset_t *libresourceSet;
     quint32 requestId;
     QMap<quint32, resmsg_type_t> messageMap;
+    quint32 mode;
 };
 }
 
