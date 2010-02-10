@@ -3,15 +3,15 @@
   <suite name="libresourceqt-tests" domain="Multimedia Middleware"> 
     <set name="libresourceqt-tests" feature="Resource policy">
 
-      <case name="test-resource" type="Functional" level="Component" description="Unit tests for libresourceqt" timeout="15">
+      <case name="test-resource" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
         <step expected_result="0">/usr/lib/libresourceqt-tests/test-resource</step>
       </case>
 
-      <case name="test-resource-set" type="Functional" level="Component" description="Unit tests for libresourceqt" timeout="15">
+      <case name="test-resource-set" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
         <step expected_result="0">/usr/lib/libresourceqt-tests/test-resource-set</step>
       </case>
 
-      <case name="test-resource-engine" type="Functional" level="Component" description="Unit tests for libresourceqt" timeout="15">
+      <case name="test-resource-engine" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
         <step expected_result="0">/usr/lib/libresourceqt-tests/test-resource-engine</step>
       </case>
       
@@ -26,7 +26,7 @@
   <suite name="libdbus-qeventloop-tests" domain="Multimedia Middleware"> 
     <set name="libdbus-qeventloop-tests" feature="Resource policy">
 
-      <case name="unit-tests" type="Functional" level="Component" description="Unit tests for libdbus-qeventloop" timeout="15">
+      <case name="unit-tests" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libdbus-qeventloop" timeout="15">
         <step expected_result="0">/usr/lib/libresourceqt-tests/test-dbus-qeventloop</step>
       </case>
 
