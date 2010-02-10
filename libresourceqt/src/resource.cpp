@@ -3,14 +3,14 @@
 using namespace ResourcePolicy;
 
 Resource::Resource()
-    :   optional(false), shared(false),
+    :   optional(false),
         identifier(0), granted(false)
 {
     identifier = (quint32)this;
 }
 
 Resource::Resource(const Resource &other)
-    :   optional(other.optional), shared(other.shared),
+    :   optional(other.optional),
         identifier(other.identifier), granted(other.granted)
 {
 }

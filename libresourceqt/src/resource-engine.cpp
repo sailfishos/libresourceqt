@@ -5,7 +5,6 @@ using namespace ResourcePolicy;
 
 static inline quint32 allResourcesToBitmask(const ResourceSet *resourceSet);
 static inline quint32 optionalResourcesToBitmask(const ResourceSet *resourceSet);
-static inline quint32 sharedResourcesToBitmask(const ResourceSet *resourceSet);
 static inline quint32 resourceTypeToLibresourceType(ResourceType type);
 
 static void connectionIsUp(resconn_t *connection);
@@ -102,7 +101,7 @@ bool ResourceEngine::connect()
 
     messageMap.insert(requestId, RESMSG_REGISTER);
 
-    uint32_t allResources, optionalResources, sharedResources;
+    uint32_t allResources, optionalResources;
     allResources = allResourcesToBitmask(resourceSet);
     optionalResources = optionalResourcesToBitmask(resourceSet);
 
@@ -132,15 +131,14 @@ bool ResourceEngine::disconnect()
 
     messageMap.insert(requestId, RESMSG_UNREGISTER);
 
-    uint32_t allResources, optionalResources, sharedResources;
+    uint32_t allResources, optionalResources;
     allResources = allResourcesToBitmask(resourceSet);
     optionalResources = optionalResourcesToBitmask(resourceSet);
-    sharedResources = sharedResourcesToBitmask(resourceSet);
 
     resourceMessage.record.rset.all = allResources;
     resourceMessage.record.rset.opt = optionalResources;
-    resourceMessage.record.rset.share = sharedResources;
-    resourceMessage.record.rset.mask = 0; //find out what it is
+    resourceMessage.record.rset.share = 0;
+    resourceMessage.record.rset.mask = mode;
 
     QByteArray ba = resourceSet->applicationClass().toLatin1();
     resourceMessage.record.klass = ba.data();
@@ -218,18 +216,6 @@ static inline quint32 optionalResourcesToBitmask(const ResourceSet *resourceSet)
     quint32 bitmask=0;
     for(int i=0; i < resourceList.size(); i++) {
         if(resourceList[i]->isOptional()) {
-            bitmask += resourceTypeToLibresourceType(resourceList[i]->type());
-        }
-    }
-    return bitmask;
-}
-
-static inline quint32 sharedResourcesToBitmask(const ResourceSet *resourceSet)
-{
-    QList<Resource *> resourceList = resourceSet->resources();
-    quint32 bitmask=0;
-    for(int i=0; i < resourceList.size(); i++) {
-        if(resourceList[i]->isShared()) {
             bitmask += resourceTypeToLibresourceType(resourceList[i]->type());
         }
     }

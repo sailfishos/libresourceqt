@@ -42,12 +42,6 @@ private slots:
     void testOptional_data();
     void testOptional();
 
-    void testShared_data();
-    void testShared();
-
-    void testGranted_data();
-    void testGranted();
-
     void testClone();
 };
 
