@@ -15,6 +15,8 @@ static void verify_resconn_connect(resconn_t *connection, resmsg_t *message,
                                    resproto_status_t callbackFunction);
 static void verify_resconn_disconnect(resset_t *resourceSet, resmsg_t *message,
                                       resproto_status_t callbackFunction);
+static void verify_resproto_send_message(resset_t *resourceSet, resmsg_t *message,
+                                 resproto_status_t  callbackFunction);
 
 TestResourceEngine::TestResourceEngine()
     : resourceEngine(NULL), resourceSet(NULL)
@@ -55,22 +57,27 @@ void TestResourceEngine::init()
 void TestResourceEngine::testConnect()
 {
     bool connectIsSuccessful = resourceEngine->connect();
+
     QVERIFY(connectIsSuccessful);
 }
 
 void TestResourceEngine::testDisconnect()
 {
     resourceEngine->connect();
+
     bool disconnectIsSuccessful = resourceEngine->disconnect();
+
     QVERIFY(disconnectIsSuccessful);
 }
 
 void TestResourceEngine::testStatusMessage()
 {
     resourceEngine->connect();
+
     resourceEngine->messageMap.insert(1, RESMSG_REGISTER);
     QObject::connect(resourceEngine, SIGNAL(connectedToManager()), this, SLOT(connectedHandler()));
     resourceEngine->handleStatusMessage(1);
+    //verification happens in mock- and callback functions
 }
 
 void TestResourceEngine::connectedHandler()
@@ -78,11 +85,77 @@ void TestResourceEngine::connectedHandler()
     QVERIFY(resourceEngine->isConnected());
 }
 
+void TestResourceEngine::testAcquire_data()
+{
+    QTest::addColumn<bool>("aquireSucceeds");
+    QTest::addColumn<ResourceType>("optionalTypeAvailable");
+    QTest::addColumn<bool>("requestFails");
+    QTest::addColumn<QString>("errorMessage");
+
+    QTest::newRow("acquire succeeds, optional VideoPlaybackType") << true << VideoPlaybackType << false << "";
+    QTest::newRow("acquire succeeds, optional AudioRecorderType") << true << AudioRecorderType << false << "";
+    QTest::newRow("acquire succeeds, optional VideoPlaybackType") << true << VideoPlaybackType << false << "";
+    QTest::newRow("acquire succeeds, no optional types") << true << NumberOfTypes << false << "";
+    QTest::newRow("acquire fails") << false << NumberOfTypes << false << "";
+    QTest::newRow("acquire error, optional VideoPlaybackType") << true << VideoPlaybackType << true << "This is a simulated error";
+}
+
+bool acquireShouldSucceed;
+ResourceType optionalType;
+bool requestShouldFail;
+const char *requestErrorMessage;
+
+void TestResourceEngine::testAcquire()
+{
+    QFETCH(bool, acquireSucceeds);
+    acquireShouldSucceed = acquireSucceeds;
+    QFETCH(ResourceType, optionalTypeAvailable);
+    optionalType = optionalTypeAvailable;
+    resourceEngine->connect();
+    QFETCH(bool, requestFails);
+    requestShouldFail = requestFails;
+    QFETCH(QString, errorMessage);
+
+    QByteArray ba = errorMessage.toLatin1();
+    requestErrorMessage = ba.data();
+
+    QObject::connect(resourceEngine, SIGNAL(resourcesAcquired(QList<ResourceType>)),
+                     this, SLOT(handleAcquire(QList<ResourceType>)));
+    QObject::connect(resourceEngine, SIGNAL(resourcesDenies()),
+                     this, SLOT(handleDeny(QList<ResourceType>)));
+    bool acquireRequestSucceeded = resourceEngine->acquireResources();
+
+    QVERIFY(acquireRequestSucceeded);
+}
+
+void TestResourceEngine::handleAcquire(QList<ResourceType> optionalResources)
+{
+    QVERIFY(acquireShouldSucceed);
+    bool hasOptionalResource = false;
+    for(int i=0; i < optionalResources.size(); i++) {
+        if(optionalResources.at(i) == optionalType) {
+            hasOptionalResource = true;
+            break;
+        }
+    }
+    if((optionalType == NumberOfTypes) && (optionalResources.size() == 0)) {
+        hasOptionalResource = true;
+    }
+    QVERIFY(hasOptionalResource);
+}
+
+void TestResourceEngine::handleDeny()
+{
+    QVERIFY(!acquireShouldSucceed);
+}
+
 QTEST_MAIN(TestResourceEngine)
 
 ////////////////////////////////////////////////////////////////
-resconn_t *resourceConnection;
-resset_t  *resSet;
+resconn_t *resourceConnection = NULL;
+resset_t  *resSet = NULL;
+resproto_handler_t grantCallback = NULL;
+resproto_status_t statusCallback = NULL;
 
 resconn_t* resproto_init(resproto_role_t role, resproto_transport_t transport, ...)
 {
@@ -151,8 +224,12 @@ char *resmsg_res_str(uint32_t res, char *buf, int len)
     return buf;
 }
 
-int resproto_set_handler(union resconn_u *, resmsg_type_t, resproto_handler_t)
+int resproto_set_handler(union resconn_u *, resmsg_type_t type,
+                         resproto_handler_t callbackFunction)
 {
+    if(type == RESMSG_GRANT) {
+        grantCallback = callbackFunction;
+    }
     return 1;
 }
 
@@ -173,5 +250,35 @@ static void verify_resconn_disconnect(resset_t *resourceSet, resmsg_t *message,
     QVERIFY(message->record.id == theID);
     QVERIFY(message->record.reqno > 1);
     QVERIFY(callbackFunction != NULL);
+}
+
+int resproto_send_message(resset_t *resourceSet, resmsg_t *message,
+                          resproto_status_t  callbackFunction)
+{
+    resmsg_t replyMessage, statusMessage;
+
+    replyMessage.type = RESMSG_GRANT;
+    replyMessage.notify.resrc = RESMSG_VIDEO_PLAYBACK | RESMSG_VIDEO_RECORDING;
+
+    verify_resproto_send_message(resourceSet, message, callbackFunction);
+
+    statusMessage.type = RESMSG_STATUS;
+    statusMessage.status.errcod = requestShouldFail;
+    statusMessage.status.errmsg = requestErrorMessage;
+    callbackFunction(resSet, &statusMessage);
+
+    grantCallback(&replyMessage, resSet, resSet->userdata);
+
+    return 1;
+}
+
+static void verify_resproto_send_message(resset_t *resourceSet, resmsg_t *message,
+                                 resproto_status_t  callbackFunction)
+{
+    if(message->record.type == RESMSG_ACQUIRE) {
+        QVERIFY(resourceSet == resSet);
+        QVERIFY(message->record.id == theID);
+        QVERIFY(callbackFunction != NULL);
+    }
 }
 

@@ -20,6 +20,8 @@ namespace ResourcePolicy {
         NumberOfTypes
     };
 
+    class ResourceSet;
+
     /**
     * This class is the super class for all resources. It represents a generic
     * \ref Resource. The type specific resource classes should be used.
@@ -27,6 +29,7 @@ namespace ResourcePolicy {
     class Resource
     {
     public:
+        friend class ResourceSet;
         /**
          * Whether or not this resource is optional, in that it doesn't need to
          * be available for the set to be acquired.

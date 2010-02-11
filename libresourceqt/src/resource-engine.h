@@ -44,8 +44,8 @@ public:
     void setMode(quint32 newMode);
 
 signals:
-    void resourcesBecameAvailable(QList<Resource *> availableResources);
-    void resourcesAcquired(QList<Resource *> grantedResources);
+    void resourcesBecameAvailable(QList<ResourceType> availableResources);
+    void resourcesAcquired(QList<ResourceType> grantedResources);
     void resourcesDenied();
     void lostResources();
     void connectedToManager();
