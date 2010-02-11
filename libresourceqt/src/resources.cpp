@@ -3,12 +3,12 @@
 using namespace ResourcePolicy;
 
 AudioResource::AudioResource(const QString &audioGroup)
-    :   Resource(), group(audioGroup), pid(0), stream(QString())
+        :   Resource(), group(audioGroup), pid(0), stream(QString())
 {
 }
 
 AudioResource::AudioResource(const AudioResource &other)
-    :   Resource(other), group(other.group), pid(other.pid), stream(other.stream)
+        :   Resource(other), group(other.group), pid(other.pid), stream(other.stream)
 {
 }
 
@@ -57,12 +57,12 @@ ResourceType AudioResource::type() const
 }
 
 AudioRecorderResource::AudioRecorderResource(const QString & audioGroup)
-    :   Resource(), group(audioGroup), pid(0), stream(QString())
+        :   Resource(), group(audioGroup), pid(0), stream(QString())
 {
 }
 
 AudioRecorderResource::AudioRecorderResource(const AudioRecorderResource &other)
-    :   Resource(other), group(other.group), pid(other.pid), stream(other.stream)
+        :   Resource(other), group(other.group), pid(other.pid), stream(other.stream)
 {
 }
 
@@ -106,12 +106,12 @@ ResourceType AudioRecorderResource::type() const
 }
 
 VideoResource::VideoResource()
-    :   Resource()
+        :   Resource()
 {
 }
 
 VideoResource::VideoResource(const VideoResource &other)
-    :    Resource(other)
+        :    Resource(other)
 {
 }
 
@@ -130,12 +130,12 @@ ResourceType VideoResource::type() const
 }
 
 VideoRecorderResource::VideoRecorderResource()
-    :   Resource()
+        :   Resource()
 {
 }
 
 VideoRecorderResource::VideoRecorderResource(const VideoRecorderResource &other)
-    :    Resource(other)
+        :    Resource(other)
 {
 }
 
@@ -154,12 +154,12 @@ ResourceType VideoRecorderResource::type() const
 }
 
 VibraResource::VibraResource()
-    :   Resource()
+        :   Resource()
 {
 }
 
 VibraResource::VibraResource(const VibraResource &other)
-    :    Resource(other)
+        :    Resource(other)
 {
 }
 
@@ -178,12 +178,12 @@ ResourceType VibraResource::type() const
 }
 
 LedsResource::LedsResource()
-    :   Resource()
+        :   Resource()
 {
 }
 
 LedsResource::LedsResource(const LedsResource &other)
-    :    Resource(other)
+        :    Resource(other)
 {
 }
 
@@ -202,12 +202,12 @@ ResourceType LedsResource::type() const
 }
 
 BacklightResource::BacklightResource()
-    :   Resource()
+        :   Resource()
 {
 }
 
 BacklightResource::BacklightResource(const BacklightResource &other)
-    :    Resource(other)
+        :    Resource(other)
 {
 }
 
@@ -226,12 +226,12 @@ ResourceType BacklightResource::type() const
 }
 
 SystemButtonResource::SystemButtonResource()
-    :   Resource()
+        :   Resource()
 {
 }
 
 SystemButtonResource::SystemButtonResource(const SystemButtonResource &other)
-    :    Resource(other)
+        :    Resource(other)
 {
 }
 
@@ -250,12 +250,12 @@ ResourceType SystemButtonResource::type() const
 }
 
 LockButtonResource::LockButtonResource()
-    :   Resource()
+        :   Resource()
 {
 }
 
 LockButtonResource::LockButtonResource(const LockButtonResource &other)
-    :    Resource(other)
+        :    Resource(other)
 {
 }
 
@@ -274,12 +274,12 @@ ResourceType LockButtonResource::type() const
 }
 
 ScaleButtonResource::ScaleButtonResource()
-    :   Resource()
+        :   Resource()
 {
 }
 
 ScaleButtonResource::ScaleButtonResource(const ScaleButtonResource &other)
-    :    Resource(other)
+        :    Resource(other)
 {
 }
 
@@ -298,12 +298,12 @@ ResourceType ScaleButtonResource::type() const
 }
 
 SnapButtonResource::SnapButtonResource()
-    :   Resource()
+        :   Resource()
 {
 }
 
 SnapButtonResource::SnapButtonResource(const SnapButtonResource &other)
-    :    Resource(other)
+        :    Resource(other)
 {
 }
 
@@ -322,12 +322,12 @@ ResourceType SnapButtonResource::type() const
 }
 
 LensCoverResource::LensCoverResource()
-    :   Resource()
+        :   Resource()
 {
 }
 
 LensCoverResource::LensCoverResource(const LensCoverResource &other)
-    :    Resource(other)
+        :    Resource(other)
 {
 }
 

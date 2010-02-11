@@ -16,10 +16,10 @@ static void verify_resconn_connect(resconn_t *connection, resmsg_t *message,
 static void verify_resconn_disconnect(resset_t *resourceSet, resmsg_t *message,
                                       resproto_status_t callbackFunction);
 static void verify_resproto_send_message(resset_t *resourceSet, resmsg_t *message,
-                                 resproto_status_t  callbackFunction);
+        resproto_status_t  callbackFunction);
 
 TestResourceEngine::TestResourceEngine()
-    : resourceEngine(NULL), resourceSet(NULL)
+        : resourceEngine(NULL), resourceSet(NULL)
 {
     audioPlayback = new AudioResource;
     videoPlayback = new VideoResource;
@@ -132,13 +132,13 @@ void TestResourceEngine::handleAcquire(QList<ResourceType> optionalResources)
 {
     QVERIFY(acquireShouldSucceed);
     bool hasOptionalResource = false;
-    for(int i=0; i < optionalResources.size(); i++) {
-        if(optionalResources.at(i) == optionalType) {
+    for (int i = 0; i < optionalResources.size(); i++) {
+        if (optionalResources.at(i) == optionalType) {
             hasOptionalResource = true;
             break;
         }
     }
-    if((optionalType == NumberOfTypes) && (optionalResources.size() == 0)) {
+    if ((optionalType == NumberOfTypes) && (optionalResources.size() == 0)) {
         hasOptionalResource = true;
     }
     QVERIFY(hasOptionalResource);
@@ -170,7 +170,7 @@ resconn_t* resproto_init(resproto_role_t role, resproto_transport_t transport, .
 
     verify_resproto_init(role, transport, callbackFunction, dbusConnection);
 
-    resourceConnection =(resconn_t *) calloc(1, sizeof(resconn_t));
+    resourceConnection = (resconn_t *) calloc(1, sizeof(resconn_t));
 
     return resourceConnection;
 }
@@ -206,10 +206,10 @@ static void verify_resconn_connect(resconn_t *connection, resmsg_t *message,
     QVERIFY(message->record.type == RESMSG_REGISTER);
     QVERIFY(message->record.id == theID);
     QVERIFY(message->record.reqno == 1);
-    QVERIFY(message->record.rset.all == (RESMSG_AUDIO_PLAYBACK|RESMSG_AUDIO_RECORDING
-                                        |RESMSG_VIDEO_PLAYBACK|RESMSG_VIDEO_RECORDING));
-    QVERIFY(message->record.rset.opt == (RESMSG_AUDIO_RECORDING|RESMSG_VIDEO_PLAYBACK
-                                        |RESMSG_VIDEO_RECORDING));
+    QVERIFY(message->record.rset.all == (RESMSG_AUDIO_PLAYBACK | RESMSG_AUDIO_RECORDING
+                                         | RESMSG_VIDEO_PLAYBACK | RESMSG_VIDEO_RECORDING));
+    QVERIFY(message->record.rset.opt == (RESMSG_AUDIO_RECORDING | RESMSG_VIDEO_PLAYBACK
+                                         | RESMSG_VIDEO_RECORDING));
     QVERIFY(message->record.rset.share == 0);
     QVERIFY(message->record.rset.mask == 0);
     QCOMPARE(message->record.klass, "player");
@@ -227,7 +227,7 @@ char *resmsg_res_str(uint32_t res, char *buf, int len)
 int resproto_set_handler(union resconn_u *, resmsg_type_t type,
                          resproto_handler_t callbackFunction)
 {
-    if(type == RESMSG_GRANT) {
+    if (type == RESMSG_GRANT) {
         grantCallback = callbackFunction;
     }
     return 1;
@@ -273,9 +273,9 @@ int resproto_send_message(resset_t *resourceSet, resmsg_t *message,
 }
 
 static void verify_resproto_send_message(resset_t *resourceSet, resmsg_t *message,
-                                 resproto_status_t  callbackFunction)
+        resproto_status_t  callbackFunction)
 {
-    if(message->record.type == RESMSG_ACQUIRE) {
+    if (message->record.type == RESMSG_ACQUIRE) {
         QVERIFY(resourceSet == resSet);
         QVERIFY(message->record.id == theID);
         QVERIFY(callbackFunction != NULL);

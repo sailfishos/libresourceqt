@@ -3,8 +3,8 @@ using namespace ResourcePolicy;
 
 
 ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
-    : QObject(parent), resourceClass(applicationClass), autoRelease(false),
-      alwaysReply(false)
+        : QObject(parent), resourceClass(applicationClass), autoRelease(false),
+        alwaysReply(false)
 
 {
     identifier = (quint32)this;
@@ -13,7 +13,7 @@ ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
 
 ResourceSet::~ResourceSet()
 {
-    for(int i=0;i<NumberOfTypes;i++) {
+    for (int i = 0;i < NumberOfTypes;i++) {
         delete resourceSet[i];
     }
 }
@@ -25,7 +25,7 @@ bool ResourceSet::finalize()
 
 void ResourceSet::addResource(const Resource *resource)
 {
-    if((resource->type() == AudioPlaybackType) || (resource->type() == AudioRecorderType)) {
+    if ((resource->type() == AudioPlaybackType) || (resource->type() == AudioRecorderType)) {
         qDebug("audioResource...");
     }
     resourceSet[resource->type()] = resource->clone();
@@ -33,14 +33,14 @@ void ResourceSet::addResource(const Resource *resource)
 
 void ResourceSet::addResources(const QList<Resource *>resources)
 {
-    for(int i=0; i < resources.size(); i++) {
+    for (int i = 0; i < resources.size(); i++) {
         addResource(resources.at(i));
     }
 }
 
 void ResourceSet::delResource(ResourceType type)
 {
-    if(contains(type)) {
+    if (contains(type)) {
         delete resourceSet[type];
         resourceSet[type] = NULL;
     }
@@ -48,7 +48,7 @@ void ResourceSet::delResource(ResourceType type)
 
 bool ResourceSet::contains(ResourceType type) const
 {
-    if((type < NumberOfTypes) && (resourceSet[type] != NULL))
+    if ((type < NumberOfTypes) && (resourceSet[type] != NULL))
         return true;
     else
         return false;
@@ -56,12 +56,13 @@ bool ResourceSet::contains(ResourceType type) const
 
 bool ResourceSet::contains(const QList<ResourceType> &types) const
 {
-    bool containsAll=true;
-    int i=0;
+    bool containsAll = true;
+    int i = 0;
     do {
         containsAll = contains(types.at(i));
         i++;
-    } while((i < types.size()) && containsAll);
+    }
+    while ((i < types.size()) && containsAll);
     return containsAll;
 }
 
@@ -73,8 +74,8 @@ quint32 ResourceSet::id() const
 QList<Resource *> ResourceSet::resources() const
 {
     QList<Resource *> listOfResources;
-    for(int i=0; i < NumberOfTypes; i++) {
-        if(resourceSet[i] != NULL) {
+    for (int i = 0; i < NumberOfTypes; i++) {
+        if (resourceSet[i] != NULL) {
             Resource *clone = resourceSet[i]->clone();
             listOfResources.append(clone);
         }
@@ -84,7 +85,7 @@ QList<Resource *> ResourceSet::resources() const
 
 Resource * ResourceSet::resource(ResourceType type) const
 {
-    if(contains(type))
+    if (contains(type))
         return resourceSet[type]->clone();
     else
         return NULL;

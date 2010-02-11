@@ -2,7 +2,7 @@
 
 Resource * TestResourceSet::resourceFromType(ResourceType type)
 {
-    switch(type) {
+    switch (type) {
     case AudioPlaybackType:
         return audioResource;
     case AudioRecorderType:
@@ -88,7 +88,7 @@ void TestResourceSet::testIdentifier()
 
 void TestResourceSet::testAddResource()
 {
-    for(int i=0;i<NumberOfTypes;i++) {
+    for (int i = 0;i < NumberOfTypes;i++) {
         ResourceType type = (ResourceType)i;
         Resource *resource = resourceFromType(type);
         resourceSet->addResource(resource);
@@ -155,11 +155,11 @@ void TestResourceSet::testContainsSet()
     QList<Resource *> resources;
 
     types << AudioPlaybackType << VideoPlaybackType
-              << AudioRecorderType << VideoRecorderType << LensCoverType;
+    << AudioRecorderType << VideoRecorderType << LensCoverType;
     subset << AudioPlaybackType << VideoPlaybackType << LensCoverType;
 
     resources << audioResource << videoResource
-              << audioRecorderResource << videoRecorderResource << lensCoverResource;
+    << audioRecorderResource << videoRecorderResource << lensCoverResource;
 
     resourceSet->addResources(resources);
 

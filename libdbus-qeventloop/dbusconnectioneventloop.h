@@ -11,31 +11,29 @@
 //#define _DISPLAY_DEBUG_
 
 #ifdef _DISPLAY_DEBUG_
-	#include <stdlib.h>
+#include <stdlib.h>
 
-	#define MYDEBUG()		MyDebug deb(__FUNCTION__)
-	#define MYDEBUGC(...)	qDebug(__VA_ARGS__)
+#define MYDEBUG()		MyDebug deb(__FUNCTION__)
+#define MYDEBUGC(...)	qDebug(__VA_ARGS__)
 
-	class MyDebug
-	{
-	public:
-		MyDebug(const char* func)
-		{
-			funcName = strdup(func);
-			qDebug("--> Entering: %s() ...", funcName);
-		}
-		~MyDebug()
-		{
-			qDebug("<-- Leaving: %s() ...", funcName);
-			free(funcName);
-		}
+class MyDebug
+{
+public:
+    MyDebug(const char* func) {
+        funcName = strdup(func);
+        qDebug("--> Entering: %s() ...", funcName);
+    }
+    ~MyDebug() {
+        qDebug("<-- Leaving: %s() ...", funcName);
+        free(funcName);
+    }
 
-	private:
-		char* funcName;
-	};
+private:
+    char* funcName;
+};
 #else
-	#define MYDEBUG()
-	#define MYDEBUGC(...)
+#define MYDEBUG()
+#define MYDEBUGC(...)
 #endif
 
 class QSocketNotifier;
@@ -48,9 +46,9 @@ class QTimerEvent;
 */
 class DBUSConnectionEventLoop : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	Q_DISABLE_COPY(DBUSConnectionEventLoop)
+    Q_DISABLE_COPY(DBUSConnectionEventLoop)
 
 public:
     DBUSConnectionEventLoop();
@@ -61,7 +59,7 @@ public:
      * Add new dbus connection into handler.
      * \return true if everything went well.
      */
-	bool addConnection(DBusConnection* conn);
+    bool addConnection(DBusConnection* conn);
 
     /**
      * Helper class for dbus watcher

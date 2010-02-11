@@ -9,38 +9,38 @@ Q_DECLARE_METATYPE(ResourcePolicy::ResourceType)
 
 namespace ResourcePolicy
 {
-    class TestResourceEngine: public QObject
-    {
-        Q_OBJECT
-    private:
-        ResourceEngine *resourceEngine;
-        AudioResource *audioPlayback;
-        VideoResource *videoPlayback;
-        AudioRecorderResource *audioRecorder;
-        VideoRecorderResource *videoRecorder;
-        bool libresourceInitialized;
+class TestResourceEngine: public QObject
+{
+    Q_OBJECT
+private:
+    ResourceEngine *resourceEngine;
+    AudioResource *audioPlayback;
+    VideoResource *videoPlayback;
+    AudioRecorderResource *audioRecorder;
+    VideoRecorderResource *videoRecorder;
+    bool libresourceInitialized;
 
-    public:
-        ResourceSet *resourceSet;
+public:
+    ResourceSet *resourceSet;
 
-        TestResourceEngine();
-        ~TestResourceEngine();
-    public slots:
-        void connectedHandler();
-        void handleDeny();
-        void handleAcquire(QList<ResourceType> optionalResources);
+    TestResourceEngine();
+    ~TestResourceEngine();
+public slots:
+    void connectedHandler();
+    void handleDeny();
+    void handleAcquire(QList<ResourceType> optionalResources);
 
-    private slots:
-        void init();
+private slots:
+    void init();
 
-        void testConnect();
-        void testDisconnect();
+    void testConnect();
+    void testDisconnect();
 
-        void testStatusMessage();
+    void testStatusMessage();
 
-        void testAcquire_data();
-        void testAcquire();
-    };
+    void testAcquire_data();
+    void testAcquire();
+};
 }
 #endif
 

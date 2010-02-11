@@ -5,7 +5,7 @@ using namespace ResourcePolicy;
 
 Resource * TestResource::resourceFromType(ResourceType type)
 {
-    switch(type) {
+    switch (type) {
     case AudioPlaybackType:
         return audioResource;
     case AudioRecorderType:
@@ -37,7 +37,7 @@ Resource * TestResource::resourceFromType(ResourceType type)
 
 const char * TestResource::stringFromType(ResourceType type)
 {
-    switch(type) {
+    switch (type) {
     case AudioPlaybackType:
         return "AudioPlaybackType";
     case AudioRecorderType:
@@ -110,10 +110,10 @@ void TestResource::cleanup()
 
 void TestResource::testType()
 {
-    for(quint32 type=AudioPlaybackType; type < NumberOfTypes; type++) {
+    for (quint32 type = AudioPlaybackType; type < NumberOfTypes; type++) {
         ResourceType expected = (ResourceType)type;
         Resource *resource = resourceFromType(expected);
-        if(resource->type() != expected) {
+        if (resource->type() != expected) {
             qDebug("expected ResourceType = %s, got %s",
                    stringFromType(expected), stringFromType(resource->type()));
         }
@@ -126,7 +126,7 @@ void TestResource::testOptional_data()
     QTest::addColumn<ResourceType>("type");
     QTest::addColumn<bool>("optional");
     QTest::addColumn<bool>("expected");
-    
+
     QTest::newRow("Resource is optional") << AudioPlaybackType << true << true;
     QTest::newRow("Resource is not optional") << AudioPlaybackType << false << false;
     QTest::newRow("Resource is optional") << AudioRecorderType << true << true;
@@ -136,7 +136,7 @@ void TestResource::testOptional_data()
     QTest::newRow("Resource is optional") << VideoRecorderType << true << true;
     QTest::newRow("Resource is not optional") << VideoRecorderType << false << false;
     QTest::newRow("Resource is optional") << VibraType << true << true;
-    QTest::newRow("Resource is not optional") << VibraType<< false << false;
+    QTest::newRow("Resource is not optional") << VibraType << false << false;
     QTest::newRow("Resource is optional") << BacklightType << true << true;
     QTest::newRow("Resource is not optional") << BacklightType << false << false;
     QTest::newRow("Resource is optional") << SystemButtonType << true << true;
@@ -169,7 +169,7 @@ void TestResource::testOptional()
 
 void TestResource::testClone()
 {
-    for(quint32 type=AudioPlaybackType; type < NumberOfTypes; type++) {
+    for (quint32 type = AudioPlaybackType; type < NumberOfTypes; type++) {
         Resource *resource = resourceFromType((ResourceType)type);
         resource->setOptional();
         Resource *copy = resource->clone();

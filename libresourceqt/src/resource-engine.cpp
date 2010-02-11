@@ -14,9 +14,9 @@ static void handleGrantMessage(resmsg_t *msg, resset_t *rs, void *data);
 static void handleAdviceMessage(resmsg_t *msg, resset_t *rs, void *data);
 
 ResourceEngine::ResourceEngine(ResourceSet *resourceSet)
-    : QObject(resourceSet), connected(false), resourceSet(resourceSet),
-      libresourceConnection(NULL), libresourceSet(NULL), requestId(0),
-      messageMap(), mode(0)
+        : QObject(resourceSet), connected(false), resourceSet(resourceSet),
+        libresourceConnection(NULL), libresourceSet(NULL), requestId(0),
+        messageMap(), mode(0)
 {
 }
 
@@ -31,15 +31,15 @@ bool ResourceEngine::initialize()
 
     dbus_error_init(&dbusError);
     dbusConnection = dbus_bus_get(DBUS_BUS_SYSTEM, &dbusError);
-    if(dbus_error_is_set(&dbusError)) {
+    if (dbus_error_is_set(&dbusError)) {
         qDebug("Error getting the system bus: %s", dbusError.message);
         dbus_error_free(&dbusError);
         return false;
     }
     dbus_error_free(&dbusError);
     libresourceConnection = resproto_init(RESPROTO_ROLE_CLIENT, RESPROTO_TRANSPORT_DBUS,
-                                           connectionIsUp, dbusConnection);
-    if(libresourceConnection == NULL) {
+                                          connectionIsUp, dbusConnection);
+    if (libresourceConnection == NULL) {
         return NULL;
     }
 
@@ -148,7 +148,7 @@ bool ResourceEngine::disconnect()
     int r = resconn_disconnect(libresourceSet, &resourceMessage,
                                statusCallbackHandler);
     connected = false;
-    if(r)
+    if (r)
         return true;
     else
         return false;
@@ -157,8 +157,8 @@ bool ResourceEngine::disconnect()
 static inline quint32 allResourcesToBitmask(const ResourceSet *resourceSet)
 {
     QList<Resource *> resourceList = resourceSet->resources();
-    quint32 bitmask=0;
-    for(int i=0; i < resourceList.size(); i++) {
+    quint32 bitmask = 0;
+    for (int i = 0; i < resourceList.size(); i++) {
         bitmask += resourceTypeToLibresourceType(resourceList[i]->type());
     }
     return bitmask;
@@ -166,46 +166,46 @@ static inline quint32 allResourcesToBitmask(const ResourceSet *resourceSet)
 
 static inline quint32 resourceTypeToLibresourceType(ResourceType type)
 {
-    quint32 bitmask=0;
-    switch(type) {
-        case AudioPlaybackType:
-            bitmask += RESMSG_AUDIO_PLAYBACK;
-            break;
-        case VideoPlaybackType:
-            bitmask += RESMSG_VIDEO_PLAYBACK;
-            break;
-        case AudioRecorderType:
-            bitmask += RESMSG_AUDIO_RECORDING;
-            break;
-        case VideoRecorderType:
-            bitmask += RESMSG_VIDEO_RECORDING;
-            break;
-        case VibraType:
-            bitmask += RESMSG_VIBRA;
-            break;
-        case LedsType:
-            bitmask += RESMSG_LEDS;
-            break;
-        case BacklightType:
-            bitmask += RESMSG_BACKLIGHT;
-            break;
-        case SystemButtonType:
-            bitmask += RESMSG_SYSTEM_BUTTON;
-            break;
-        case LockButtonType:
-            bitmask += RESMSG_LOCK_BUTTON;
-            break;
-        case ScaleButtonType:
-            bitmask += RESMSG_SCALE_BUTTON;
-            break;        
-        case SnapButtonType:
-            bitmask += RESMSG_SNAP_BUTTON;
-            break;        
-        case LensCoverType:
-            bitmask += RESMSG_LENS_COVER;
-            break;        
-        default:
-            break;
+    quint32 bitmask = 0;
+    switch (type) {
+    case AudioPlaybackType:
+        bitmask += RESMSG_AUDIO_PLAYBACK;
+        break;
+    case VideoPlaybackType:
+        bitmask += RESMSG_VIDEO_PLAYBACK;
+        break;
+    case AudioRecorderType:
+        bitmask += RESMSG_AUDIO_RECORDING;
+        break;
+    case VideoRecorderType:
+        bitmask += RESMSG_VIDEO_RECORDING;
+        break;
+    case VibraType:
+        bitmask += RESMSG_VIBRA;
+        break;
+    case LedsType:
+        bitmask += RESMSG_LEDS;
+        break;
+    case BacklightType:
+        bitmask += RESMSG_BACKLIGHT;
+        break;
+    case SystemButtonType:
+        bitmask += RESMSG_SYSTEM_BUTTON;
+        break;
+    case LockButtonType:
+        bitmask += RESMSG_LOCK_BUTTON;
+        break;
+    case ScaleButtonType:
+        bitmask += RESMSG_SCALE_BUTTON;
+        break;
+    case SnapButtonType:
+        bitmask += RESMSG_SNAP_BUTTON;
+        break;
+    case LensCoverType:
+        bitmask += RESMSG_LENS_COVER;
+        break;
+    default:
+        break;
     }
     return bitmask;
 }
@@ -213,9 +213,9 @@ static inline quint32 resourceTypeToLibresourceType(ResourceType type)
 static inline quint32 optionalResourcesToBitmask(const ResourceSet *resourceSet)
 {
     QList<Resource *> resourceList = resourceSet->resources();
-    quint32 bitmask=0;
-    for(int i=0; i < resourceList.size(); i++) {
-        if(resourceList[i]->isOptional()) {
+    quint32 bitmask = 0;
+    for (int i = 0; i < resourceList.size(); i++) {
+        if (resourceList[i]->isOptional()) {
             bitmask += resourceTypeToLibresourceType(resourceList[i]->type());
         }
     }
@@ -232,12 +232,12 @@ static void statusCallbackHandler(resset_t *libresourceSet, resmsg_t *message)
 void ResourceEngine::handleStatusMessage(quint32 requestNo)
 {
     resmsg_type_t messageType = messageMap.take(requestNo);
-    if(messageType == RESMSG_REGISTER) {
+    if (messageType == RESMSG_REGISTER) {
         qDebug("connected!");
         connected = true;
         emit connectedToManager();
     }
-    else if(messageType == RESMSG_UNREGISTER) {
+    else if (messageType == RESMSG_UNREGISTER) {
         qDebug("disconnected!");
         connected = false;
         emit disconnectedFromManager();

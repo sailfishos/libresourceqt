@@ -8,9 +8,9 @@ using namespace ResourcePolicy;
 
 class TestResourceSet: public QObject
 {
-   Q_OBJECT
+    Q_OBJECT
 private:
-    ResourceSet *resourceSet;    
+    ResourceSet *resourceSet;
 
     AudioResource *audioResource;
     AudioRecorderResource *audioRecorderResource;
@@ -27,24 +27,24 @@ private:
 
     Resource * resourceFromType(ResourceType type);
 public:
-   TestResourceSet();
-   ~TestResourceSet();
+    TestResourceSet();
+    ~TestResourceSet();
 
-   
+
 private slots:
 
-   void init();
-   void cleanup();
+    void init();
+    void cleanup();
 
-   void testIdentifier();
+    void testIdentifier();
 
-   void testAddResource();
-   void testAddResources();
-   void testDelResource();
+    void testAddResource();
+    void testAddResources();
+    void testDelResource();
 
-   void testContainsSingle();
-   void testDoesNotContainSingle();
-   void testContainsSet();
+    void testContainsSingle();
+    void testDoesNotContainSingle();
+    void testContainsSet();
 };
 
 #endif
