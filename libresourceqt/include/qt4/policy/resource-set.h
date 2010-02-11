@@ -166,18 +166,10 @@ public:
      */
     void setAutoRelease();
     /**
-     * Resets the auto reselease flag to false (see \ref setAutoRelease()).
-     */
-    void resetAutoRelease();
-    /**
      * Sets that the resourcesGranted() signal is emited even if we already
      * have the requested resources granted. By default this feature is off.
      */
     void setAlwaysReply();
-    /**
-     * Resets the always reply flag (see \ref setAlwaysReply()) to false.
-     */
-    void resetAlwaysReply();
 
 signals:
     /**

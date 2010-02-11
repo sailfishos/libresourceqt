@@ -116,18 +116,8 @@ void ResourceSet::setAutoRelease()
     autoRelease = true;
 }
 
-void ResourceSet::resetAutoRelease()
-{
-    autoRelease = false;
-}
-
 void ResourceSet::setAlwaysReply()
 {
     alwaysReply = true;
-}
-
-void ResourceSet::resetAlwaysReply()
-{
-    alwaysReply = false;
 }
 
