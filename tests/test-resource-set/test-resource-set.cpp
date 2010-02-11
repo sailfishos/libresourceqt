@@ -117,7 +117,7 @@ void TestResourceSet::testDelResource()
 {
     resourceSet->addResource(audioResource);
     resourceSet->addResource(vibraResource);
-    resourceSet->delResource(AudioPlaybackType);
+    resourceSet->deleteResource(AudioPlaybackType);
 
     bool setDoesNotContainAudioResource = !resourceSet->contains(AudioPlaybackType);
     QVERIFY(setDoesNotContainAudioResource);

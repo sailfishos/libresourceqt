@@ -101,7 +101,7 @@ public:
      * This method removes the resource of the given type
      * \param type The type of the resource to remove from the set.
      */
-    void delResource(ResourceType type);
+    void deleteResource(ResourceType type);
 
     /**
      * This method returns a list of all resource in the set.
@@ -166,18 +166,18 @@ public:
      */
     void setAutoRelease();
     /**
-     * see \ref setAutoRelease().
+     * Resets the auto reselease flag to false (see \ref setAutoRelease()).
      */
-    void unsetAutoRelease();
+    void resetAutoRelease();
     /**
      * Sets that the resourcesGranted() signal is emited even if we already
      * have the requested resources granted. By default this feature is off.
      */
     void setAlwaysReply();
     /**
-     * Unsets the always reply flag (see \ref setAlwaysReply())
+     * Resets the always reply flag (see \ref setAlwaysReply()) to false.
      */
-    void unsetAlwaysReply();
+    void resetAlwaysReply();
 
 signals:
     /**
@@ -186,13 +186,13 @@ signals:
      * \param availableResources A list of available resources. The list of
      * available resources contains only available resource which we have in the set.
      */
-    void resourcesBecameAvailable(QList<ResourceType> availableResources);
+    void resourcesBecameAvailable(const QList<ResourceType> &availableResources);
     /**
      * This signal is emited as a response to the acquire() request.
      * \param grantedOptionalResources The list of granted optional resources.
      * All the mandatory resources have also been aquired.
      */
-    void resourcesGranted(QList<ResourceType> grantedOptionalResources);
+    void resourcesGranted(const QList<ResourceType> &grantedOptionalResources);
     /**
      * This signal is emited as a response to the acquire() request, in the
      * case where one or more of the mandatroy resources were not availalble.

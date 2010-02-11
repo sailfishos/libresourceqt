@@ -38,7 +38,7 @@ void ResourceSet::addResources(const QList<Resource *>resources)
     }
 }
 
-void ResourceSet::delResource(ResourceType type)
+void ResourceSet::deleteResource(ResourceType type)
 {
     if (contains(type)) {
         delete resourceSet[type];
@@ -116,7 +116,7 @@ void ResourceSet::setAutoRelease()
     autoRelease = true;
 }
 
-void ResourceSet::unsetAutoRelease()
+void ResourceSet::resetAutoRelease()
 {
     autoRelease = false;
 }
@@ -126,7 +126,7 @@ void ResourceSet::setAlwaysReply()
     alwaysReply = true;
 }
 
-void ResourceSet::unsetAlwaysReply()
+void ResourceSet::resetAlwaysReply()
 {
     alwaysReply = false;
 }
