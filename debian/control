@@ -1,7 +1,7 @@
 Source: libresourceqt
 Priority: extra
 Maintainer: Martin Wolf <ext-martin.2.wolf@nokia.com>
-Build-Depends: debhelper (>= 5), libqt4-dev (>= 4.5), libdbus-1-dev, libresource0-dev
+Build-Depends: debhelper (>= 5), libqt4-dev (> 4.6.0), libdbus-1-dev, libresource0-dev
 Standards-Version: 3.8.0
 Section: libs
 
@@ -32,6 +32,14 @@ Architecture: any
 Depends: libdbus-qeventloop1 (= ${binary:Version}), libdbus-1-dev
 Description: Development package for libdbus-qeventloop
  Includes development files for libdbus-qeventloop.
+
+Package: resourceqt-client
+Section: utils
+Architecture: any
+Depends: libresourceqt1, ${shlibs:Depends}, ${misc:Depends}
+Description: Maemo Qt resource aware client test example
+ Resource management for Mamemo
+ This is a simple test tool to play with resource management.
 
 Package: libresourceqt-tests
 Section: misc
