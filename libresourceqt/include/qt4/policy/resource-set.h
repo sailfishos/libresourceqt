@@ -1,11 +1,11 @@
 #ifndef RESOURCE_SET_H
 #define RESOURCE_SET_H
 
-#include <policy/resources.h>
 #include <QString>
 #include <QObject>
 #include <QVector>
 #include <QList>
+#include <policy/resources.h>
 
 /**
  * \mainpage Resource Policy Library

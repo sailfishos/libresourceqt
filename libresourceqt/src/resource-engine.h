@@ -3,11 +3,14 @@
 
 #include <QObject>
 #include <QMap>
+#include <QString>
 #include <dbus/dbus.h>
 #include <res-conn.h>
 #include <policy/resource-set.h>
 
 namespace ResourcePolicy {
+
+quint32 resourceTypeToLibresourceType(ResourceType type);
 
 class ResourceEngine: public QObject
 {
@@ -40,14 +43,14 @@ public:
     void receivedAdvice(resmsg_notify_t *notifyMessage);
 
     void handleStatusMessage(quint32 requestNo);
+    void handleError(quint32 requestNo, quint32 code, const char *message);
 
     void setMode(quint32 newMode);
 
 signals:
     void resourcesBecameAvailable(QList<ResourceType> availableResources);
-    void resourcesAcquired(QList<ResourceType> grantedResources);
+    void resourcesAcquired(quint32 bitmaskOfGrantedResources);
     void resourcesDenied();
-    void lostResources();
     void connectedToManager();
     void disconnectedFromManager();
 

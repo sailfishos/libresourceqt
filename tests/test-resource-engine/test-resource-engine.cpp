@@ -19,8 +19,9 @@ static void verify_resproto_send_message(resset_t *resourceSet, resmsg_t *messag
         resproto_status_t  callbackFunction);
 
 TestResourceEngine::TestResourceEngine()
-        : resourceEngine(NULL), resourceSet(NULL)
 {
+    resourceEngine = NULL;
+    acquireOrDenyWasCalled = false;
     audioPlayback = new AudioResource;
     videoPlayback = new VideoResource;
     audioRecorder = new AudioRecorderResource;
@@ -50,6 +51,7 @@ void TestResourceEngine::init()
 {
     resourceEngine = new ResourceEngine(resourceSet);
     bool initializeSucceeded = resourceEngine->initialize();
+    acquireOrDenyWasCalled = false;
     QVERIFY(!resourceEngine->isConnected());
     QVERIFY(initializeSucceeded);
 }
@@ -87,7 +89,7 @@ void TestResourceEngine::connectedHandler()
 
 void TestResourceEngine::testAcquire_data()
 {
-    QTest::addColumn<bool>("aquireSucceeds");
+    QTest::addColumn<bool>("acquireSucceeds");
     QTest::addColumn<ResourceType>("optionalTypeAvailable");
     QTest::addColumn<bool>("requestFails");
     QTest::addColumn<QString>("errorMessage");
@@ -119,34 +121,50 @@ void TestResourceEngine::testAcquire()
     QByteArray ba = errorMessage.toLatin1();
     requestErrorMessage = ba.data();
 
-    QObject::connect(resourceEngine, SIGNAL(resourcesAcquired(QList<ResourceType>)),
-                     this, SLOT(handleAcquire(QList<ResourceType>)));
-    QObject::connect(resourceEngine, SIGNAL(resourcesDenies()),
-                     this, SLOT(handleDeny(QList<ResourceType>)));
+    QObject::connect(resourceEngine, SIGNAL(resourcesAcquired(quint32)),
+                     this, SLOT(handleAcquire(quint32)));
+    QObject::connect(resourceEngine, SIGNAL(resourcesDenied()),
+                     this, SLOT(handleDeny()));
     bool acquireRequestSucceeded = resourceEngine->acquireResources();
 
-    QVERIFY(acquireRequestSucceeded);
+    QVERIFY(acquireRequestSucceeded == !requestShouldFail);
+    QVERIFY(acquireOrDenyWasCalled);
 }
 
-void TestResourceEngine::handleAcquire(QList<ResourceType> optionalResources)
+void TestResourceEngine::handleAcquire(quint32 bitmaskOfGrantedResources)
 {
+    qDebug("Acquired resources: 0x%04x", bitmaskOfGrantedResources);
     QVERIFY(acquireShouldSucceed);
     bool hasOptionalResource = false;
-    for (int i = 0; i < optionalResources.size(); i++) {
-        if (optionalResources.at(i) == optionalType) {
-            hasOptionalResource = true;
-            break;
+    QList<Resource *> resourceList = resourceSet->resources();
+    for (int i=0; i < resourceList.size(); i++) {
+        quint32 bitmask = resourceTypeToLibresourceType(resourceList.at(i)->type());
+        qDebug("Checking if resource %x(%x) is in the list", resourceList.at(i)->type(), bitmask);
+        if ((bitmask & bitmaskOfGrantedResources) == bitmask)
+        {
+            qDebug("Yes :)");
+            if (resourceList.at(i)->type() == optionalType) {
+                qDebug("Resource is the one we are looking for. :D");
+                hasOptionalResource = true;
+                break;
+            }
+        }
+        else {
+            qDebug("No :(");
         }
     }
-    if ((optionalType == NumberOfTypes) && (optionalResources.size() == 0)) {
+    if ((optionalType == NumberOfTypes) && (bitmaskOfGrantedResources > 0)) {
+        qDebug("Expected to get no optional resources");
         hasOptionalResource = true;
     }
     QVERIFY(hasOptionalResource);
+    acquireOrDenyWasCalled = true;
 }
 
 void TestResourceEngine::handleDeny()
 {
     QVERIFY(!acquireShouldSucceed);
+    acquireOrDenyWasCalled = true;
 }
 
 QTEST_MAIN(TestResourceEngine)
@@ -257,19 +275,34 @@ int resproto_send_message(resset_t *resourceSet, resmsg_t *message,
 {
     resmsg_t replyMessage, statusMessage;
 
+    qDebug("%s(): id:%u req#: %u", __FUNCTION__, message->record.id, message->record.reqno);
+
     replyMessage.type = RESMSG_GRANT;
-    replyMessage.notify.resrc = RESMSG_VIDEO_PLAYBACK | RESMSG_VIDEO_RECORDING;
+    if (acquireShouldSucceed) {
+        replyMessage.notify.resrc = RESMSG_AUDIO_PLAYBACK | RESMSG_AUDIO_RECORDING 
+                                  | RESMSG_VIDEO_PLAYBACK | RESMSG_VIDEO_RECORDING;
+    }
+    else {
+        replyMessage.notify.resrc = 0;
+    }
+    replyMessage.record.id = message->record.id;
+    replyMessage.record.reqno = message->record.reqno;
 
     verify_resproto_send_message(resourceSet, message, callbackFunction);
 
     statusMessage.type = RESMSG_STATUS;
     statusMessage.status.errcod = requestShouldFail;
     statusMessage.status.errmsg = requestErrorMessage;
+    statusMessage.record.id = 11;
+    statusMessage.record.reqno = 77;
     callbackFunction(resSet, &statusMessage);
 
     grantCallback(&replyMessage, resSet, resSet->userdata);
 
-    return 1;
+    if (requestShouldFail)
+        return 0;
+    else
+        return 1;
 }
 
 static void verify_resproto_send_message(resset_t *resourceSet, resmsg_t *message,

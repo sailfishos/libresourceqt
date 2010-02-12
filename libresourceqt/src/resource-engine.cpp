@@ -5,7 +5,6 @@ using namespace ResourcePolicy;
 
 static inline quint32 allResourcesToBitmask(const ResourceSet *resourceSet);
 static inline quint32 optionalResourcesToBitmask(const ResourceSet *resourceSet);
-static inline quint32 resourceTypeToLibresourceType(ResourceType type);
 
 static void connectionIsUp(resconn_t *connection);
 static void statusCallbackHandler(resset_t *rset, resmsg_t *msg);
@@ -73,9 +72,13 @@ static void handleGrantMessage(resmsg_t *msg, resset_t *, void *data)
 
 void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
 {
-    char buf[80];
-    resmsg_res_str(notifyMessage->resrc, buf, sizeof(buf));
-    qDebug("%s: %s", __FUNCTION__, buf);
+    qDebug("received a grant message");
+    if(notifyMessage->resrc == 0) {
+        emit resourcesDenied();
+    }
+    else {
+        emit resourcesAcquired(notifyMessage->resrc);
+    }
 }
 
 static void handleAdviceMessage(resmsg_t *msg, resset_t *, void *data)
@@ -164,50 +167,36 @@ static inline quint32 allResourcesToBitmask(const ResourceSet *resourceSet)
     return bitmask;
 }
 
-static inline quint32 resourceTypeToLibresourceType(ResourceType type)
+quint32 ResourcePolicy::resourceTypeToLibresourceType(ResourceType type)
 {
-    quint32 bitmask = 0;
     switch (type) {
     case AudioPlaybackType:
-        bitmask += RESMSG_AUDIO_PLAYBACK;
-        break;
+        return RESMSG_AUDIO_PLAYBACK;
     case VideoPlaybackType:
-        bitmask += RESMSG_VIDEO_PLAYBACK;
-        break;
+        return RESMSG_VIDEO_PLAYBACK;
     case AudioRecorderType:
-        bitmask += RESMSG_AUDIO_RECORDING;
-        break;
+        return RESMSG_AUDIO_RECORDING;
     case VideoRecorderType:
-        bitmask += RESMSG_VIDEO_RECORDING;
-        break;
+        return RESMSG_VIDEO_RECORDING;
     case VibraType:
-        bitmask += RESMSG_VIBRA;
-        break;
+        return RESMSG_VIBRA;
     case LedsType:
-        bitmask += RESMSG_LEDS;
-        break;
+        return RESMSG_LEDS;
     case BacklightType:
-        bitmask += RESMSG_BACKLIGHT;
-        break;
+        return RESMSG_BACKLIGHT;
     case SystemButtonType:
-        bitmask += RESMSG_SYSTEM_BUTTON;
-        break;
+        return RESMSG_SYSTEM_BUTTON;
     case LockButtonType:
-        bitmask += RESMSG_LOCK_BUTTON;
-        break;
+        return RESMSG_LOCK_BUTTON;
     case ScaleButtonType:
-        bitmask += RESMSG_SCALE_BUTTON;
-        break;
+        return RESMSG_SCALE_BUTTON;
     case SnapButtonType:
-        bitmask += RESMSG_SNAP_BUTTON;
-        break;
+        return RESMSG_SNAP_BUTTON;
     case LensCoverType:
-        bitmask += RESMSG_LENS_COVER;
-        break;
+        return RESMSG_LENS_COVER;
     default:
-        break;
+        return 0;
     }
-    return bitmask;
 }
 
 static inline quint32 optionalResourcesToBitmask(const ResourceSet *resourceSet)
@@ -226,12 +215,23 @@ static void statusCallbackHandler(resset_t *libresourceSet, resmsg_t *message)
 {
     ResourceEngine *resourceEngine = reinterpret_cast<ResourceEngine *>(libresourceSet->userdata);
     qDebug("Received a status notification");
-    resourceEngine->handleStatusMessage(message->status.reqno);
+    if (message->type != RESMSG_STATUS) {
+        qDebug("Invalid message type.. (got %x, expected %x", message->type, RESMSG_STATUS);
+        return;
+    }
+    if (message->status.errcod) {
+        resourceEngine->handleError(message->status.reqno, message->status.errcod, message->status.errmsg);
+    }
+    else {
+//        resourceEngine->handleStatusMessage(message->status.reqno);
+        qDebug("Received a status message of type 0x%02x and #:%u", message->type, message->status.reqno);
+    }
 }
 
 void ResourceEngine::handleStatusMessage(quint32 requestNo)
 {
     resmsg_type_t messageType = messageMap.take(requestNo);
+    qDebug("Received a status message: %u(0x%02x)", requestNo, messageType);
     if (messageType == RESMSG_REGISTER) {
         qDebug("connected!");
         connected = true;
@@ -242,7 +242,12 @@ void ResourceEngine::handleStatusMessage(quint32 requestNo)
         connected = false;
         emit disconnectedFromManager();
     }
+}
 
+void ResourceEngine::handleError(quint32 requestNo, quint32 code, const char *message)
+{
+    resmsg_type_t messageType = messageMap.take(requestNo);
+    qDebug("Error on request %u(0x%02x): %u - %s", requestNo, messageType, code, message);
 }
 
 bool ResourceEngine::isConnected()
@@ -252,7 +257,22 @@ bool ResourceEngine::isConnected()
 
 bool ResourceEngine::acquireResources()
 {
-    return false;
+    resmsg_t message;
+    memset(&message, 0, sizeof(resmsg_t));
+
+    message.possess.type = RESMSG_ACQUIRE;
+    message.any.id    = resourceSet->id();
+    message.any.reqno = ++requestId;
+
+    messageMap.insert(requestId, RESMSG_ACQUIRE);
+
+    qDebug("acquire %u:%u", resourceSet->id(), requestId);
+    int success = resproto_send_message(libresourceSet, &message, statusCallbackHandler);
+
+    if(!success)
+        return false;
+    else
+        return true;
 }
 
 bool ResourceEngine::releaseResources()

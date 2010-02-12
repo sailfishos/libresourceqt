@@ -19,6 +19,7 @@ private:
     AudioRecorderResource *audioRecorder;
     VideoRecorderResource *videoRecorder;
     bool libresourceInitialized;
+    bool acquireOrDenyWasCalled;
 
 public:
     ResourceSet *resourceSet;
@@ -28,7 +29,7 @@ public:
 public slots:
     void connectedHandler();
     void handleDeny();
-    void handleAcquire(QList<ResourceType> optionalResources);
+    void handleAcquire(quint32 bitmaskOfResources);
 
 private slots:
     void init();
