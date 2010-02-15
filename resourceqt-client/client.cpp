@@ -323,7 +323,7 @@ void Client::showResources(const QList<Resource*> resList)
 	}
 }
 
-void Client::resourceAcquiredHandler(const QList<ResourceType>& grantedResList)
+void Client::resourceAcquiredHandler(const QList<ResourceType>& /*grantedResList*/)
 {
 	QList<Resource*> list = resourceSet->resources();
 	if( !list.count() )
@@ -476,7 +476,38 @@ void Client::timerEvent(QTimerEvent*)
 			}
 			else if( params[0] == "audio" )
 			{
-				printf("Not yet implemented!\n");
+				if( params.count() < 3 )
+				{
+					printf("Not enough parameters! See help!\n");
+				}
+				else
+				{
+					AudioResource* p = reinterpret_cast<AudioResource*>(resourceSet->resource(AudioPlaybackType));
+					if( p == NULL )
+					{
+						printf("No AudioResource available in set!\n");
+					}
+					else
+					{
+						p->setAudioGroup(params[1]);
+
+						bool ok;
+						quint32 pid = (quint32)params[2].toInt(&ok, 10);
+						if( ok && pid != 0 )
+						{
+							p->setProcessID(pid);
+						}
+						else
+						{
+							printf("Ignoring pid parameter!\n");
+						}
+
+						if( params.count() > 3 )
+						{
+							p->setStreamTag(params[3]);
+						}
+					}
+				}
 			}
 			else if( !params[0].isEmpty() )
 			{
