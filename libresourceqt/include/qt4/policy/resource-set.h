@@ -212,6 +212,12 @@ private:
     bool alwaysReply;
     bool initialized;
     bool pendingAcquire;
+    
+private slots:
+    void connectedHandler();
+    void handleAcquire(quint32);
+    void handleDeny();
+    
 };
 }
 

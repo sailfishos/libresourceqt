@@ -144,3 +144,37 @@ void ResourceSet::setAlwaysReply()
     alwaysReply = true;
 }
 
+void ResourceSet::connectedHandler()
+{
+    if (pendingAcquire) {
+        resourceEngine->acquireResources();
+    }
+}
+
+void ResourceSet::handleAcquire(quint32 bitmaskOfGrantedResources)
+{
+    QList<ResourceType> optionalResources;
+    qDebug("Acquired resources: 0x%04x", bitmaskOfGrantedResources);
+    for(int i=0;i < NumberOfTypes; i++) {
+        ResourceType type = (ResourceType)i;
+        quint32 bitmask = resourceTypeToLibresourceType(type);
+        qDebug("Checking if resource %x(%x) is in the set", i, bitmask);
+        if ((bitmask & bitmaskOfGrantedResources) == bitmask) {
+            if (resourceSet[i]->isOptional()) {
+                optionalResources << type;
+            }
+            resourceSet[i]->setGranted();
+        }
+    }
+    emit resourcesGranted(optionalResources);
+}
+
+void ResourceSet::handleDeny()
+{
+    for(int i=0;i < NumberOfTypes; i++) {
+        if(resourceSet[i] != NULL) {
+            resourceSet[i]->unsetGranted();
+        }
+    }
+}
+
