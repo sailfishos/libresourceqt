@@ -211,9 +211,15 @@ resset_t  *resconn_connect(resconn_t *connection, resmsg_t *message,
                            resproto_status_t callbackFunction)
 {
     verify_resconn_connect(connection, message, callbackFunction);
+    resmsg_t statusMessage;
 
     resSet = (resset_t *) calloc(1, sizeof(resset_t));
-
+    statusMessage.type = RESMSG_STATUS;
+    statusMessage.status.errcod = 0;
+    statusMessage.status.errmsg = 0;
+    statusMessage.record.id = 11;
+    statusMessage.record.reqno = message->record.reqno;
+    callbackFunction(resSet, &statusMessage);
     return resSet;
 }
 

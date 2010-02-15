@@ -25,19 +25,20 @@ bool ResourceSet::initialize()
     if (resourceEngine == NULL) {
         return false;
     }
-    if (!resourceEngine->initialize()) {
-        return false;
-    }
-    if (!resourceEngine->connect()) {
-        return false;
-    }
     QObject::connect(resourceEngine, SIGNAL(connectedToManager()), 
                      this, SLOT(connectedHandler()));
     QObject::connect(resourceEngine, SIGNAL(resourcesAcquired(quint32)),
                      this, SLOT(handleAcquire(quint32)));
     QObject::connect(resourceEngine, SIGNAL(resourcesDenied()),
                      this, SLOT(handleDeny()));
-
+    if (!resourceEngine->initialize()) {
+        return false;
+    }
+    if (!resourceEngine->connect()) {
+        return false;
+    }
+    qDebug("ResourceSet is initialized engine=%p", resourceEngine);
+    initialized = true;
     return true;
 }
 
@@ -113,6 +114,7 @@ bool ResourceSet::acquire()
     else if (!resourceEngine->isConnected()) {
         pendingAcquire = true;
         resourceEngine->connect();
+        return true;
     }
     else {
         return resourceEngine->acquireResources();
@@ -153,6 +155,7 @@ void ResourceSet::connectedHandler()
 
 void ResourceSet::handleAcquire(quint32 bitmaskOfGrantedResources)
 {
+    qDebug("in %s",__FUNCTION__);
     QList<ResourceType> optionalResources;
     qDebug("Acquired resources: 0x%04x", bitmaskOfGrantedResources);
     for(int i=0;i < NumberOfTypes; i++) {
@@ -164,6 +167,7 @@ void ResourceSet::handleAcquire(quint32 bitmaskOfGrantedResources)
                 optionalResources << type;
             }
             resourceSet[i]->setGranted();
+            qDebug("Resource %02x is now granted", i);
         }
     }
     emit resourcesGranted(optionalResources);

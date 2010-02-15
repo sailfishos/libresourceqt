@@ -32,9 +32,9 @@ bool ResourceEngine::initialize()
         return false;
 
     dbus_error_init(&dbusError);
-    dbusConnection = dbus_bus_get(DBUS_BUS_SYSTEM, &dbusError);
+    dbusConnection = dbus_bus_get(DBUS_BUS_SESSION, &dbusError);
     if (dbus_error_is_set(&dbusError)) {
-        qDebug("Error getting the system bus: %s", dbusError.message);
+        qDebug("Error getting the session bus: %s", dbusError.message);
         dbus_error_free(&dbusError);
         return false;
     }
@@ -49,13 +49,13 @@ bool ResourceEngine::initialize()
     resproto_set_handler(libresourceConnection, RESMSG_UNREGISTER, handleUnregisterMessage);
     resproto_set_handler(libresourceConnection, RESMSG_GRANT, handleGrantMessage);
     resproto_set_handler(libresourceConnection, RESMSG_ADVICE, handleAdviceMessage);
-
+    qDebug("ResourceEngine (%p) is now initialized.", this);
     return true;
 }
 
-static void handleUnregisterMessage(resmsg_t *, resset_t *, void *data)
+static void handleUnregisterMessage(resmsg_t *, resset_t *resSet, void *)
 {
-    ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(data);
+    ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(resSet->userdata);
 
     engine->disconnected();
 }
@@ -67,27 +67,29 @@ void ResourceEngine::disconnected()
     emit disconnectedFromManager();
 }
 
-static void handleGrantMessage(resmsg_t *msg, resset_t *, void *data)
+static void handleGrantMessage(resmsg_t *msg, resset_t *resSet, void *)
 {
-    ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(data);
+    ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(resSet->userdata);
 
     engine->receivedGrant(&(msg->notify));
 }
 
 void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
 {
-    qDebug("received a grant message");
+    qDebug("received a grant message for request %u", notifyMessage->reqno);
     if(notifyMessage->resrc == 0) {
+        qDebug("request DENIED!");
         emit resourcesDenied();
     }
     else {
+        qDebug("emiting signal resourcesAcquired(%02x), this=%p", notifyMessage->resrc, this);
         emit resourcesAcquired(notifyMessage->resrc);
     }
 }
 
-static void handleAdviceMessage(resmsg_t *msg, resset_t *, void *data)
+static void handleAdviceMessage(resmsg_t *msg, resset_t *resSet, void *)
 {
-    ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(data);
+    ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(resSet->userdata);
 
     engine->receivedAdvice(&(msg->notify));
 }
@@ -122,6 +124,7 @@ bool ResourceEngine::connect()
 
     resourceMessage.record.mode = mode;
 
+    qDebug("ResourceEngine is now connecting...");
     libresourceSet = resconn_connect(libresourceConnection, &resourceMessage,
                                      statusCallbackHandler);
 
@@ -227,8 +230,8 @@ static void statusCallbackHandler(resset_t *libresourceSet, resmsg_t *message)
         resourceEngine->handleError(message->status.reqno, message->status.errcod, message->status.errmsg);
     }
     else {
-//        resourceEngine->handleStatusMessage(message->status.reqno);
-        qDebug("Received a status message of type 0x%02x and #:%u", message->type, message->status.reqno);
+        qDebug("Received a status message with id %02x and #:%u", message->status.id, message->status.reqno);
+        resourceEngine->handleStatusMessage(message->status.reqno);
     }
 }
 
@@ -248,10 +251,10 @@ void ResourceEngine::handleStatusMessage(quint32 requestNo)
     }
 }
 
-void ResourceEngine::handleError(quint32 requestNo, quint32 code, const char *message)
+void ResourceEngine::handleError(quint32 requestNo, qint32 code, const char *message)
 {
     resmsg_type_t messageType = messageMap.take(requestNo);
-    qDebug("Error on request %u(0x%02x): %u - %s", requestNo, messageType, code, message);
+    qDebug("Error on request %u(0x%02x): %d - %s", requestNo, messageType, code, message);
 }
 
 bool ResourceEngine::isConnected()

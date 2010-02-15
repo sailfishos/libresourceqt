@@ -44,7 +44,7 @@ public:
     void receivedAdvice(resmsg_notify_t *notifyMessage);
 
     void handleStatusMessage(quint32 requestNo);
-    void handleError(quint32 requestNo, quint32 code, const char *message);
+    void handleError(quint32 requestNo, qint32 code, const char *message);
 
     void setMode(quint32 newMode);
 
