@@ -1,11 +1,12 @@
 #include <policy/resource-set.h>
+#include "resource-engine.h"
 using namespace ResourcePolicy;
 
 
 ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
-        : QObject(parent), resourceClass(applicationClass), autoRelease(false),
-        alwaysReply(false)
-
+        : QObject(parent), resourceClass(applicationClass), resourceEngine(NULL),
+        autoRelease(false), alwaysReply(false), initialized(false),
+        pendingAcquire(false)
 {
     identifier = (quint32)this;
     memset(resourceSet, 0, sizeof(QPointer<Resource *>)*NumberOfTypes);
@@ -18,9 +19,26 @@ ResourceSet::~ResourceSet()
     }
 }
 
-bool ResourceSet::finalize()
+bool ResourceSet::initialize()
 {
-    return false;
+    resourceEngine = new ResourceEngine(this);
+    if (resourceEngine == NULL) {
+        return false;
+    }
+    if (!resourceEngine->initialize()) {
+        return false;
+    }
+    if (!resourceEngine->connect()) {
+        return false;
+    }
+    QObject::connect(resourceEngine, SIGNAL(connectedToManager()), 
+                     this, SLOT(connectedHandler()));
+    QObject::connect(resourceEngine, SIGNAL(resourcesAcquired(quint32)),
+                     this, SLOT(handleAcquire(quint32)));
+    QObject::connect(resourceEngine, SIGNAL(resourcesDenied()),
+                     this, SLOT(handleDeny()));
+
+    return true;
 }
 
 void ResourceSet::addResource(const Resource *resource)
@@ -28,6 +46,7 @@ void ResourceSet::addResource(const Resource *resource)
     if ((resource->type() == AudioPlaybackType) || (resource->type() == AudioRecorderType)) {
         qDebug("audioResource...");
     }
+    delete resourceSet[resource->type()];
     resourceSet[resource->type()] = resource->clone();
 }
 
@@ -40,10 +59,8 @@ void ResourceSet::addResources(const QList<Resource *>resources)
 
 void ResourceSet::deleteResource(ResourceType type)
 {
-    if (contains(type)) {
-        delete resourceSet[type];
-        resourceSet[type] = NULL;
-    }
+    delete resourceSet[type];
+    resourceSet[type] = NULL;
 }
 
 bool ResourceSet::contains(ResourceType type) const
@@ -76,8 +93,7 @@ QList<Resource *> ResourceSet::resources() const
     QList<Resource *> listOfResources;
     for (int i = 0; i < NumberOfTypes; i++) {
         if (resourceSet[i] != NULL) {
-            Resource *clone = resourceSet[i]->clone();
-            listOfResources.append(clone);
+            listOfResources.append(resourceSet[i]);
         }
     }
     return listOfResources;
@@ -85,15 +101,22 @@ QList<Resource *> ResourceSet::resources() const
 
 Resource * ResourceSet::resource(ResourceType type) const
 {
-    if (contains(type))
-        return resourceSet[type]->clone();
-    else
-        return NULL;
+    return resourceSet[type];
 }
 
 bool ResourceSet::acquire()
 {
-    return false;
+    if(!initialized) {
+        pendingAcquire = true;
+        return initialize();
+    }
+    else if (!resourceEngine->isConnected()) {
+        pendingAcquire = true;
+        resourceEngine->connect();
+    }
+    else {
+        return resourceEngine->acquireResources();
+    }
 }
 
 bool ResourceSet::release()

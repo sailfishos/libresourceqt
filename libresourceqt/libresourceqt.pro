@@ -3,7 +3,7 @@ TEMPLATE = lib
 TARGET = resourceqt
 DESTDIR = build
 DEPENDPATH += $${POLICY} src
-INCLUDEPATH += $${LIBRESOURCEINC} src
+INCLUDEPATH += $${LIBRESOURCEINC} $${LIBDBUSQEVENTLOOP} src
 
 # Input
 PUBLIC_HEADERS = $${POLICY}/resource.h $${POLICY}/resource-set.h $${POLICY}/resources.h
@@ -14,6 +14,9 @@ SOURCES += src/resource.cpp \
            src/resource-set.cpp \
            src/resource-engine.cpp \
            src/resources.cpp
+
+QMAKE_CXXFLAGS += -Wall
+LIBS += -L$${LIBDBUSQEVENTLOOP}/build -ldbus-qeventloop
 
 OBJECTS_DIR = build
 MOC_DIR = build

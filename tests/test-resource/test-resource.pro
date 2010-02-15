@@ -12,6 +12,8 @@ SOURCES +=  $${LIBRESOURCEQT}/src/resource.cpp $${LIBRESOURCEQT}/src/resources.c
 OBJECTS_DIR = build
 MOC_DIR = build
 
+QMAKE_CXXFLAGS += -Wall
+
 CONFIG  += qt qtestlib debug warn_on
 QT -= gui
 

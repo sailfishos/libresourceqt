@@ -31,18 +31,24 @@
  * ResourcePolicy::ResourceSet *resources = new ResourcePolicy::ResourceSet("player");
  * resources->addResource(audioResource);
  * resources->addResource(videoResource);
- * resources->initialize();
- * QObject::connect(resources, SIGNAL(connectedToManager()), this, SLOT(connectedHandler()));
- * resources->connectToManager();
  * \endcode
- * Then the when you want to acquire the \ref ResourcePolicy::ResourceSet you simply use the
- * \ref acquire() method of the \ref ResourceSet object, like this:
+ * The resource set now has control over the Resource object pointers. You can
+ * drop them, but should NOT delete them. Instead call the ResourcePolicy::ResourceSet::deleteResource() 
+ * method. Then when you want to acquire the \ref ResourcePolicy::ResourceSet
+ * you simply use the \ref ResourcePolicy::ResourceSetacquire() method, like this:
  * \code
- * QObject::connect(resources, SIGNAL(resourcesAcquired),
+ * QObject::connect(resources, SIGNAL(resourcesAcquired()),
  *                  this, SLOT(acquireOkHandler(QList<ResourcePolicy::Resource>)));
- * QObject::connect(resources, SIGNAL(resourcesDenied), this, SLOT(acquireDeniedHandler()));
+ * QObject::connect(resources, SIGNAL(resourcesDenied()), this, SLOT(acquireDeniedHandler()));
  * resources->acquire();
  * \endcode
+ * You should also connect to the ResourcePolicy::ResourceSet::lostResources() signal like this:
+ * \code
+ * QObject::connect(resources, SIGNAL(lostResources()),
+ *                  this, SLOT(lostResources()));
+ * \endcode
+ * This signal tells you when you should stop using the resources you have asked for.
+ * So it is important that you connect to it.
  */
 
 /**
@@ -50,6 +56,7 @@
  */
 namespace ResourcePolicy
 {
+class ResourceEngine;
 /**
  * The resourceSet repesents a set of attributes. Each set can only contain
  * a single Resource of a given type. That is one AudioPlaybackResource, etc.
@@ -73,12 +80,6 @@ public:
      * The destructor
      */
     ~ResourceSet();
-    /**
-     * Finalizes the ResourceSet. This method should be called after all
-     * resources have been added to the set.
-     * \return true if the finalization was successful.
-     */
-    bool finalize();
 
     /**
      * This method adds a resource to the set. A set contains only a single
@@ -168,6 +169,7 @@ public:
     /**
      * Sets that the resourcesGranted() signal is emited even if we already
      * have the requested resources granted. By default this feature is off.
+     * This flag should be set once only before finalize is called, and cannot be unset.
      */
     void setAlwaysReply();
 
@@ -193,16 +195,23 @@ signals:
     /**
      * This signal is emited when some other program with a higher priority
      * superseeds us, and as a result we loose our resources.
+     * It is very important to connect to this signal as it is signaling when
+     * the acquired resources can't be used anymore.
      */
     void lostResources();
 
 private:
+
+    bool initialize();
+
     quint32 identifier;
     const QString resourceClass;
     Resource* resourceSet[NumberOfTypes];
-    bool connected;
+    ResourceEngine *resourceEngine;
     bool autoRelease;
     bool alwaysReply;
+    bool initialized;
+    bool pendingAcquire;
 };
 }
 

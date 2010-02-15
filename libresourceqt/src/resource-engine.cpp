@@ -14,8 +14,8 @@ static void handleAdviceMessage(resmsg_t *msg, resset_t *rs, void *data);
 
 ResourceEngine::ResourceEngine(ResourceSet *resourceSet)
         : QObject(resourceSet), connected(false), resourceSet(resourceSet),
-        libresourceConnection(NULL), libresourceSet(NULL), requestId(0),
-        messageMap(), mode(0)
+        dbusEngine(NULL), libresourceConnection(NULL), libresourceSet(NULL),
+        requestId(0), messageMap(), mode(0)
 {
 }
 
@@ -27,6 +27,9 @@ bool ResourceEngine::initialize()
 {
     DBusError dbusError;
     DBusConnection *dbusConnection;
+    dbusEngine = new DBUSConnectionEventLoop;
+    if(dbusEngine == NULL)
+        return false;
 
     dbus_error_init(&dbusError);
     dbusConnection = dbus_bus_get(DBUS_BUS_SYSTEM, &dbusError);
@@ -36,6 +39,7 @@ bool ResourceEngine::initialize()
         return false;
     }
     dbus_error_free(&dbusError);
+    dbusEngine->addConnection(dbusConnection);
     libresourceConnection = resproto_init(RESPROTO_ROLE_CLIENT, RESPROTO_TRANSPORT_DBUS,
                                           connectionIsUp, dbusConnection);
     if (libresourceConnection == NULL) {

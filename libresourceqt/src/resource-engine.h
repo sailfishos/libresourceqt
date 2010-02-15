@@ -7,6 +7,7 @@
 #include <dbus/dbus.h>
 #include <res-conn.h>
 #include <policy/resource-set.h>
+#include <dbusconnectioneventloop.h>
 
 namespace ResourcePolicy {
 
@@ -55,9 +56,11 @@ signals:
     void disconnectedFromManager();
 
 private:
+    
     bool connected;
     ResourceSet *resourceSet;
     DBusConnection *dbusConnection;
+    DBUSConnectionEventLoop *dbusEngine;
     resconn_t *libresourceConnection;
     resset_t *libresourceSet;
     quint32 requestId;

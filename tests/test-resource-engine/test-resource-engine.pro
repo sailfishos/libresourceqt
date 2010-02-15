@@ -3,7 +3,7 @@ TEMPLATE = app
 TARGET = test-resource-engine
 DESTDIR = build
 DEPENDPATH += $${POLICY} $${LIBRESOURCEQT}/src .
-INCLUDEPATH += $${LIBRESOURCEQT}/src $${LIBRESOURCEINC} /usr/include/resource
+INCLUDEPATH += $${LIBRESOURCEQT}/src $${LIBRESOURCEINC} $${LIBDBUSQEVENTLOOP} /usr/include/resource
 
 # Input
 HEADERS +=  $${POLICY}/resource.h \
@@ -20,6 +20,8 @@ SOURCES +=  $${LIBRESOURCEQT}/src/resource.cpp \
 
 OBJECTS_DIR = build
 MOC_DIR = build
+QMAKE_CXXFLAGS += -Wall
+LIBS += -L$${LIBDBUSQEVENTLOOP}/build -ldbus-qeventloop
 
 CONFIG  += qt qtestlib debug warn_on link_pkgconfig
 QT -= gui
