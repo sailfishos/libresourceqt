@@ -159,12 +159,22 @@ void Client::updateSet(uint32_t list, uint32_t optional, bool remove)
 	}
 }
 
-bool Client::initialize(uint32_t all, uint32_t optional)
+bool Client::initialize(uint32_t all, uint32_t optional, bool alwaysReply, bool autoRelease)
 {
 	resourceSet = new ResourceSet(applicationClass);
 	if( resourceSet == NULL )
 	{
 		return false;
+	}
+
+	if( alwaysReply )
+	{
+		resourceSet->setAlwaysReply();
+	}
+
+	if( autoRelease )
+	{
+		resourceSet->setAutoRelease();
 	}
 
 	updateSet(all, optional, false);
@@ -309,14 +319,23 @@ void Client::showResources(const QList<Resource*> resList)
 		Resource* r = resList[i];
 		printf("\t%s%s%s\n", resTypes[r->type()],
 				r->isOptional() ? " (optional)" : "",
-				r->isGranted() ? "(granted)" : "");
+				r->isGranted() ? " (granted)" : "");
 	}
 }
 
-void Client::resourceAcquiredHandler(const QList<ResourceType>& resList)
+void Client::resourceAcquiredHandler(const QList<ResourceType>& grantedResList)
 {
-	printf("\nManager grants access to these resources:\n");
-	showResources(resList);
+	QList<Resource*> list = resourceSet->resources();
+	if( !list.count() )
+	{
+		printf("\nGranted resource set is empty. Possible bug?\n");
+	}
+	else
+	{
+		printf("\nManager grants access to these resources:\n");
+		printf("Resource set:\n");
+		showResources(list);
+	}
 	showPrompt();
 }
 

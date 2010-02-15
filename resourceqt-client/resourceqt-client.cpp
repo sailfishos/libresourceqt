@@ -18,6 +18,8 @@ public:
 
 		resourcesAll 		= 0;
 		resourcesOptional	= 0;
+    	autoRelease = false;
+    	alwaysReply = false;
 
 	    parseArguments(argc, argv);
 	}
@@ -38,6 +40,8 @@ public:
 	uint32_t	resourcesAll;
 	uint32_t	resourcesOptional;
 	QString		applicationClass;
+	bool		autoRelease;
+	bool		alwaysReply;
 
 	void printMessage(const char *fmt, ...)
 	{
@@ -71,16 +75,15 @@ private:
 	{
 	    int   option;
 
-	    while( (option = getopt(argc, argv, "hf:s:")) != -1 )
+	    while( (option = getopt(argc, argv, "hm:o:")) != -1 )
 	    {
 	        switch (option)
 	        {
 	        case 'h':
 	        	usage(0);
 	        	return;
-	        case 'f':
-	        	printf("-f - not implemented!\n");
-	        	//config.mode = parseModeValues(optarg, 1);
+	        case 'm':
+	        	parseModeValues(optarg);
 	        	break;
 	        case 'o':
 	        	resourcesOptional = Client::parseResourceList(optarg);
@@ -135,15 +138,40 @@ private:
 	    return str;
 	}
 
+	void parseModeValues(QString modeListStr)
+	{
+	    if( !modeListStr.isEmpty() && !modeListStr.isNull() )
+	    {
+	    	QStringList modeList = modeListStr.split(",", QString::SkipEmptyParts);
+
+	    	for( int i = 0; i < modeList.count(); i++ )
+	        {
+                if( modeList[i] == "AutoRelease" )
+                {
+                	autoRelease = true;
+                }
+                else if( modeList[i] == "AlwaysReply" )
+                {
+                	alwaysReply = true;
+                }
+                else
+                {
+                	const char* mode = qPrintable(modeList[i]);
+                	printMessage("Ignoring unknown mode '%s'!", mode);
+                }
+	        }
+	    }
+	}
+
 	void usage(int theExitCode)
 	{
-	    printf("usage: %s [-h] [-t] [-v] [-f mode-values]"
+	    printf("usage: %s [-h] [-t] [-v] [-m mode-values]"
 	           "[-o optional-resources] [-s shared-resources -m shared-mask] "
 	           "class all-resources\n",
 	           exeName);
 	    printf("\toptions:\n");
 	    printf("\t  h\tprint this help message and exit\n");
-	    printf("\t  f\tmode values. See 'modes' below for the "
+	    printf("\t  m\tmode values. See 'modes' below for the "
 	           "\n\t\tsyntax of <mode-values>\n");
 	    printf("\t  o\toptional resources. See 'resources' below for the "
 	           "syntax of\n\t\t<optional-resources>\n");
@@ -193,7 +221,7 @@ int main(int argc, char *argv[])
     QCoreApplication app(argc, argv);
 
     Client client(parser.applicationClass);
-    if( !client.initialize(parser.resourcesAll, parser.resourcesOptional) )
+    if( !client.initialize(parser.resourcesAll, parser.resourcesOptional, parser.alwaysReply, parser.autoRelease) )
     {
     	parser.printMessage("initialization failed!");
     	return EINVAL;

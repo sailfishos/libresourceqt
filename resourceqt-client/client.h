@@ -29,11 +29,11 @@ public:
 	Client(QString appClass);
 	~Client();
 
-	bool initialize(uint32_t all, uint32_t optional);
+	bool initialize(uint32_t all, uint32_t optional, bool alwaysReply, bool autoRelease);
 	static uint32_t parseResourceList(QString resourceListStr);
 
 private slots:
-	void resourceAcquiredHandler(const QList<ResourceType>& resList);
+	void resourceAcquiredHandler(const QList<ResourceType>& grantedResList);
 	void resourceDeniedHandler();
 	void resourceLostHandler();
 
