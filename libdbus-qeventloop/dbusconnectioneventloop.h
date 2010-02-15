@@ -93,7 +93,7 @@ public:
      */
     Connections	connections;
 
-public slots:
+private slots:
     void readSocket(int fd);
     void writeSocket(int fd);
     void dispatch();
