@@ -7,10 +7,11 @@ INCLUDEPATH += $${LIBRESOURCEQT}/src $${LIBRESOURCEINC} $${LIBDBUSQEVENTLOOP}
 
 # Input
 HEADERS +=  $${POLICY}/resources.h $${POLICY}/resource-set.h test-resource-set.h \
-            $${LIBRESOURCEQT}/src/resource-engine.h
+            $${POLICY}/audio-resource.h $${LIBRESOURCEQT}/src/resource-engine.h
 
 SOURCES +=  $${LIBRESOURCEQT}/src/resource.cpp $${LIBRESOURCEQT}/src/resources.cpp \
             $${LIBRESOURCEQT}/src/resource-engine.cpp \
+            $${LIBRESOURCEQT}/src/audio-resource.cpp \
             $${LIBRESOURCEQT}/src/resource-set.cpp test-resource-set.cpp 
 
 OBJECTS_DIR = build

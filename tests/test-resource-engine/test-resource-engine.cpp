@@ -52,29 +52,29 @@ void TestResourceEngine::init()
     resourceEngine = new ResourceEngine(resourceSet);
     bool initializeSucceeded = resourceEngine->initialize();
     acquireOrDenyWasCalled = false;
-    QVERIFY(!resourceEngine->isConnected());
+    QVERIFY(!resourceEngine->isConnectedToManager());
     QVERIFY(initializeSucceeded);
 }
 
 void TestResourceEngine::testConnect()
 {
-    bool connectIsSuccessful = resourceEngine->connect();
+    bool connectIsSuccessful = resourceEngine->connectToManager();
 
     QVERIFY(connectIsSuccessful);
 }
 
 void TestResourceEngine::testDisconnect()
 {
-    resourceEngine->connect();
+    resourceEngine->connectToManager();
 
-    bool disconnectIsSuccessful = resourceEngine->disconnect();
+    bool disconnectIsSuccessful = resourceEngine->disconnectFromManager();
 
     QVERIFY(disconnectIsSuccessful);
 }
 
 void TestResourceEngine::testStatusMessage()
 {
-    resourceEngine->connect();
+    resourceEngine->connectToManager();
 
     resourceEngine->messageMap.insert(1, RESMSG_REGISTER);
     QObject::connect(resourceEngine, SIGNAL(connectedToManager()), this, SLOT(connectedHandler()));
@@ -84,7 +84,7 @@ void TestResourceEngine::testStatusMessage()
 
 void TestResourceEngine::connectedHandler()
 {
-    QVERIFY(resourceEngine->isConnected());
+    QVERIFY(resourceEngine->isConnectedToManager());
 }
 
 void TestResourceEngine::testAcquire_data()
@@ -113,7 +113,7 @@ void TestResourceEngine::testAcquire()
     acquireShouldSucceed = acquireSucceeds;
     QFETCH(ResourceType, optionalTypeAvailable);
     optionalType = optionalTypeAvailable;
-    resourceEngine->connect();
+    resourceEngine->connectToManager();
     QFETCH(bool, requestFails);
     requestShouldFail = requestFails;
     QFETCH(QString, errorMessage);
@@ -219,7 +219,6 @@ resset_t  *resconn_connect(resconn_t *connection, resmsg_t *message,
     statusMessage.status.errmsg = 0;
     statusMessage.record.id = 11;
     statusMessage.record.reqno = message->record.reqno;
-    callbackFunction(resSet, &statusMessage);
     return resSet;
 }
 

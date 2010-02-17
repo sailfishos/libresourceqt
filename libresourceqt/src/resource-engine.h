@@ -27,15 +27,17 @@ public:
 
     bool initialize();
 
-    bool connect();
-    bool disconnect();
-    bool isConnected();
+    bool connectToManager();
+    bool disconnectFromManager();
+    bool isConnectedToManager();
 
     bool acquireResources();
     bool releaseResources();
     bool updateResources();
 
-    bool registerAudioProperties(quint32 pid, QString streamName);
+    bool registerAudioPid(quint32 pid);
+    bool registerAudioStreamTag(const QString &streamName);
+    bool registerAudioGroup(const QString &);
 
     void handleConnectionIsUp();
 
@@ -49,9 +51,11 @@ public:
     void setMode(quint32 newMode);
 
 signals:
-    void resourcesBecameAvailable(QList<ResourceType> availableResources);
-    void resourcesAcquired(quint32 bitmaskOfGrantedResources);
+    void resourcesBecameAvailable(quint32 bitmaskOfAvailableResources);
+    void resourcesGranted(quint32 bitmaskOfGrantedResources);
     void resourcesDenied();
+    void resourcesReleased();
+    void resourcesLost(quint32 bitmaskOfGrantedResources);
     void connectedToManager();
     void disconnectedFromManager();
 
@@ -70,3 +74,4 @@ private:
 }
 
 #endif
+

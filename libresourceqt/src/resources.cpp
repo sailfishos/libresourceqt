@@ -2,62 +2,8 @@
 
 using namespace ResourcePolicy;
 
-AudioResource::AudioResource(const QString &audioGroup)
-        :   Resource(), group(audioGroup), pid(0), stream(QString())
-{
-}
-
-AudioResource::AudioResource(const AudioResource &other)
-        :   Resource(other), group(other.group), pid(other.pid), stream(other.stream)
-{
-}
-
-Resource * AudioResource::clone() const
-{
-    return new AudioResource(*this);
-}
-
-AudioResource::~AudioResource()
-{
-}
-
-QString AudioResource::audioGroup() const
-{
-    return group;
-}
-
-void AudioResource::setAudioGroup(const QString &newGroup)
-{
-    group = newGroup;
-}
-
-quint32 AudioResource::processID() const
-{
-    return pid;
-}
-
-void AudioResource::setProcessID(quint32 newPID)
-{
-    pid = newPID;
-}
-
-QString AudioResource::streamTag() const
-{
-    return stream;
-}
-
-void AudioResource::setStreamTag(const QString & newStreamTag)
-{
-    stream = newStreamTag;
-}
-
-ResourceType AudioResource::type() const
-{
-    return AudioPlaybackType;
-}
-
-AudioRecorderResource::AudioRecorderResource(const QString & audioGroup)
-        :   Resource(), group(audioGroup), pid(0), stream(QString())
+AudioRecorderResource::AudioRecorderResource()
+        :   Resource()
 {
 }
 
@@ -73,31 +19,6 @@ Resource * AudioRecorderResource::clone() const
 
 AudioRecorderResource::~AudioRecorderResource()
 {
-}
-
-void AudioRecorderResource::setAudioGroup(const QString & newGroup)
-{
-    group = newGroup;
-}
-
-quint32 AudioRecorderResource::processID() const
-{
-    return pid;
-}
-
-void AudioRecorderResource::setProcessID(quint32 newPID)
-{
-    pid = newPID;
-}
-
-QString AudioRecorderResource::streamTag() const
-{
-    return stream;
-}
-
-void AudioRecorderResource::setStreamTag(const QString & newStreamTag)
-{
-    stream = newStreamTag;
 }
 
 ResourceType AudioRecorderResource::type() const

@@ -6,6 +6,7 @@
 #include <QVector>
 #include <QList>
 #include <policy/resources.h>
+#include <policy/audio-resource.h>
 
 /**
  * \mainpage Resource Policy Library
@@ -88,7 +89,7 @@ public:
      * \param resource The resource to add to the set. A copy of this object
      * is stored in the Set.
      */
-    void addResource(const Resource *resource);
+    void addResource(Resource *resource);
     /**
      * This method adds all resources in the list to the set.
      * A set contains only a single instance of a given resource. If the
@@ -193,10 +194,14 @@ signals:
      */
     void resourcesDenied();
     /**
+     * This signal is emited as a response to the release() request.
+     */
+    void resourcesReleased();
+    /**
      * This signal is emited when some other program with a higher priority
-     * superseeds us, and as a result we loose our resources.
+     * superseeds us, and as a result we loose (some of) our resources.
      * It is very important to connect to this signal as it is signaling when
-     * the acquired resources can't be used anymore.
+     * the acquired resources shouldn't be used anymore.
      */
     void lostResources();
 
@@ -208,16 +213,27 @@ private:
     const QString resourceClass;
     Resource* resourceSet[NumberOfTypes];
     ResourceEngine *resourceEngine;
+    AudioResource *audioResource;
     bool autoRelease;
     bool alwaysReply;
     bool initialized;
     bool pendingAcquire;
+    bool pendingUpdate;
+    bool pendingAudioGroup;
+    bool pendingAudioStream;
+    bool pendingAudioPid;
     
 private slots:
     void connectedHandler();
-    void handleAcquire(quint32);
+    void handleGranted(quint32);
     void handleDeny();
-    
+    void handleReleased();
+    void handleResourcesLost(quint32);
+    void handleResourcesBecameAvailable(quint32);
+
+    void handleAudioPidChange(quint32 newPid);
+    void handleAudioGroupChange(const QString &newGroup);
+    void handleAudioStreamTagChanged(const QString &newGroup);
 };
 }
 

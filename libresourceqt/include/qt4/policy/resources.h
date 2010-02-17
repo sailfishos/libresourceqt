@@ -8,45 +8,12 @@
 namespace ResourcePolicy
 {
 
-class AudioResource: public Resource
-{
-public:
-    AudioResource(const QString &audioGroup = QString());
-    AudioResource(const AudioResource &other);
-    virtual ~AudioResource();
-
-    QString audioGroup() const;
-    void setAudioGroup(const QString & newGroup);
-
-    quint32 processID() const;
-    void setProcessID(quint32 newPID);
-
-    QString streamTag() const;
-    void setStreamTag(const QString & newStreamTag);
-
-    virtual ResourceType type() const;
-    virtual Resource * clone() const;
-private:
-    QString group;
-    quint32 pid;
-    QString stream;
-};
-
 class AudioRecorderResource: public Resource
 {
 public:
-    AudioRecorderResource(const QString & audioGroup = QString());
+    AudioRecorderResource();
     AudioRecorderResource(const AudioRecorderResource &other);
     virtual ~AudioRecorderResource();
-
-    QString audioGroup() const;
-    void setAudioGroup(const QString & newGroup);
-
-    quint32 processID() const;
-    void setProcessID(quint32 newPID);
-
-    QString streamTag() const;
-    void setStreamTag(const QString & newStreamTag);
 
     virtual ResourceType type() const;
     virtual Resource * clone() const;

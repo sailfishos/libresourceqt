@@ -10,12 +10,14 @@ HEADERS +=  $${POLICY}/resource.h \
             $${POLICY}/resources.h \
             $${POLICY}/resource-set.h \
             $${LIBRESOURCEQT}/src/resource-engine.h \
+            $${POLICY}/audio-resource.h \
             test-resource-engine.h
 
 SOURCES +=  $${LIBRESOURCEQT}/src/resource.cpp \
             $${LIBRESOURCEQT}/src/resources.cpp \
             $${LIBRESOURCEQT}/src/resource-set.cpp \
             $${LIBRESOURCEQT}/src/resource-engine.cpp \
+            $${LIBRESOURCEQT}/src/audio-resource.cpp \
             test-resource-engine.cpp
 
 OBJECTS_DIR = build

@@ -193,6 +193,7 @@ bool Client::initialize(uint32_t all, uint32_t optional, bool alwaysReply, bool 
 	{
 		return false;
 	}
+    connect(resourceSet, SIGNAL(resourcesReleased()), this, SLOT(resourceReleasedHandler()));
 
 	showPrompt();
 
@@ -351,6 +352,12 @@ void Client::resourceLostHandler()
 	showPrompt();
 }
 
+void Client::resourceReleasedHandler()
+{
+	printf("\nAll resources released\n");
+	showPrompt();
+}
+
 void Client::timerEvent(QTimerEvent*)
 {
 	bool quitFlag = false;
@@ -384,7 +391,7 @@ void Client::timerEvent(QTimerEvent*)
 			    printf("\t  update\tupdate modified resource set after add or remove command\n");
 			    printf("\t  add reslist [-o]\tadd reosurce list, if -o provided, set as optional\n");
 			    printf("\t  remove reslist [-o]\tremove reosurce list, if -o provided, removed only optional flag\n");
-			    printf("\t  audio \tnot implemented ....\n");
+			    printf("\t  audio pid <pid>|group <audio group>|tag <name:value>\tset audio properties");
 			    printf("\t  show  \tshow resources\n");
 			}
 			else if( params[0] == "show" )
@@ -482,30 +489,38 @@ void Client::timerEvent(QTimerEvent*)
 				}
 				else
 				{
-					AudioResource* p = reinterpret_cast<AudioResource*>(resourceSet->resource(AudioPlaybackType));
-					if( p == NULL )
+				    Resource *resource = resourceSet->resource(AudioPlaybackType);
+					AudioResource *audioResource = static_cast<AudioResource*>(resource);
+                    qDebug("resource = %p audioResource = %p", resource, audioResource);
+					if( audioResource == NULL )
 					{
 						printf("No AudioResource available in set!\n");
 					}
 					else
 					{
-						p->setAudioGroup(params[1]);
-
-						bool ok;
-						quint32 pid = (quint32)params[2].toInt(&ok, 10);
-						if( ok && pid != 0 )
-						{
-							p->setProcessID(pid);
+					    if( params[1] == "group" )
+					    {
+					        audioResource->setAudioGroup(params[2]);
+				        }
+				        else if( params[1] == "pid" )
+				        {
+				            bool ok;
+    						quint32 pid = (quint32)params[2].toInt(&ok, 10);
+						    if( ok && pid != 0 )
+    						{
+	    						audioResource->setProcessID(pid);
+	    					}
+	    					else
+	    					{
+	    						printf("Bad pid parameter!\n");
+	    					}
+    					}
+    					else if( params[1] == "tag" ) {
+    					    audioResource->setStreamTag(params[2]);
 						}
-						else
-						{
-							printf("Ignoring pid parameter!\n");
-						}
-
-						if( params.count() > 3 )
-						{
-							p->setStreamTag(params[3]);
-						}
+					    else {
+					        printf("Unknown audio command!\n");
+					    }
 					}
 				}
 			}

@@ -21,6 +21,10 @@ ResourceEngine::ResourceEngine(ResourceSet *resourceSet)
 
 ResourceEngine::~ResourceEngine()
 {
+    delete dbusEngine;
+    if (libresourceSet != NULL)
+        libresourceSet->userdata = NULL;
+    //need to destroy all libresource structures, but how?
 }
 
 bool ResourceEngine::initialize()
@@ -53,9 +57,13 @@ bool ResourceEngine::initialize()
     return true;
 }
 
-static void handleUnregisterMessage(resmsg_t *, resset_t *resSet, void *)
+static void handleUnregisterMessage(resmsg_t *, resset_t *libresourceSet, void *)
 {
-    ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(resSet->userdata);
+    if (NULL == libresourceSet->userdata) {
+        qDebug("IGNORING unregister, no context");
+        return;
+    }
+    ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(libresourceSet->userdata);
 
     engine->disconnected();
 }
@@ -67,43 +75,78 @@ void ResourceEngine::disconnected()
     emit disconnectedFromManager();
 }
 
-static void handleGrantMessage(resmsg_t *msg, resset_t *resSet, void *)
+static void handleGrantMessage(resmsg_t *message, resset_t *libresourceSet, void *)
 {
-    ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(resSet->userdata);
-
-    engine->receivedGrant(&(msg->notify));
+    if (NULL == libresourceSet->userdata) {
+        qDebug("IGNORING grant, no context: type=0x%04x, id=0x%04x, reqno=0x%04x, resc=0x%04x",
+               message->notify.type, message->notify.id, message->notify.reqno, message->notify.resrc);
+        return;
+    }
+    ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(libresourceSet->userdata);
+    engine->receivedGrant(&(message->notify));
 }
 
 void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
 {
-    qDebug("received a grant message for request %u", notifyMessage->reqno);
-    if(notifyMessage->resrc == 0) {
-        qDebug("request DENIED!");
-        emit resourcesDenied();
+    qDebug("receivedGrant: type=0x%04x, id=0x%04x, reqno=0x%04x, resc=0x%04x",
+           notifyMessage->type, notifyMessage->id, notifyMessage->reqno, notifyMessage->resrc);
+    if (notifyMessage->resrc == 0) {
+        bool unkownRequest = !messageMap.contains(notifyMessage->reqno);
+        resmsg_type_t originaloriginalMessageType = messageMap.take(notifyMessage->reqno);
+        qDebug("lost resources, originaloriginalMessageType=%u", originaloriginalMessageType);
+        if (unkownRequest) {
+            //we don't know this req number => it must be a server override.
+            qDebug("emiting signal resourcesLost()");
+            emit resourcesLost(allResourcesToBitmask(resourceSet));
+        }
+        else if (originaloriginalMessageType == RESMSG_ACQUIRE) {
+                qDebug("request DENIED!");
+                emit resourcesDenied();
+        }
+        else if (originaloriginalMessageType == RESMSG_RELEASE) {
+                qDebug("confirmnation to release");
+                emit resourcesReleased();
+        }
+        else {
+            qDebug("Ignoring the receivedGrant");
+        }
     }
     else {
-        qDebug("emiting signal resourcesAcquired(%02x), this=%p", notifyMessage->resrc, this);
-        emit resourcesAcquired(notifyMessage->resrc);
+        qDebug("emiting signal resourcesGranted(%02x)", notifyMessage->resrc);
+        emit resourcesGranted(notifyMessage->resrc);
     }
 }
 
-static void handleAdviceMessage(resmsg_t *msg, resset_t *resSet, void *)
+static void handleAdviceMessage(resmsg_t *message, resset_t *libresourceSet, void *)
 {
-    ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(resSet->userdata);
+    qDebug("ADVICE: type=0x%04x, id=0x%04x, reqno=0x%04x, resc=0x%04x",
+           message->notify.type, message->notify.id, message->notify.reqno, message->notify.resrc);
 
-    engine->receivedAdvice(&(msg->notify));
+    if (NULL == libresourceSet->userdata) {
+        qDebug("IGNORING advice, no context");
+        return;
+    }
+    ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(libresourceSet->userdata);
+
+    engine->receivedAdvice(&(message->notify));
 }
 
-void ResourceEngine::receivedAdvice(resmsg_notify_t *notifyMessage)
+void ResourceEngine::receivedAdvice(resmsg_notify_t *message)
 {
-    char buf[80];
-    resmsg_res_str(notifyMessage->resrc, buf, sizeof(buf));
-    qDebug("%s: %s", __FUNCTION__, buf);
+    qDebug("%s: %04x", __FUNCTION__, message->resrc);
+    uint32_t allResources = allResourcesToBitmask(resourceSet);
+    if(message->resrc < allResources) {
+        emit resourcesLost(allResources-message->resrc);
+    }
+    else {
+        emit resourcesBecameAvailable(message->resrc);
+    }
 }
 
-bool ResourceEngine::connect()
+bool ResourceEngine::connectToManager()
 {
     resmsg_t resourceMessage;
+    memset(&resourceMessage, 0, sizeof(resmsg_t));
     resourceMessage.record.type = RESMSG_REGISTER;
     resourceMessage.record.id = resourceSet->id();
     resourceMessage.record.reqno = ++requestId;
@@ -132,28 +175,18 @@ bool ResourceEngine::connect()
     return true;
 }
 
-bool ResourceEngine::disconnect()
+bool ResourceEngine::disconnectFromManager()
 {
     resmsg_t resourceMessage;
+    memset(&resourceMessage, 0, sizeof(resmsg_t));
+
+    qDebug("disconnecting from manager");
+
     resourceMessage.record.type = RESMSG_UNREGISTER;
     resourceMessage.record.id = resourceSet->id();
     resourceMessage.record.reqno = ++requestId;
 
     messageMap.insert(requestId, RESMSG_UNREGISTER);
-
-    uint32_t allResources, optionalResources;
-    allResources = allResourcesToBitmask(resourceSet);
-    optionalResources = optionalResourcesToBitmask(resourceSet);
-
-    resourceMessage.record.rset.all = allResources;
-    resourceMessage.record.rset.opt = optionalResources;
-    resourceMessage.record.rset.share = 0;
-    resourceMessage.record.rset.mask = mode;
-
-    QByteArray ba = resourceSet->applicationClass().toLatin1();
-    resourceMessage.record.klass = ba.data();
-
-    resourceMessage.record.mode = 0; //No auto release
 
     int r = resconn_disconnect(libresourceSet, &resourceMessage,
                                statusCallbackHandler);
@@ -220,6 +253,11 @@ static inline quint32 optionalResourcesToBitmask(const ResourceSet *resourceSet)
 
 static void statusCallbackHandler(resset_t *libresourceSet, resmsg_t *message)
 {
+    if (NULL == libresourceSet->userdata) {
+        qDebug("IGNORING status message, no context: type=0x%04x, id=0x%04x, reqno=0x%04x, errcod=%d",
+               message->status.type, message->status.id, message->status.reqno, message->status.errcod);
+        return;
+    }
     ResourceEngine *resourceEngine = reinterpret_cast<ResourceEngine *>(libresourceSet->userdata);
     qDebug("Received a status notification");
     if (message->type != RESMSG_STATUS) {
@@ -237,27 +275,38 @@ static void statusCallbackHandler(resset_t *libresourceSet, resmsg_t *message)
 
 void ResourceEngine::handleStatusMessage(quint32 requestNo)
 {
-    resmsg_type_t messageType = messageMap.take(requestNo);
-    qDebug("Received a status message: %u(0x%02x)", requestNo, messageType);
-    if (messageType == RESMSG_REGISTER) {
+    resmsg_type_t originalMessageType = messageMap.value(requestNo);
+    qDebug("Received a status message: %u(0x%02x)", requestNo, originalMessageType);
+    if (originalMessageType == RESMSG_REGISTER) {
         qDebug("connected!");
         connected = true;
         emit connectedToManager();
+        messageMap.remove(requestNo);
     }
-    else if (messageType == RESMSG_UNREGISTER) {
+    else if (originalMessageType == RESMSG_UNREGISTER) {
         qDebug("disconnected!");
         connected = false;
         emit disconnectedFromManager();
+        messageMap.remove(requestNo);
+    }
+    else if(originalMessageType == RESMSG_UPDATE) {
+        qDebug("Update status");
+    }
+    else if(originalMessageType == RESMSG_ACQUIRE) {
+        qDebug("Acquire status");
+    }
+    else if(originalMessageType == RESMSG_RELEASE) {
+        qDebug("Release status");
     }
 }
 
 void ResourceEngine::handleError(quint32 requestNo, qint32 code, const char *message)
 {
-    resmsg_type_t messageType = messageMap.take(requestNo);
-    qDebug("Error on request %u(0x%02x): %d - %s", requestNo, messageType, code, message);
+    resmsg_type_t originalMessageType = messageMap.take(requestNo);
+    qDebug("Error on request %u(0x%02x): %d - %s", requestNo, originalMessageType, code, message);
 }
 
-bool ResourceEngine::isConnected()
+bool ResourceEngine::isConnectedToManager()
 {
     return connected;
 }
@@ -268,8 +317,8 @@ bool ResourceEngine::acquireResources()
     memset(&message, 0, sizeof(resmsg_t));
 
     message.possess.type = RESMSG_ACQUIRE;
-    message.any.id    = resourceSet->id();
-    message.any.reqno = ++requestId;
+    message.possess.id    = resourceSet->id();
+    message.possess.reqno = ++requestId;
 
     messageMap.insert(requestId, RESMSG_ACQUIRE);
 
@@ -284,21 +333,102 @@ bool ResourceEngine::acquireResources()
 
 bool ResourceEngine::releaseResources()
 {
-    return false;
+    resmsg_t message;
+    memset(&message, 0, sizeof(resmsg_t));
+
+    message.possess.type = RESMSG_RELEASE;
+    message.possess.id    = resourceSet->id();
+    message.possess.reqno = ++requestId;
+
+    messageMap.insert(requestId, RESMSG_RELEASE);
+    qDebug("release %u:%u", resourceSet->id(), requestId);
+    int success = resproto_send_message(libresourceSet, &message, statusCallbackHandler);
+
+    if(!success)
+        return false;
+    else
+        return true;
 }
 
 bool ResourceEngine::updateResources()
 {
+    resmsg_t message;
+    memset(&message, 0, sizeof(resmsg_t));
+    message.record.type = RESMSG_UPDATE;
+    message.record.id = resourceSet->id();
+    message.record.reqno = ++requestId;
+
+    uint32_t allResources, optionalResources;
+    allResources = allResourcesToBitmask(resourceSet);
+    optionalResources = optionalResourcesToBitmask(resourceSet);
+
+    message.record.rset.all = allResources;
+    message.record.rset.opt = optionalResources;
+    message.record.rset.share = 0;
+    message.record.rset.mask = 0;
+
+    QByteArray ba = resourceSet->applicationClass().toLatin1();
+    message.record.klass = ba.data();
+
+    messageMap.insert(requestId, RESMSG_UPDATE);
+
+    qDebug("update %u:%u", resourceSet->id(), requestId);
+    int success = resproto_send_message(libresourceSet, &message, statusCallbackHandler);
+
+    if(!success)
+        return false;
+    else
+        return true;
+}
+
+bool ResourceEngine::registerAudioPid(quint32)
+{
     return false;
 }
 
-bool ResourceEngine::registerAudioProperties(quint32 pid, QString streamName)
+bool ResourceEngine::registerAudioStreamTag(const QString &)
 {
     return false;
+}
+
+bool ResourceEngine::registerAudioGroup(const QString &audioGroup)
+{
+    resmsg_t message;
+    memset(&message, 0, sizeof(resmsg_t));
+
+    QByteArray ba = resourceSet->applicationClass().toLatin1();
+    message.audio.group = ba.data();
+
+    message.audio.type = RESMSG_AUDIO;
+    message.audio.id    = resourceSet->id();
+    message.audio.reqno = ++requestId;
+
+    message.audio.type  = RESMSG_AUDIO;
+
+//    msg.audio.pid   = pid;
+//stream tag is a name:value pair
+//    msg.audio.property.name = name;
+//    msg.audio.property.match.method  = resmsg_method_equals;
+//    msg.audio.property.match.pattern = value; 
+
+    messageMap.insert(requestId, RESMSG_AUDIO);
+
+    qDebug("audio %u:%u", resourceSet->id(), requestId);
+    int success = resproto_send_message(libresourceSet, &message, statusCallbackHandler);
+
+    if(!success)
+        return false;
+    else
+        return true;
+    
 }
 
 static void connectionIsUp(resconn_t *connection)
 {
+    if (NULL == connection->dbus.rsets->userdata) {
+        qDebug("IGNORING connectionIsUp");
+        return;
+    }
     ResourceEngine *resourceEngine;
 
     resourceEngine = reinterpret_cast<ResourceEngine *>(connection->dbus.rsets->userdata);

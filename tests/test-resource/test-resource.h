@@ -4,6 +4,7 @@
 #include <QtTest/QTest>
 #include <QMetaType>
 #include <policy/resources.h>
+#include <policy/audio-resource.h>
 
 Q_DECLARE_METATYPE(ResourcePolicy::ResourceType)
 

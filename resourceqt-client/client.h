@@ -36,6 +36,7 @@ private slots:
 	void resourceAcquiredHandler(const QList<ResourceType>& grantedResList);
 	void resourceDeniedHandler();
 	void resourceLostHandler();
+	void resourceReleasedHandler();
 
 protected:
     void timerEvent(QTimerEvent *e);
