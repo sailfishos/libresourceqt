@@ -48,8 +48,6 @@ public:
     void handleStatusMessage(quint32 requestNo);
     void handleError(quint32 requestNo, qint32 code, const char *message);
 
-    void setMode(quint32 newMode);
-
 signals:
     void resourcesBecameAvailable(quint32 bitmaskOfAvailableResources);
     void resourcesGranted(quint32 bitmaskOfGrantedResources);
@@ -69,7 +67,7 @@ private:
     resset_t *libresourceSet;
     quint32 requestId;
     QMap<quint32, resmsg_type_t> messageMap;
-    quint32 mode;
+    quint32 connectionMode;
 };
 }
 

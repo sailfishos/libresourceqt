@@ -174,14 +174,30 @@ QString ResourceSet::applicationClass()
     return this->resourceClass;
 }
 
-void ResourceSet::setAutoRelease()
+bool ResourceSet::setAutoRelease()
 {
+    if(initialized)
+        return false;
     autoRelease = true;
+    return true;
 }
 
-void ResourceSet::setAlwaysReply()
+bool ResourceSet::willAutoRelease()
 {
+    return autoRelease;
+}
+
+bool ResourceSet::setAlwaysReply()
+{
+    if(initialized)
+        return false;
     alwaysReply = true;
+    return true;
+}
+
+bool ResourceSet::alwaysGetReply()
+{
+    return alwaysReply;
 }
 
 void ResourceSet::connectedHandler()

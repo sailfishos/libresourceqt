@@ -163,16 +163,23 @@ public:
      * re-gain our resources without having to re-request them. However if
      * the AutoRelease is set we release the resources and need to re-acquire
      * them, when the pre-emting application releases it s resources.
+     *
      * This feature is by default disabled.
-     * Remember to call update() when changing this.
+     *
+     * This flag should be set once only before the first acquire is called,
+     * and cannot be unset.
      */
-    void setAutoRelease();
+    bool setAutoRelease();
+    bool willAutoRelease();
     /**
      * Sets that the resourcesGranted() signal is emited even if we already
      * have the requested resources granted. By default this feature is off.
-     * This flag should be set once only before finalize is called, and cannot be unset.
+     *
+     * This flag should be set once only before the first acquire is called,
+     * and cannot be unset.
      */
-    void setAlwaysReply();
+    bool setAlwaysReply();
+    bool alwaysGetReply();
 
 signals:
     /**

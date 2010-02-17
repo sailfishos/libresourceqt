@@ -15,8 +15,15 @@ static void handleAdviceMessage(resmsg_t *msg, resset_t *rs, void *data);
 ResourceEngine::ResourceEngine(ResourceSet *resourceSet)
         : QObject(resourceSet), connected(false), resourceSet(resourceSet),
         dbusEngine(NULL), libresourceConnection(NULL), libresourceSet(NULL),
-        requestId(0), messageMap(), mode(0)
+        requestId(0), messageMap(), connectionMode(0)
 {
+    if (resourceSet->alwaysGetReply()) {
+        connectionMode += RESMSG_MODE_ALWAYS_REPLY;
+    }
+    if (resourceSet->willAutoRelease()) {
+        connectionMode += RESOURCE_AUTO_RELEASE;
+    }
+    qDebug("connectionMode = %04x", connectionMode);
 }
 
 ResourceEngine::~ResourceEngine()
@@ -160,12 +167,12 @@ bool ResourceEngine::connectToManager()
     resourceMessage.record.rset.all = allResources;
     resourceMessage.record.rset.opt = optionalResources;
     resourceMessage.record.rset.share = 0;
-    resourceMessage.record.rset.mask = 0;
+    resourceMessage.record.rset.mask = connectionMode;
 
     QByteArray ba = resourceSet->applicationClass().toLatin1();
     resourceMessage.record.klass = ba.data();
 
-    resourceMessage.record.mode = mode;
+    resourceMessage.record.mode = connectionMode;
 
     qDebug("ResourceEngine is now connecting...");
     libresourceSet = resconn_connect(libresourceConnection, &resourceMessage,
@@ -365,7 +372,7 @@ bool ResourceEngine::updateResources()
     message.record.rset.all = allResources;
     message.record.rset.opt = optionalResources;
     message.record.rset.share = 0;
-    message.record.rset.mask = 0;
+    message.record.rset.mask = connectionMode;
 
     QByteArray ba = resourceSet->applicationClass().toLatin1();
     message.record.klass = ba.data();
@@ -393,10 +400,13 @@ bool ResourceEngine::registerAudioStreamTag(const QString &)
 
 bool ResourceEngine::registerAudioGroup(const QString &audioGroup)
 {
+    if((audioGroup == "") || (audioGroup == QString()))
+        return false; 
+
     resmsg_t message;
     memset(&message, 0, sizeof(resmsg_t));
 
-    QByteArray ba = resourceSet->applicationClass().toLatin1();
+    QByteArray ba = audioGroup.toLatin1();
     message.audio.group = ba.data();
 
     message.audio.type = RESMSG_AUDIO;
@@ -439,10 +449,5 @@ static void connectionIsUp(resconn_t *connection)
 void ResourceEngine::handleConnectionIsUp()
 {
     emit connectedToManager();
-}
-
-void ResourceEngine::setMode(quint32 newMode)
-{
-    mode = newMode;
 }
 

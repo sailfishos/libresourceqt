@@ -169,11 +169,13 @@ bool Client::initialize(uint32_t all, uint32_t optional, bool alwaysReply, bool 
 
 	if( alwaysReply )
 	{
+	    qDebug("client: alwaysReply");
 		resourceSet->setAlwaysReply();
 	}
 
 	if( autoRelease )
 	{
+	    qDebug("client: autoRelease");
 		resourceSet->setAutoRelease();
 	}
 
