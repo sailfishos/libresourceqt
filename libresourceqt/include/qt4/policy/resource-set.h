@@ -34,7 +34,7 @@
  * resources->addResource(videoResource);
  * \endcode
  * The resource set now has control over the Resource object pointers. You can
- * drop them, but should NOT delete them. Instead call the ResourcePolicy::ResourceSet::deleteResource() 
+ * drop them, but should NOT delete them. Instead call the ResourcePolicy::ResourceSet::deleteResource()
  * method. Then when you want to acquire the \ref ResourcePolicy::ResourceSet
  * you simply use the \ref ResourcePolicy::ResourceSetacquire() method, like this:
  * \code
@@ -229,7 +229,7 @@ private:
     bool pendingAudioGroup;
     bool pendingAudioStream;
     bool pendingAudioPid;
-    
+
 private slots:
     void connectedHandler();
     void handleGranted(quint32);
@@ -240,7 +240,7 @@ private slots:
 
     void handleAudioPidChange(quint32 newPid);
     void handleAudioGroupChange(const QString &newGroup);
-    void handleAudioStreamTagChanged(const QString &newGroup);
+    void handleAudioStreamTagChanged(const QString &name, const QString &value);
 };
 }
 

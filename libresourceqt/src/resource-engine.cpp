@@ -388,20 +388,42 @@ bool ResourceEngine::updateResources()
         return true;
 }
 
-bool ResourceEngine::registerAudioPid(quint32)
+bool ResourceEngine::registerAudioPid(quint32 pid)
 {
-    return false;
+    if(pid == 0)
+        return false;
+
+    resmsg_t message;
+    memset(&message, 0, sizeof(resmsg_t));
+
+    message.audio.pid = pid;
+
+    qDebug("audio pid %u", pid);
+    return sendAudioMessage(&message);
 }
 
-bool ResourceEngine::registerAudioStreamTag(const QString &)
+bool ResourceEngine::registerAudioStreamTag(const QString &name, const QString &value)
 {
-    return false;
+    if(name.isEmpty() || name.isNull() || value.isEmpty() || value.isNull())
+        return false;
+
+    resmsg_t message;
+    memset(&message, 0, sizeof(resmsg_t));
+
+    QByteArray nameBa = name.toLatin1();
+    QByteArray valueBa = value.toLatin1();
+    message.audio.property.name = nameBa.data();
+    message.audio.property.match.method  = resmsg_method_equals;
+    message.audio.property.match.pattern = valueBa.data();
+
+    qDebug() << "audio stream tag " << name << ":" << value;
+    return sendAudioMessage(&message);
 }
 
 bool ResourceEngine::registerAudioGroup(const QString &audioGroup)
 {
-    if((audioGroup == "") || (audioGroup == QString()))
-        return false; 
+    if(audioGroup.isEmpty() || audioGroup.isNull())
+        return false;
 
     resmsg_t message;
     memset(&message, 0, sizeof(resmsg_t));
@@ -409,28 +431,27 @@ bool ResourceEngine::registerAudioGroup(const QString &audioGroup)
     QByteArray ba = audioGroup.toLatin1();
     message.audio.group = ba.data();
 
-    message.audio.type = RESMSG_AUDIO;
-    message.audio.id    = resourceSet->id();
-    message.audio.reqno = ++requestId;
+    qDebug() << "audio group " << audioGroup;
+    return sendAudioMessage(&message);
+}
 
-    message.audio.type  = RESMSG_AUDIO;
+bool ResourceEngine::sendAudioMessage(resmsg_t *message)
+{
+    message->audio.type = RESMSG_AUDIO;
+    message->audio.id    = resourceSet->id();
+    message->audio.reqno = ++requestId;
 
-//    msg.audio.pid   = pid;
-//stream tag is a name:value pair
-//    msg.audio.property.name = name;
-//    msg.audio.property.match.method  = resmsg_method_equals;
-//    msg.audio.property.match.pattern = value; 
+    message->audio.type  = RESMSG_AUDIO;
 
     messageMap.insert(requestId, RESMSG_AUDIO);
 
     qDebug("audio %u:%u", resourceSet->id(), requestId);
-    int success = resproto_send_message(libresourceSet, &message, statusCallbackHandler);
+    int success = resproto_send_message(libresourceSet, message, statusCallbackHandler);
 
     if(!success)
         return false;
     else
         return true;
-    
 }
 
 static void connectionIsUp(resconn_t *connection)
