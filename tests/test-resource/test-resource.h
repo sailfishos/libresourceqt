@@ -42,8 +42,6 @@ private slots:
 
     void testOptional_data();
     void testOptional();
-
-    void testClone();
 };
 
 #endif

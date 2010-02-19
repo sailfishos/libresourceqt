@@ -33,10 +33,10 @@ TestResourceEngine::TestResourceEngine()
 
     resourceSet = new ResourceSet("player", this);
     theID = resourceSet->id();
-    resourceSet->addResource(audioPlayback);
-    resourceSet->addResource(videoPlayback);
-    resourceSet->addResource(audioRecorder);
-    resourceSet->addResource(videoRecorder);
+    resourceSet->addResourceObject(audioPlayback);
+    resourceSet->addResourceObject(videoPlayback);
+    resourceSet->addResourceObject(audioRecorder);
+    resourceSet->addResourceObject(videoRecorder);
 }
 
 TestResourceEngine::~TestResourceEngine()

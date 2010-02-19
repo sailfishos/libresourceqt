@@ -4,29 +4,29 @@ Resource * TestResourceSet::resourceFromType(ResourceType type)
 {
     switch (type) {
     case AudioPlaybackType:
-        return audioResource;
+        return new AudioResource;
     case AudioRecorderType:
-        return audioRecorderResource;
+        return new AudioRecorderResource;
     case VideoPlaybackType:
-        return videoResource;
+        return new VideoResource;
     case VideoRecorderType:
-        return videoRecorderResource;
+        return new VideoRecorderResource;
     case VibraType:
-        return vibraResource;
+        return new VibraResource;
     case LedsType:
-        return ledsResource;
+        return new LedsResource;
     case BacklightType:
-        return backlightResource;
+        return new BacklightResource;
     case SystemButtonType:
-        return systemButtonResource;
+        return new SystemButtonResource;
     case LockButtonType:
-        return lockButtonResource;
+        return new LockButtonResource;
     case ScaleButtonType:
-        return scaleButtonResource;
+        return new ScaleButtonResource;
     case SnapButtonType:
-        return snapButtonResource;
+        return new SnapButtonResource;
     case LensCoverType:
-        return lensCoverResource;
+        return new LensCoverResource;
     default:
         return NULL;
     }
@@ -36,34 +36,10 @@ using namespace ResourcePolicy;
 
 TestResourceSet::TestResourceSet()
 {
-    audioResource = new AudioResource;
-    audioRecorderResource = new AudioRecorderResource;
-    videoResource = new VideoResource;
-    videoRecorderResource = new VideoRecorderResource;
-    vibraResource = new VibraResource;
-    ledsResource = new LedsResource;
-    backlightResource = new BacklightResource;
-    systemButtonResource = new SystemButtonResource;
-    lockButtonResource = new LockButtonResource;
-    scaleButtonResource = new ScaleButtonResource;
-    snapButtonResource = new SnapButtonResource;
-    lensCoverResource = new LensCoverResource;
 }
 
 TestResourceSet::~TestResourceSet()
 {
-    delete audioResource;
-    delete audioRecorderResource;
-    delete videoResource;
-    delete videoRecorderResource;
-    delete vibraResource;
-    delete ledsResource;
-    delete backlightResource;
-    delete systemButtonResource;
-    delete lockButtonResource;
-    delete scaleButtonResource;
-    delete snapButtonResource;
-    delete lensCoverResource;
 }
 
 void TestResourceSet::init()
@@ -90,78 +66,59 @@ void TestResourceSet::testAddResource()
 {
     for (int i = 0;i < NumberOfTypes;i++) {
         ResourceType type = (ResourceType)i;
-        Resource *resource = resourceFromType(type);
-        resourceSet->addResource(resource);
+        resourceSet->addResource(type);
         bool setContainsGivenResource = resourceSet->contains(type);
         QVERIFY(setContainsGivenResource);
     }
 }
 
-void TestResourceSet::testAddResources()
+void TestResourceSet::testAddResourceObject()
 {
-    resourceSet->addResource(audioResource);
-
-    bool setContainsAudioResource = resourceSet->contains(AudioPlaybackType);
-    QVERIFY(setContainsAudioResource);
-    QList<Resource *> resources;
-
-    resources << audioResource << videoResource;
-
-    resourceSet->addResources(resources);
-
-    QVERIFY(resourceSet->contains(AudioPlaybackType));
-    QVERIFY(resourceSet->contains(VideoPlaybackType));
+    for (int i = 0;i < NumberOfTypes;i++) {
+        ResourceType type = (ResourceType)i;
+        Resource *resource = resourceFromType(type);
+        resourceSet->addResourceObject(resource);
+        bool setContainsGivenResource = resourceSet->contains(type);
+        QVERIFY(setContainsGivenResource);
+    }
 }
 
 void TestResourceSet::testDelResource()
 {
-    resourceSet->addResource(audioResource);
-    resourceSet->addResource(vibraResource);
-    resourceSet->deleteResource(AudioPlaybackType);
+    for (int i = 0;i < NumberOfTypes;i++) {
+        ResourceType type = (ResourceType)i;
+        resourceSet->addResource(type);
+        bool setContainsGivenResource = resourceSet->contains(type);
+        QVERIFY(setContainsGivenResource);
+    }
 
-    bool setDoesNotContainAudioResource = !resourceSet->contains(AudioPlaybackType);
-    QVERIFY(setDoesNotContainAudioResource);
-    QVERIFY(resourceSet->contains(VibraType));
+    for (int i = 0;i < NumberOfTypes;i++) {
+        ResourceType type = (ResourceType)i;
+        resourceSet->deleteResource(type);
+        bool setNoLongerContainType = !resourceSet->contains(type);
+        QVERIFY(setNoLongerContainType);
+        for (int j = 0; j < NumberOfTypes; j++) {
+            if(j == i) continue;
+            ResourceType otherType = (ResourceType)j;
+            bool setStillContainsOtherTypes = resourceSet->contains(otherType);
+            QVERIFY(setStillContainsOtherTypes);
+        }
+        resourceSet->addResource(type);
+    }
 }
-
-void TestResourceSet::testContainsSingle()
-{
-    QList<Resource *> resources;
-
-    resources << audioResource << videoResource << audioRecorderResource;
-    resourceSet->addResources(resources);
-    QList<Resource *> resourcesInSet = resourceSet->resources();
-
-    bool containsVideoPlayback = resourceSet->contains(VideoPlaybackType);
-    QVERIFY(containsVideoPlayback);
-}
-
-void TestResourceSet::testDoesNotContainSingle()
-{
-    QList<Resource *> resources;
-
-    resources << audioResource << videoResource;
-    resourceSet->addResources(resources);
-    QList<Resource *> resourcesInSet = resourceSet->resources();
-
-    bool doesNotContainVideoRecorder = !resourceSet->contains(VideoRecorderType);
-    QVERIFY(doesNotContainVideoRecorder);
-}
-
 
 void TestResourceSet::testContainsSet()
 {
     QList<ResourceType> types, subset;
-    QList<Resource *> resources;
 
-    types << AudioPlaybackType << VideoPlaybackType
+    for (int i = 0;i < NumberOfTypes;i++) {
+        ResourceType type = (ResourceType)i;
+        resourceSet->addResource(type);
+        types.append(type);
+    }
+
+    subset << AudioPlaybackType << VideoPlaybackType
     << AudioRecorderType << VideoRecorderType << LensCoverType;
-    subset << AudioPlaybackType << VideoPlaybackType << LensCoverType;
-
-    resources << audioResource << videoResource
-    << audioRecorderResource << videoRecorderResource << lensCoverResource;
-
-    resourceSet->addResources(resources);
 
     bool containsAll = resourceSet->contains(types);
     bool containsSubset = resourceSet->contains(subset);

@@ -167,18 +167,4 @@ void TestResource::testOptional()
     QVERIFY(result == expected);
 }
 
-void TestResource::testClone()
-{
-    for (quint32 type = AudioPlaybackType; type < NumberOfTypes; type++) {
-        Resource *resource = resourceFromType((ResourceType)type);
-        resource->setOptional();
-        Resource *copy = resource->clone();
-
-        QCOMPARE(copy->isOptional(), resource->isOptional());
-        QCOMPARE(copy->type(), resource->type());
-        delete copy;
-    }
-}
-
 QTEST_MAIN(TestResource)
-

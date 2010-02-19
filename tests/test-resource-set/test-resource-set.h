@@ -39,11 +39,9 @@ private slots:
     void testIdentifier();
 
     void testAddResource();
-    void testAddResources();
+    void testAddResourceObject();
     void testDelResource();
 
-    void testContainsSingle();
-    void testDoesNotContainSingle();
     void testContainsSet();
 };
 
