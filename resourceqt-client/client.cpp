@@ -352,7 +352,7 @@ void Client::timerEvent(QTimerEvent*)
                 printf("\t  update\tupdate modified resource set after add or remove command\n");
                 printf("\t  add reslist [-o]\tadd reosurce list, if -o provided, set as optional\n");
                 printf("\t  remove reslist [-o]\tremove reosurce list, if -o provided, removed only optional flag\n");
-                printf("\t  audio pid <pid>|group <audio group>|tag <name:value>\tset audio properties");
+                printf("\t  audio pid <pid> | group <audio group> | tag <name> <value>\tset audio properties");
                 printf("\t  show  \tshow resources\n");
             }
             else if (params[0] == "show") {
@@ -435,9 +435,10 @@ void Client::timerEvent(QTimerEvent*)
                             audioResource->setAudioGroup(params[2]);
                         }
                         else if (params[1] == "pid") {
-                            bool ok;
+                            bool ok=false;
                             quint32 pid = (quint32)params[2].toInt(&ok, 10);
                             if (ok && pid != 0) {
+                                qDebug("Setting audio PID to %u", pid);
                                 audioResource->setProcessID(pid);
                             }
                             else {
@@ -445,7 +446,12 @@ void Client::timerEvent(QTimerEvent*)
                             }
                         }
                         else if (params[1] == "tag") {
-                            audioResource->setStreamTag(params[2]);
+                            if (params.count() < 4) {
+                                printf("tag requires TWO parameters name and value. See help \n");
+                            }
+                            else {
+                                audioResource->setStreamTag(params[2], params[3]);
+                            }
                         }
                         else {
                             printf("Unknown audio command!\n");

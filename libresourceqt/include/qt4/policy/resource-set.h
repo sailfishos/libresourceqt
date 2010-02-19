@@ -226,9 +226,7 @@ private:
     bool initialized;
     bool pendingAcquire;
     bool pendingUpdate;
-    bool pendingAudioGroup;
-    bool pendingAudioStream;
-    bool pendingAudioPid;
+    bool pendingAudioProperties;
 
 private slots:
     void connectedHandler();
@@ -238,9 +236,9 @@ private slots:
     void handleResourcesLost(quint32);
     void handleResourcesBecameAvailable(quint32);
 
-    void handleAudioPidChange(quint32 newPid);
-    void handleAudioGroupChange(const QString &newGroup);
-    void handleAudioStreamTagChanged(const QString &name, const QString &value);
+    void handleAudioPropertiesChanged(const QString &group, quint32 pid,
+                                      const QString &name, const QString &value);
+
 };
 }
 

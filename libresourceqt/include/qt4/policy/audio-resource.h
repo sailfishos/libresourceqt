@@ -36,9 +36,8 @@ private:
     QString streamName;
     QString streamValue;
 signals:
-    void pidChanged(quint32 newPid);
-    void audioGroupChanged(const QString &newGroup);
-    void streamTagChanged(const QString &name, const QString &value);
+    void audioPropertiesChanged(const QString &group, quint32 pid,
+                                const QString &name, const QString &value);
 };
 }
 

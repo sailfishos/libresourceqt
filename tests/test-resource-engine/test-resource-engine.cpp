@@ -284,7 +284,7 @@ int resproto_send_message(resset_t *resourceSet, resmsg_t *message,
 
     replyMessage.type = RESMSG_GRANT;
     if (acquireShouldSucceed) {
-        replyMessage.notify.resrc = RESMSG_AUDIO_PLAYBACK | RESMSG_AUDIO_RECORDING 
+        replyMessage.notify.resrc = RESMSG_AUDIO_PLAYBACK | RESMSG_AUDIO_RECORDING
                                   | RESMSG_VIDEO_PLAYBACK | RESMSG_VIDEO_RECORDING;
     }
     else {
@@ -320,3 +320,10 @@ static void verify_resproto_send_message(resset_t *resourceSet, resmsg_t *messag
     }
 }
 
+char *resmsg_dump_message(resmsg_t *resmsg,
+                           int       indent,
+                           char     *buf,
+                           int       len)
+{
+    return "message";
+}

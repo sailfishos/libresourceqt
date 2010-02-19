@@ -35,9 +35,8 @@ public:
     bool releaseResources();
     bool updateResources();
 
-    bool registerAudioPid(quint32 pid);
-    bool registerAudioStreamTag(const QString &name, const QString &value);
-    bool registerAudioGroup(const QString &);
+    bool registerAudioProperties(const QString &audioGroup, quint32 pid,
+                                  const QString &name, const QString &value);
 
     void handleConnectionIsUp();
 
@@ -69,7 +68,6 @@ private:
     QMap<quint32, resmsg_type_t> messageMap;
     quint32 connectionMode;
 
-    bool sendAudioMessage(resmsg_t *message);
 };
 }
 

@@ -7,7 +7,7 @@ ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
         : QObject(parent), resourceClass(applicationClass), resourceEngine(NULL),
         audioResource(NULL), autoRelease(false), alwaysReply(false),
         initialized(false), pendingAcquire(false), pendingUpdate(false),
-        pendingAudioGroup(true), pendingAudioStream(true), pendingAudioPid(true)
+        pendingAudioProperties(false)
 {
     identifier = (quint32)this;
     memset(resourceSet, 0, sizeof(QPointer<Resource *>)*NumberOfTypes);
@@ -57,18 +57,17 @@ void ResourceSet::addResource(Resource *resource)
     if (resource->type() == AudioPlaybackType) {
         qDebug("audioResource... %p", resource);
         audioResource = static_cast<AudioResource *>(resource);
-        QObject::connect(audioResource, SIGNAL(pidChanged(quint32)),
-                          this, SLOT(handleAudioPidChange(quint32)));
-        QObject::connect(audioResource, SIGNAL(audioGroupChanged(const QString &)),
-                          this, SLOT(handleAudioGroupChange(QString)));
-        QObject::connect(audioResource, SIGNAL(streamTagChanged(const QString &, const QString &)),
-                          this, SLOT(handleAudioStreamTagChanged(const QString &, const QString &)));
-        if(audioResource->streamTagIsSet())
-            pendingAudioStream = true;
-        if(audioResource->audioGroupIsSet())
-            pendingAudioGroup = true;
-        if(audioResource->processID() > 0)
-            pendingAudioPid = true;
+        QObject::connect(audioResource,
+                          SIGNAL(audioPropertiesChanged(const QString &, quint32,
+                                                         const QString &, const QString &)),
+                          this,
+                          SLOT(handleAudioPropertiesChanged(const QString &, quint32,
+                                                             const QString &, const QString &)));
+        if(audioResource->streamTagIsSet() || audioResource->audioGroupIsSet() ||
+           (audioResource->processID() > 0))
+        {
+            pendingAudioProperties = true;
+        }
     }
     delete resourceSet[resource->type()];
     resourceSet[resource->type()] = resource;
@@ -204,10 +203,16 @@ bool ResourceSet::alwaysGetReply()
 
 void ResourceSet::connectedHandler()
 {
-    if (pendingAudioGroup) {
+    if (pendingAudioProperties) {
         qDebug() << "registering audio group: " << audioResource->audioGroup();
-        resourceEngine->registerAudioGroup(audioResource->audioGroup());
-        pendingAudioGroup = false;
+        qDebug() << "registering PID: " << audioResource->processID();
+        qDebug() << "registering audio stream: " << audioResource->streamTagName()
+        << ":" << audioResource->streamTagValue();
+        resourceEngine->registerAudioProperties(audioResource->audioGroup(),
+                                                audioResource->processID(),
+                                                audioResource->streamTagName(),
+                                                audioResource->streamTagValue());
+        pendingAudioProperties = false;
     }
     if (pendingUpdate) {
         resourceEngine->updateResources();
@@ -289,38 +294,17 @@ void ResourceSet::handleResourcesBecameAvailable(quint32 availableResources)
     emit resourcesBecameAvailable(listOfResources);
 }
 
-void ResourceSet::handleAudioPidChange(quint32 newPid)
+void ResourceSet::handleAudioPropertiesChanged(const QString &group, quint32 pid,
+                                                const QString &name, const QString &value)
 {
-    qDebug("Audio renderer PID = %u", newPid);
+    qDebug() << "Audio group is: " << group;
+    qDebug("Audio renderer PID = %u", pid);
     if (initialized && resourceEngine->isConnectedToManager()) {
-        qDebug("registering new PID");
-        resourceEngine->registerAudioPid(newPid);
-    }
-    else {
-        qDebug("registering PID later...");
-        pendingAudioPid = true;
-    }
-}
-
-void ResourceSet::handleAudioGroupChange(const QString &newGroup)
-{
-    qDebug() << "Audio group changed to: " << newGroup;
-    if (initialized && resourceEngine->isConnectedToManager()) {
-        qDebug("registering new audio group");
-        resourceEngine->registerAudioGroup(newGroup);
+        qDebug("registering new audio settings");
+        resourceEngine->registerAudioProperties(group, pid, name, value);
     }
     else {
         qDebug("registering new audio group LATER");
-        pendingAudioGroup = true;
-    }
-}
-
-void ResourceSet::handleAudioStreamTagChanged(const QString &name, const QString &value)
-{
-    if (initialized && resourceEngine->isConnectedToManager()) {
-        resourceEngine->registerAudioStreamTag(name, value);
-    }
-    else {
-        pendingAudioStream = true;
+        pendingAudioProperties = true;
     }
 }

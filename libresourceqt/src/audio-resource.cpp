@@ -41,7 +41,7 @@ void AudioResource::setAudioGroup(const QString &newGroup)
     qDebug("this = %p", this);
     group = newGroup;
     qDebug() << "Audio group changed! New group is: " << newGroup;
-    emit audioGroupChanged(group);
+    emit audioPropertiesChanged(group, pid, streamName, streamValue);
 }
 
 quint32 AudioResource::processID() const
@@ -52,7 +52,8 @@ quint32 AudioResource::processID() const
 void AudioResource::setProcessID(quint32 newPID)
 {
     pid = newPID;
-    emit pidChanged(pid);
+    qDebug("New PID = %u", pid);
+    emit audioPropertiesChanged(group, pid, streamName, streamValue);
 }
 
 QString AudioResource::streamTagName() const
@@ -78,7 +79,7 @@ void AudioResource::setStreamTag(const QString &name, const QString &value)
 {
     streamName = name;
     streamValue = value;
-    emit streamTagChanged(name, value);
+    emit audioPropertiesChanged(group, pid, name, value);
 }
 
 ResourceType AudioResource::type() const
