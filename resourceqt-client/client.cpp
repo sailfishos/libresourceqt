@@ -129,7 +129,7 @@ void Client::updateSet(uint32_t list, uint32_t optional, bool remove)
 
                 resource = allocateResource(res, opt);
                 if (resource) {
-                    resourceSet->addResource(resource);
+                    resourceSet->addResourceObject(resource);
                 }
             }
         }

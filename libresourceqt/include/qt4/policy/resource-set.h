@@ -13,30 +13,34 @@
  *
  * \section intro_section Introduction
  *
- * This library is used to request resources from the Polict Resource Manager.
+ * This library is used to request resources from the Policy Resource Manager.
  * To use this library two classes are provided: \ref ResourcePolicy::Resource and
  * \ref ResourcePolicy::ResourceSet.
  *
  * \section library_use_section Library Usage
  *
- * To use the Resource Policy Library, you first need to create a number of
- * \ref Resource objects like this (given as an example of what a media player
- * might want/need):
- * \code
- * ResourcePolicy::AudioResource *audioResource = new ResourcePolicy::AudioResource();
- * ResourcePolicy::VideoResource *audioResource = new ResourcePolicy::VideoResource();
- * videoResource->setOptional();
- * \endcode
- * Then you need to create a \ref ResourcePolicy::ResourceSet like this:
+ * To use the Resource Policy Library, you first need to create the
+ * \ref ResourcePolicy::ResourceSet like this:
  * \code
  * ResourcePolicy::ResourceSet *resources = new ResourcePolicy::ResourceSet("player");
- * resources->addResource(audioResource);
- * resources->addResource(videoResource);
  * \endcode
- * The resource set now has control over the Resource object pointers. You can
- * drop them, but should NOT delete them. Instead call the ResourcePolicy::ResourceSet::deleteResource()
- * method. Then when you want to acquire the \ref ResourcePolicy::ResourceSet
- * you simply use the \ref ResourcePolicy::ResourceSetacquire() method, like this:
+ * Then to add resources to the set use the \ref addResource() method to add
+ * resources to the \ref ResourceSet. Like this:
+ * \code
+ * resources->addResource(AudioPlaybackType);
+ * resources->addResource(VideoPlaybackType);
+ * \endcode
+ * If you want to pre-populate the AudioResource with the audio group (it is a good idea)
+ * and other oudio parameters you can create an audio object your self and then
+ * give that to the \ref ResourceSet. Note that you should NOT free this object.
+ * The \ref ResourceSet takes ownership of this pointer.
+ * \code
+ * ResourcePolicy::AudioResource *audioResource = new ResourcePolicy::AudioResource("fmradio");
+ * resources->addResourceObject(audioResource);
+ * \endcode
+ * Calling the ResourcePolicy::ResourceSet::deleteResource() method will remove
+ * and delete the object. Then when you want to acquire the \ref ResourcePolicy::ResourceSet
+ * you simply use the \ref acquire() method, like this:
  * \code
  * QObject::connect(resources, SIGNAL(resourcesAcquired()),
  *                  this, SLOT(acquireOkHandler(QList<ResourcePolicy::Resource>)));
@@ -50,6 +54,8 @@
  * \endcode
  * This signal tells you when you should stop using the resources you have asked for.
  * So it is important that you connect to it.
+ *
+ * To modify the properties of the resources you can use the \ref resource() method.
  */
 
 /**
@@ -86,19 +92,20 @@ public:
      * This method adds a resource to the set. A set contains only a single
      * instance of a given resource. If the ResourceSet already contains a
      * resource of the given type it will be overridden.
-     * \param resource The resource to add to the set. A copy of this object
+     * \param resourceType The resource to add to the set. A copy of this object
      * is stored in the Set.
      */
-    void addResource(Resource *resource);
+    bool addResource(ResourceType resourceType);
+
     /**
-     * This method adds all resources in the list to the set.
-     * A set contains only a single instance of a given resource. If the
-     * ResourceSet already contains a resource of the given type it will be
-     * overridden.
-     * \param resources The list of resources to add to the set. These will
-     * be copied.
-     */
-    void addResources(const QList<Resource *>resources);
+    * This method adds a resource to the set. A set contains only a single
+    * instance of a given resource. If the ResourceSet already contains a
+    * resource of the given type it will be overridden.
+    * \param resource The resource to add to the set. The \ref ResourseSet takes
+    * ownership of the pointer. Do NOT free!
+    */
+    void addResourceObject(Resource *resource);
+
     /**
      * This method removes the resource of the given type
      * \param type The type of the resource to remove from the set.

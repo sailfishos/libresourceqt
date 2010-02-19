@@ -2,7 +2,6 @@
 #define RESOURCES_H
 
 #include <policy/resource.h>
-#include <QObject>
 #include <QString>
 
 namespace ResourcePolicy
@@ -16,7 +15,6 @@ public:
     virtual ~AudioRecorderResource();
 
     virtual ResourceType type() const;
-    virtual Resource * clone() const;
 private:
     QString group;
     quint32 pid;
@@ -31,7 +29,6 @@ public:
     virtual ~BacklightResource();
 
     virtual ResourceType type() const;
-    virtual Resource * clone() const;
 };
 
 class LedsResource: public Resource
@@ -42,7 +39,6 @@ public:
     virtual ~LedsResource();
 
     virtual ResourceType type() const;
-    virtual Resource * clone() const;
 };
 
 class VibraResource: public Resource
@@ -53,7 +49,6 @@ public:
     virtual ~VibraResource();
 
     virtual ResourceType type() const;
-    virtual Resource * clone() const;
 };
 
 class VideoRecorderResource: public Resource
@@ -64,7 +59,6 @@ public:
     virtual ~VideoRecorderResource();
 
     virtual ResourceType type() const;
-    virtual Resource * clone() const;
 };
 
 class VideoResource: public Resource
@@ -75,7 +69,6 @@ public:
     virtual ~VideoResource();
 
     virtual ResourceType type() const;
-    virtual Resource * clone() const;
 };
 
 class SystemButtonResource: public Resource
@@ -86,7 +79,6 @@ public:
     virtual ~SystemButtonResource();
 
     virtual ResourceType type() const;
-    virtual Resource * clone() const;
 };
 
 class LockButtonResource: public Resource
@@ -97,7 +89,6 @@ public:
     virtual ~LockButtonResource();
 
     virtual ResourceType type() const;
-    virtual Resource * clone() const;
 };
 
 class ScaleButtonResource: public Resource
@@ -108,7 +99,6 @@ public:
     virtual ~ScaleButtonResource();
 
     virtual ResourceType type() const;
-    virtual Resource * clone() const;
 };
 
 class SnapButtonResource: public Resource
@@ -119,7 +109,6 @@ public:
     virtual ~SnapButtonResource();
 
     virtual ResourceType type() const;
-    virtual Resource * clone() const;
 };
 
 class LensCoverResource: public Resource
@@ -130,7 +119,6 @@ public:
     virtual ~LensCoverResource();
 
     virtual ResourceType type() const;
-    virtual Resource * clone() const;
 };
 }
 #endif

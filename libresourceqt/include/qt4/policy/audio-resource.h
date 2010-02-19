@@ -29,7 +29,6 @@ public:
     void setStreamTag(const QString &name, const QString &value);
 
     virtual ResourceType type() const;
-    virtual Resource * clone() const;
 private:
     QString group;
     quint32 pid;

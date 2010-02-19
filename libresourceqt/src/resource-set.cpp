@@ -18,9 +18,11 @@ ResourceSet::~ResourceSet()
     for (int i = 0;i < NumberOfTypes;i++) {
         delete resourceSet[i];
     }
-    resourceEngine->disconnect(this);
-//    resourceEngine->disconnectFromManager();
-    delete resourceEngine;
+    if(resourceEngine != NULL) {
+        resourceEngine->disconnect(this);
+        //resourceEngine->disconnectFromManager();
+        delete resourceEngine;
+    }
 }
 
 bool ResourceSet::initialize()
@@ -52,8 +54,10 @@ bool ResourceSet::initialize()
     return true;
 }
 
-void ResourceSet::addResource(Resource *resource)
+void ResourceSet::addResourceObject(Resource *resource)
 {
+    if(resource == NULL)
+        return;
     if (resource->type() == AudioPlaybackType) {
         qDebug("audioResource... %p", resource);
         audioResource = static_cast<AudioResource *>(resource);
@@ -73,11 +77,54 @@ void ResourceSet::addResource(Resource *resource)
     resourceSet[resource->type()] = resource;
 }
 
-void ResourceSet::addResources(const QList<Resource *>resources)
+bool ResourceSet::addResource(ResourceType type)
 {
-    for (int i = 0; i < resources.size(); i++) {
-        addResource(resources.at(i));
+    Resource *resource = NULL;
+    switch (type) {
+        case AudioPlaybackType:
+            resource = new AudioResource;
+            break;
+        case AudioRecorderType:
+            resource = new AudioRecorderResource;
+            break;
+        case VideoPlaybackType:
+            resource = new VideoResource;
+            break;
+        case VideoRecorderType:
+            resource = new VideoRecorderResource;
+            break;
+        case VibraType:
+            resource = new VibraResource;
+            break;
+        case LedsType:
+            resource = new LedsResource;
+            break;
+        case BacklightType:
+            resource = new BacklightResource;
+            break;
+        case SystemButtonType:
+            resource = new SystemButtonResource;
+            break;
+        case LockButtonType:
+            resource = new LockButtonResource;
+            break;
+        case ScaleButtonType:
+            resource = new ScaleButtonResource;
+            break;
+        case SnapButtonType:
+            resource = new SnapButtonResource;
+            break;
+        case LensCoverType:
+            resource = new LensCoverResource;
+            break;
+        default:
+            return false;
     }
+    if (resource == NULL) {
+        return false;
+    }
+    addResourceObject(resource);
+    return true;
 }
 
 void ResourceSet::deleteResource(ResourceType type)

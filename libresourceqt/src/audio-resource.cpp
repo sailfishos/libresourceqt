@@ -14,11 +14,6 @@ AudioResource::AudioResource(const AudioResource &other)
 {
 }
 
-Resource * AudioResource::clone() const
-{
-    return new AudioResource(*this);
-}
-
 AudioResource::~AudioResource()
 {
 }
@@ -86,4 +81,3 @@ ResourceType AudioResource::type() const
 {
     return AudioPlaybackType;
 }
-

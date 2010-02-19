@@ -52,7 +52,6 @@ public:
     bool isGranted() const;
 
     virtual ResourceType type() const = 0;
-    virtual Resource * clone() const = 0;
     virtual ~Resource();
 protected:
     Resource();

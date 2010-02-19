@@ -12,11 +12,6 @@ AudioRecorderResource::AudioRecorderResource(const AudioRecorderResource &other)
 {
 }
 
-Resource * AudioRecorderResource::clone() const
-{
-    return new AudioRecorderResource(*this);
-}
-
 AudioRecorderResource::~AudioRecorderResource()
 {
 }
@@ -34,11 +29,6 @@ VideoResource::VideoResource()
 VideoResource::VideoResource(const VideoResource &other)
         :    Resource(other)
 {
-}
-
-Resource * VideoResource::clone() const
-{
-    return new VideoResource(*this);
 }
 
 VideoResource::~VideoResource()
@@ -60,11 +50,6 @@ VideoRecorderResource::VideoRecorderResource(const VideoRecorderResource &other)
 {
 }
 
-Resource * VideoRecorderResource::clone() const
-{
-    return new VideoRecorderResource(*this);
-}
-
 VideoRecorderResource::~VideoRecorderResource()
 {
 }
@@ -82,11 +67,6 @@ VibraResource::VibraResource()
 VibraResource::VibraResource(const VibraResource &other)
         :    Resource(other)
 {
-}
-
-Resource * VibraResource::clone() const
-{
-    return new VibraResource(*this);
 }
 
 VibraResource::~VibraResource()
@@ -108,11 +88,6 @@ LedsResource::LedsResource(const LedsResource &other)
 {
 }
 
-Resource * LedsResource::clone() const
-{
-    return new LedsResource(*this);
-}
-
 LedsResource::~LedsResource()
 {
 }
@@ -130,11 +105,6 @@ BacklightResource::BacklightResource()
 BacklightResource::BacklightResource(const BacklightResource &other)
         :    Resource(other)
 {
-}
-
-Resource * BacklightResource::clone() const
-{
-    return new BacklightResource(*this);
 }
 
 BacklightResource::~BacklightResource()
@@ -156,11 +126,6 @@ SystemButtonResource::SystemButtonResource(const SystemButtonResource &other)
 {
 }
 
-Resource * SystemButtonResource::clone() const
-{
-    return new SystemButtonResource(*this);
-}
-
 SystemButtonResource::~SystemButtonResource()
 {
 }
@@ -178,11 +143,6 @@ LockButtonResource::LockButtonResource()
 LockButtonResource::LockButtonResource(const LockButtonResource &other)
         :    Resource(other)
 {
-}
-
-Resource * LockButtonResource::clone() const
-{
-    return new LockButtonResource(*this);
 }
 
 LockButtonResource::~LockButtonResource()
@@ -204,11 +164,6 @@ ScaleButtonResource::ScaleButtonResource(const ScaleButtonResource &other)
 {
 }
 
-Resource * ScaleButtonResource::clone() const
-{
-    return new ScaleButtonResource(*this);
-}
-
 ScaleButtonResource::~ScaleButtonResource()
 {
 }
@@ -226,11 +181,6 @@ SnapButtonResource::SnapButtonResource()
 SnapButtonResource::SnapButtonResource(const SnapButtonResource &other)
         :    Resource(other)
 {
-}
-
-Resource * SnapButtonResource::clone() const
-{
-    return new SnapButtonResource(*this);
 }
 
 SnapButtonResource::~SnapButtonResource()
@@ -252,11 +202,6 @@ LensCoverResource::LensCoverResource(const LensCoverResource &other)
 {
 }
 
-Resource * LensCoverResource::clone() const
-{
-    return new LensCoverResource(*this);
-}
-
 LensCoverResource::~LensCoverResource()
 {
 }
@@ -265,4 +210,3 @@ ResourceType LensCoverResource::type() const
 {
     return LensCoverType;
 }
-
