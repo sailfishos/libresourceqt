@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <testdefinition version="0.1">
-  <suite name="libresourceqt-tests" domain="Multimedia Middleware"> 
+  <suite name="libresourceqt-tests" domain="Multimedia Middleware">
     <set name="libresourceqt-tests" feature="Resource policy">
 
       <case name="test-resource" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
@@ -12,18 +12,18 @@
       </case>
 
       <case name="test-resource-engine" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
-        <step expected_result="0">/usr/lib/libresourceqt-tests/test-resource-engine</step>
+        <step expected_result="0">/usr/lib/libresourceqt-tests/test-resource-engine-wrapper</step>
       </case>
-      
+
       <environments>
         <scratchbox>false</scratchbox>
-        <hardware>true</hardware>    
+        <hardware>true</hardware>
       </environments>
 
     </set>
   </suite>
 
-  <suite name="libdbus-qeventloop-tests" domain="Multimedia Middleware"> 
+  <suite name="libdbus-qeventloop-tests" domain="Multimedia Middleware">
     <set name="libdbus-qeventloop-tests" feature="Resource policy">
 
       <case name="unit-tests" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libdbus-qeventloop" timeout="15">
@@ -32,7 +32,7 @@
 
       <environments>
         <scratchbox>false</scratchbox>
-        <hardware>true</hardware>    
+        <hardware>true</hardware>
       </environments>
 
     </set>

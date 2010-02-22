@@ -32,5 +32,8 @@ PKGCONFIG += dbus-1
 # Install directives
 INSTALLBASE    = /usr
 target.path    = $${INSTALLBASE}/lib/libresourceqt-tests/
-INSTALLS       = target
 
+wrapper.path  = $${INSTALLBASE}/lib/libresourceqt-tests/
+wrapper.files = test-resource-engine-wrapper
+
+INSTALLS       = target wrapper
