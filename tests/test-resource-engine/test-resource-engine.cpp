@@ -117,14 +117,14 @@ void TestResourceEngine::testAcquire()
     QByteArray ba = errorMessage.toLatin1();
     requestErrorMessage = ba.data();
 
-    QObject::connect(resourceEngine, SIGNAL(resourcesAcquired(quint32)),
+    QObject::connect(resourceEngine, SIGNAL(resourcesGranted(quint32)),
                      this, SLOT(handleAcquire(quint32)));
     QObject::connect(resourceEngine, SIGNAL(resourcesDenied()),
                      this, SLOT(handleDeny()));
     bool acquireRequestSucceeded = resourceEngine->acquireResources();
 
     QVERIFY(acquireRequestSucceeded == !requestShouldFail);
-//    QVERIFY(acquireOrDenyWasCalled);
+    QVERIFY(acquireOrDenyWasCalled);
 }
 
 void TestResourceEngine::handleAcquire(quint32 bitmaskOfGrantedResources)
