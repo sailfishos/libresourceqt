@@ -98,7 +98,7 @@ void TestResourceEngine::testAcquire_data()
     QTest::newRow("acquire error, optional VideoPlaybackType") << true << VideoPlaybackType << true << "This is a simulated error";
 }
 
-bool acquireShouldSucceed;
+bool messageOperationShoulSucceed;
 ResourceType optionalType;
 bool requestShouldFail;
 const char *requestErrorMessage;
@@ -106,7 +106,7 @@ const char *requestErrorMessage;
 void TestResourceEngine::testAcquire()
 {
     QFETCH(bool, acquireSucceeds);
-    acquireShouldSucceed = acquireSucceeds;
+    messageOperationShoulSucceed = acquireSucceeds;
     QFETCH(ResourceType, optionalTypeAvailable);
     optionalType = optionalTypeAvailable;
     resourceEngine->connectToManager();
@@ -130,7 +130,7 @@ void TestResourceEngine::testAcquire()
 void TestResourceEngine::handleAcquire(quint32 bitmaskOfGrantedResources)
 {
     qDebug("Acquired resources: 0x%04x", bitmaskOfGrantedResources);
-    QVERIFY(acquireShouldSucceed);
+    QVERIFY(messageOperationShoulSucceed);
     bool hasOptionalResource = false;
     QList<Resource *> resourceList = resourceSet->resources();
     for (int i=0; i < resourceList.size(); i++) {
@@ -159,8 +159,42 @@ void TestResourceEngine::handleAcquire(quint32 bitmaskOfGrantedResources)
 
 void TestResourceEngine::handleDeny()
 {
-    QVERIFY(!acquireShouldSucceed);
+    QVERIFY(!messageOperationShoulSucceed);
     acquireOrDenyWasCalled = true;
+}
+
+void TestResourceEngine::testRelease_data()
+{
+    QTest::addColumn<bool>("releaseSucceeds");
+    QTest::addColumn<bool>("requestFails");
+    QTest::addColumn<QString>("errorMessage");
+
+    QTest::newRow("release succeeds") << true << false << "";
+    QTest::newRow("release fails") << false << false << "";
+    QTest::newRow("release error, optional VideoPlaybackType") << true << true << "This is a simulated error";
+}
+
+void TestResourceEngine::testRelease()
+{
+    QFETCH(bool, releaseSucceeds);
+    messageOperationShoulSucceed = releaseSucceeds;
+    resourceEngine->connectToManager();
+    QFETCH(bool, requestFails);
+    requestShouldFail = requestFails;
+    QFETCH(QString, errorMessage);
+
+    QByteArray ba = errorMessage.toLatin1();
+    requestErrorMessage = ba.data();
+
+    resourceEngine->connectToManager();
+
+    QObject::connect(resourceEngine, SIGNAL(resourcesGranted(quint32)),
+                      this, SLOT(handleAcquire(quint32)));
+    QObject::connect(resourceEngine, SIGNAL(resourcesDenied()),
+                      this, SLOT(handleDeny()));
+
+    bool releaseRequestSucceeded = resourceEngine->releaseResources();
+    QVERIFY(releaseRequestSucceeded == !requestShouldFail);
 }
 
 QTEST_MAIN(TestResourceEngine)
@@ -224,7 +258,7 @@ static void verify_resconn_connect(resconn_t *connection, resmsg_t *message,
     QVERIFY(connection == resourceConnection);
     QVERIFY(message->record.type == RESMSG_REGISTER);
     QVERIFY(message->record.id == theID);
-    QVERIFY(message->record.reqno == 1);
+    QVERIFY(message->record.reqno > 0);
     QVERIFY(message->record.rset.all == (RESMSG_AUDIO_PLAYBACK | RESMSG_AUDIO_RECORDING
                                          | RESMSG_VIDEO_PLAYBACK | RESMSG_VIDEO_RECORDING));
     QVERIFY(message->record.rset.opt == (RESMSG_AUDIO_RECORDING | RESMSG_VIDEO_PLAYBACK
@@ -274,31 +308,50 @@ static void verify_resconn_disconnect(resset_t *resourceSet, resmsg_t *message,
 int resproto_send_message(resset_t *resourceSet, resmsg_t *message,
                           resproto_status_t  callbackFunction)
 {
-    resmsg_t replyMessage, statusMessage;
-
+    resmsg_t grantMessage, statusMessage;
     qDebug("%s(): id:%u req#: %u", __FUNCTION__, message->record.id, message->record.reqno);
-
-    replyMessage.type = RESMSG_GRANT;
-    if (acquireShouldSucceed) {
-        replyMessage.notify.resrc = RESMSG_AUDIO_PLAYBACK | RESMSG_AUDIO_RECORDING
-                                  | RESMSG_VIDEO_PLAYBACK | RESMSG_VIDEO_RECORDING;
-    }
-    else {
-        replyMessage.notify.resrc = 0;
-    }
-    replyMessage.record.id = message->record.id;
-    replyMessage.record.reqno = message->record.reqno;
 
     verify_resproto_send_message(resourceSet, message, callbackFunction);
 
-    statusMessage.type = RESMSG_STATUS;
-    statusMessage.status.errcod = requestShouldFail;
-    statusMessage.status.errmsg = requestErrorMessage;
-    statusMessage.record.id = 11;
-    statusMessage.record.reqno = 77;
-    callbackFunction(resSet, &statusMessage);
+    switch (message->record.type) {
+    case RESMSG_ACQUIRE:
+        statusMessage.type = RESMSG_STATUS;
+        statusMessage.status.errcod = requestShouldFail;
+        statusMessage.status.errmsg = requestErrorMessage;
+        statusMessage.record.id = 11;
+        statusMessage.record.reqno = 77;
+        callbackFunction(resSet, &statusMessage);
 
-    grantCallback(&replyMessage, resSet, resSet->userdata);
+        grantMessage.type = RESMSG_GRANT;
+        if (messageOperationShoulSucceed) {
+            grantMessage.notify.resrc = RESMSG_AUDIO_PLAYBACK | RESMSG_AUDIO_RECORDING
+            | RESMSG_VIDEO_PLAYBACK | RESMSG_VIDEO_RECORDING;
+        }
+        else {
+            grantMessage.notify.resrc = 0;
+        }
+        grantMessage.record.id = message->record.id;
+        grantMessage.record.reqno = message->record.reqno;
+        grantCallback(&grantMessage, resSet, resSet->userdata);
+            break;
+    case RESMSG_RELEASE:
+        statusMessage.type = RESMSG_STATUS;
+        statusMessage.status.errcod = requestShouldFail;
+        statusMessage.status.errmsg = requestErrorMessage;
+        statusMessage.record.id = 11;
+        statusMessage.record.reqno = 77;
+        callbackFunction(resSet, &statusMessage);
+
+        grantMessage.type = RESMSG_GRANT;
+        grantMessage.notify.resrc = 0;
+        grantMessage.record.id = message->record.id;
+        grantMessage.record.reqno = message->record.reqno;
+        grantCallback(&grantMessage, resSet, resSet->userdata);
+        break;
+    default:
+        qDebug("Unknown message requested...");
+        return 0;
+    }
 
     if (requestShouldFail)
         return 0;
@@ -309,10 +362,16 @@ int resproto_send_message(resset_t *resourceSet, resmsg_t *message,
 static void verify_resproto_send_message(resset_t *resourceSet, resmsg_t *message,
         resproto_status_t  callbackFunction)
 {
-    if (message->record.type == RESMSG_ACQUIRE) {
+    switch (message->record.type) {
+    case RESMSG_ACQUIRE:
+    case RESMSG_RELEASE:
         QVERIFY(resourceSet == resSet);
-        QVERIFY(message->record.id == theID);
+        QVERIFY(message->possess.id == theID);
         QVERIFY(callbackFunction != NULL);
+        break;
+    default:
+        bool expectedMessageType = false;
+        QVERIFY(expectedMessageType);
     }
 }
 

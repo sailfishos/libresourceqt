@@ -41,6 +41,9 @@ private slots:
 
     void testAcquire_data();
     void testAcquire();
+
+    void testRelease_data();
+    void testRelease();
 };
 }
 #endif
