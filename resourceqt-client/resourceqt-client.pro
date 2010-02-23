@@ -11,7 +11,7 @@ CONFIG      -= app_bundle
 
 INCLUDEPATH += $${LIBRESOURCEINC}
 QMAKE_CXXFLAGS += -Wall
-LIBS += -Wl,-rpath $${LIBDBUSQEVENTLOOP}/build -L$${LIBRESOURCEQT}/build -lresourceqt
+LIBS += -L$${LIBRESOURCEQT}/build -lresourceqt -L$${LIBDBUSQEVENTLOOP}/build -ldbus-qeventloop
 
 # Input 
 HEADERS     = client.h

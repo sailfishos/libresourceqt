@@ -1,7 +1,7 @@
 Source: libresourceqt
 Priority: extra
 Maintainer: Martin Wolf <ext-martin.2.wolf@nokia.com>
-Build-Depends: debhelper (>= 5), libqt4-dev (> 4.6.0), libdbus-1-dev, libresource0-dev
+Build-Depends: debhelper (>= 5), libqt4-dev (>> 4.6.0), libdbus-1-dev, libresource0-dev
 Standards-Version: 3.8.0
 Section: libs
 
