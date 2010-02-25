@@ -4,32 +4,37 @@
 #include <QtTest/QTest>
 #include <policy/resource-set.h>
 
-using namespace ResourcePolicy;
-
 class TestResourceSet: public QObject
 {
     Q_OBJECT
 private:
-    ResourceSet *resourceSet;
+    ResourcePolicy::ResourceSet *resourceSet;
 
-    AudioResource *audioResource;
-    AudioRecorderResource *audioRecorderResource;
-    Resource *videoResource;
-    Resource *videoRecorderResource;
-    Resource *vibraResource;
-    Resource *ledsResource;
-    Resource *backlightResource;
-    Resource *systemButtonResource;
-    Resource *lockButtonResource;
-    Resource *scaleButtonResource;
-    Resource *snapButtonResource;
-    Resource *lensCoverResource;
+    ResourcePolicy::AudioResource *audioResource;
+    ResourcePolicy::AudioRecorderResource *audioRecorderResource;
+    ResourcePolicy::Resource *videoResource;
+    ResourcePolicy::Resource *videoRecorderResource;
+    ResourcePolicy::Resource *vibraResource;
+    ResourcePolicy::Resource *ledsResource;
+    ResourcePolicy::Resource *backlightResource;
+    ResourcePolicy::Resource *systemButtonResource;
+    ResourcePolicy::Resource *lockButtonResource;
+    ResourcePolicy::Resource *scaleButtonResource;
+    ResourcePolicy::Resource *snapButtonResource;
+    ResourcePolicy::Resource *lensCoverResource;
 
-    Resource * resourceFromType(ResourceType type);
+    ResourcePolicy::Resource * resourceFromType(ResourcePolicy::ResourceType type);
 public:
     TestResourceSet();
     ~TestResourceSet();
 
+public slots:
+
+    void handleResourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &availableResources);
+    void handleResourcesGranted(const QList<ResourcePolicy::ResourceType> &grantedOptionalResources);
+    void handleResourcesDenied();
+    void handleResourcesReleased();
+    void handleLostResources();
 
 private slots:
 
@@ -43,6 +48,8 @@ private slots:
     void testDelResource();
 
     void testContainsSet();
+
+    void testConnectToSignals();
 };
 
 #endif

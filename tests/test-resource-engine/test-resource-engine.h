@@ -3,26 +3,27 @@
 
 #include <QtTest/QTest>
 #include <QMetaType>
+
+class TestResourceEngine;
+
 #include "resource-engine.h"
 
 Q_DECLARE_METATYPE(ResourcePolicy::ResourceType)
 
-namespace ResourcePolicy
-{
 class TestResourceEngine: public QObject
 {
     Q_OBJECT
 private:
-    ResourceEngine *resourceEngine;
-    AudioResource *audioPlayback;
-    VideoResource *videoPlayback;
-    AudioRecorderResource *audioRecorder;
-    VideoRecorderResource *videoRecorder;
+    ResourcePolicy::ResourceEngine *resourceEngine;
+    ResourcePolicy::AudioResource *audioPlayback;
+    ResourcePolicy::VideoResource *videoPlayback;
+    ResourcePolicy::AudioRecorderResource *audioRecorder;
+    ResourcePolicy::VideoRecorderResource *videoRecorder;
     bool libresourceInitialized;
     bool acquireOrDenyWasCalled;
 
 public:
-    ResourceSet *resourceSet;
+    ResourcePolicy::ResourceSet *resourceSet;
 
     TestResourceEngine();
     ~TestResourceEngine();
@@ -44,7 +45,10 @@ private slots:
 
     void testRelease_data();
     void testRelease();
+
+    void testRegisterAudioProperties_data();
+    void testRegisterAudioProperties();
 };
-}
+
 #endif
 

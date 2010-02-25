@@ -7,6 +7,8 @@
 
 #include "client.h"
 
+using namespace ResourcePolicy;
+
 Client::Client(QString appClass) : QObject()
 {
     applicationClass 	= appClass;

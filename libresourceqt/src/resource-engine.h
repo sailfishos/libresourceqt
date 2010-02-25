@@ -17,8 +17,8 @@ class ResourceEngine: public QObject
 {
     Q_OBJECT
     Q_DISABLE_COPY( ResourceEngine )
-#ifndef QT_NO_DEBUG
-    friend class TestResourceEngine;
+#ifdef TEST_RESOURCE_ENGINE_H
+    friend class ::TestResourceEngine;
 #endif
 
 public:

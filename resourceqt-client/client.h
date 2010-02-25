@@ -6,8 +6,6 @@
 
 #include <policy/resource-set.h>
 
-using namespace ResourcePolicy;
-
 #define RES_AUDIO_PLAYBACK	(1<<0)
 #define RES_VIDEO_PLAYBACK	(1<<1)
 #define RES_AUDIO_RECORDING	(1<<2)
@@ -33,7 +31,7 @@ public:
 	static uint32_t parseResourceList(QString resourceListStr);
 
 private slots:
-	void resourceAcquiredHandler(const QList<ResourceType>& grantedResList);
+	void resourceAcquiredHandler(const QList<ResourcePolicy::ResourceType>& grantedResList);
 	void resourceDeniedHandler();
 	void resourceLostHandler();
 	void resourceReleasedHandler();
@@ -49,14 +47,14 @@ private:
 	uint32_t		resourcesOptional;
 	QString			applicationClass;
 
-	ResourceSet* 	resourceSet;
+	ResourcePolicy::ResourceSet* 	resourceSet;
 
-	Resource* allocateResource(ResourceType resource, bool optional);
-	ResourceType getResourceType(uint32_t resource);
+	ResourcePolicy::Resource* allocateResource(ResourcePolicy::ResourceType resource, bool optional);
+	ResourcePolicy::ResourceType getResourceType(uint32_t resource);
 
 	void showPrompt();
-	void showResources(const QList<ResourceType> resList);
-	void showResources(const QList<Resource*> resList);
+	void showResources(const QList<ResourcePolicy::ResourceType> resList);
+	void showResources(const QList<ResourcePolicy::Resource*> resList);
 	void updateSet(uint32_t list, uint32_t optional, bool remove);
 };
 

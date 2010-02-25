@@ -195,13 +195,13 @@ signals:
      * \param availableResources A list of available resources. The list of
      * available resources contains only available resource which we have in the set.
      */
-    void resourcesBecameAvailable(const QList<ResourceType> &availableResources);
+    void resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &availableResources);
     /**
      * This signal is emited as a response to the acquire() request.
      * \param grantedOptionalResources The list of granted optional resources.
      * All the mandatory resources have also been aquired.
      */
-    void resourcesGranted(const QList<ResourceType> &grantedOptionalResources);
+    void resourcesGranted(const QList<ResourcePolicy::ResourceType> &grantedOptionalResources);
     /**
      * This signal is emited as a response to the acquire() request, in the
      * case where one or more of the mandatroy resources were not availalble.
