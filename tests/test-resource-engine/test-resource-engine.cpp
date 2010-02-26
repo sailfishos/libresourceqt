@@ -131,28 +131,28 @@ void TestResourceEngine::testAcquire()
 
 void TestResourceEngine::handleAcquire(quint32 bitmaskOfGrantedResources)
 {
-    qDebug("Acquired resources: 0x%04x", bitmaskOfGrantedResources);
+    //qDebug("Acquired resources: 0x%04x", bitmaskOfGrantedResources);
     QVERIFY(messageOperationShoulSucceed);
     bool hasOptionalResource = false;
     QList<Resource *> resourceList = resourceSet->resources();
     for (int i=0; i < resourceList.size(); i++) {
         quint32 bitmask = resourceTypeToLibresourceType(resourceList.at(i)->type());
-        qDebug("Checking if resource %x(%x) is in the list", resourceList.at(i)->type(), bitmask);
+        //qDebug("Checking if resource %x(%x) is in the list", resourceList.at(i)->type(), bitmask);
         if ((bitmask & bitmaskOfGrantedResources) == bitmask)
         {
-            qDebug("Yes :)");
+            //qDebug("Yes :)");
             if (resourceList.at(i)->type() == optionalType) {
-                qDebug("Resource is the one we are looking for. :D");
+                //qDebug("Resource is the one we are looking for. :D");
                 hasOptionalResource = true;
                 break;
             }
         }
         else {
-            qDebug("No :(");
+            //qDebug("No :(");
         }
     }
     if ((optionalType == NumberOfTypes) && (bitmaskOfGrantedResources > 0)) {
-        qDebug("Expected to get no optional resources");
+        //qDebug("Expected to get no optional resources");
         hasOptionalResource = true;
     }
     QVERIFY(hasOptionalResource);
@@ -206,18 +206,18 @@ void TestResourceEngine::testRegisterAudioProperties_data()
     QTest::addColumn<QString>("streamName");
     QTest::addColumn<QString>("streamValue");
 
-    QTest::newRow("'player':12345:'media.role':'music'") << "player" << 12345 << "media.role" << "music";
-    QTest::newRow("'':12345:'media.role':'music'") << "" << 12345 << "media.role" << "music";
-    QTest::newRow(":12345:'media.role':'music'") << QString() << 12345 << "media.role" << "music";
-    QTest::newRow("'player':0:'media.role':'music'") << "player" << 0 << "media.role" << "music";
-    QTest::newRow("'player':12345:'':'music'") << "player" << 12345 << "" << "music";
-    QTest::newRow("'player':12345::'music'") << "player" << 12345 << QString() << "music";
-    QTest::newRow("'player':12345:'':''") << "player" << 12345 << "" << "";
-    QTest::newRow("'player':12345::") << "player" << 12345 << QString() << QString();
-    QTest::newRow("'player':12345:'media.role':''") << "player" << 12345 << "media.role" << "";
-    QTest::newRow("'player':12345:'media.role':") << "player" << 12345 << "media.role" << QString();
-    QTest::newRow("'':0:'':''") << "" << 0 << "" << "";
-    QTest::newRow(":0::") << QString() << 0 << QString() << QString();
+    QTest::newRow("'player':12345:'media.role':'music'") << "player" << 12345u << "media.role" << "music";
+    QTest::newRow("'':12345:'media.role':'music'") << "" << 12345u << "media.role" << "music";
+    QTest::newRow(":12345:'media.role':'music'") << QString() << 12345u << "media.role" << "music";
+    QTest::newRow("'player':0:'media.role':'music'") << "player" << 0u << "media.role" << "music";
+    QTest::newRow("'player':12345:'':'music'") << "player" << 12345u << "" << "music";
+    QTest::newRow("'player':12345::'music'") << "player" << 12345u << QString() << "music";
+    QTest::newRow("'player':12345:'':''") << "player" << 12345u << "" << "";
+    QTest::newRow("'player':12345::") << "player" << 12345u << QString() << QString();
+    QTest::newRow("'player':12345:'media.role':''") << "player" << 12345u << "media.role" << "";
+    QTest::newRow("'player':12345:'media.role':") << "player" << 12345u << "media.role" << QString();
+    QTest::newRow("'':0:'':''") << "" << 0u << "" << "";
+    QTest::newRow(":0::") << QString() << 0u << QString() << QString();
 }
 
 char *expectedGroup, *expectedStreamName, *expectedStreamValue;
@@ -229,6 +229,8 @@ void TestResourceEngine::testRegisterAudioProperties()
     QFETCH(QString, streamName);
     QFETCH(QString, streamValue);
 
+    requestShouldFail = false;
+
     if(audioGroup.isEmpty() || audioGroup.isNull()) {
         expectedGroup = NULL;
     }
@@ -237,20 +239,18 @@ void TestResourceEngine::testRegisterAudioProperties()
         expectedGroup = strdup(ba.data());
     }
 
-    if(streamName.isEmpty() || streamName.isNull()) {
+    if(streamName.isEmpty() || streamName.isNull() || streamValue.isEmpty() || streamValue.isNull()) {
         expectedStreamName = NULL;
+        expectedStreamValue = NULL;
     }
     else {
         QByteArray ba = streamName.toLatin1();
         expectedStreamName = strdup(ba.data());
-    }
-    if(streamValue.isEmpty() || streamValue.isNull()) {
-        expectedStreamValue = NULL;
-    }
-    else {
-        QByteArray ba = streamValue.toLatin1();
+        ba = streamValue.toLatin1();
         expectedStreamValue = strdup(ba.data());
     }
+    //qDebug() << "streamValue = " << streamValue;
+    //qDebug("expectedStreamValue = %s", expectedStreamValue);
 
     resourceEngine->connectToManager();
 
@@ -358,7 +358,7 @@ int resconn_disconnect(resset_t *resSet, resmsg_t *message,
 static void verify_resconn_disconnect(resset_t *resourceSet, resmsg_t *message,
                                       resproto_status_t callbackFunction)
 {
-    qDebug("resourceSet = %p resSet = %p", resourceSet, resSet);
+    //qDebug("resourceSet = %p resSet = %p", resourceSet, resSet);
     QVERIFY(resourceSet == resSet);
     QVERIFY(message->record.type == RESMSG_UNREGISTER);
     QVERIFY(message->record.id == theID);
@@ -370,7 +370,7 @@ int resproto_send_message(resset_t *resourceSet, resmsg_t *message,
                           resproto_status_t  callbackFunction)
 {
     resmsg_t grantMessage, statusMessage;
-    qDebug("%s(): id:%u req#: %u", __FUNCTION__, message->record.id, message->record.reqno);
+    //qDebug("%s(): id:%u req#: %u", __FUNCTION__, message->record.id, message->record.reqno);
 
     verify_resproto_send_message(resourceSet, message, callbackFunction);
 
@@ -418,7 +418,7 @@ int resproto_send_message(resset_t *resourceSet, resmsg_t *message,
         callbackFunction(resSet, &statusMessage);
         break;
     default:
-        qDebug("Unknown message requested...");
+        //qDebug("Unknown message requested...");
         return 0;
     }
 
@@ -445,6 +445,7 @@ static void verify_resproto_send_message(resset_t *resourceSet, resmsg_t *messag
         QVERIFY(strverify(expectedGroup, message->audio.group));
         QVERIFY(strverify(expectedStreamName, message->audio.property.name));
         QVERIFY(strverify(expectedStreamValue, message->audio.property.match.pattern));
+        break;
     default:
         bool expectedMessageType = false;
         QVERIFY(expectedMessageType);
@@ -453,6 +454,7 @@ static void verify_resproto_send_message(resset_t *resourceSet, resmsg_t *messag
 
 static bool strverify(const char *a, const char *b)
 {
+    //qDebug("a='%s' b='%s'", a, b);
     if (a == b) {
         return true;
     }
