@@ -159,7 +159,9 @@ bool Client::initialize(uint32_t all, uint32_t optional, bool alwaysReply, bool 
 
     updateSet(all, optional, false);
 
-    if (!connect(resourceSet, SIGNAL(resourcesGranted(QList<ResourceType>)), this, SLOT(resourceAcquiredHandler(QList<ResourceType>)))) {
+    if (!connect(resourceSet, SIGNAL(resourcesGranted(QList<ResourcePolicy::ResourceType>)),
+                 this, SLOT(resourceAcquiredHandler(QList<ResourcePolicy::ResourceType>))))
+    {
         return false;
     }
 
