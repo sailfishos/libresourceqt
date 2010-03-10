@@ -18,14 +18,26 @@ public:
 
     QString audioGroup() const;
     bool audioGroupIsSet() const;
+    /**
+     * Set the audio group (classification)
+     * \param newGroup The new audio group to set.
+     */
     void setAudioGroup(const QString & newGroup);
 
     quint32 processID() const;
+    /**
+     * Set the PID of the process which will render the audio. Use this if the
+     * audio renderer is in a separate process.
+     */
     void setProcessID(quint32 newPID);
 
     QString streamTagName() const;
     QString streamTagValue() const;
     bool streamTagIsSet() const;
+    /**
+     * Set the tream tag to help policy to correctly identify the audio stream
+     * beloning to you
+     */
     void setStreamTag(const QString &name, const QString &value);
 
     virtual ResourceType type() const;

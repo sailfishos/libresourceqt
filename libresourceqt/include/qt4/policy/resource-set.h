@@ -24,23 +24,23 @@
  * \code
  * ResourcePolicy::ResourceSet *resources = new ResourcePolicy::ResourceSet("player");
  * \endcode
- * Then to add resources to the set use the \ref addResource() method to add
- * resources to the \ref ResourceSet. Like this:
+ * Then to add resources to the set use the ResourceSet::addResource() method to add
+ * resources to the ResourcePolicy::ResourceSet. Like this:
  * \code
  * resources->addResource(AudioPlaybackType);
  * resources->addResource(VideoPlaybackType);
  * \endcode
  * If you want to pre-populate the AudioResource with the audio group (it is a good idea)
- * and other oudio parameters you can create an audio object your self and then
- * give that to the \ref ResourceSet. Note that you should NOT free this object.
- * The \ref ResourceSet takes ownership of this pointer.
+ * and other oudio parameters you can create an audio object yourself and then
+ * give that to the ResourcePolicy::ResourceSet. Note that you should NOT free this object.
+ * The ResourcePolicy::ResourceSet takes ownership of this pointer.
  * \code
- * ResourcePolicy::AudioResource *audioResource = new ResourcePolicy::AudioResource("fmradio");
+ * ResourcePolicy::AudioResource *audioResource = new ResourcePolicy::AudioResource("player");
  * resources->addResourceObject(audioResource);
  * \endcode
  * Calling the ResourcePolicy::ResourceSet::deleteResource() method will remove
- * and delete the object. Then when you want to acquire the \ref ResourcePolicy::ResourceSet
- * you simply use the \ref acquire() method, like this:
+ * and delete the object. Then when you want to acquire the ResourcePolicy::ResourceSet
+ * you simply use the ResourcePolicy::ResourceSet::acquire() method, like this:
  * \code
  * QObject::connect(resources, SIGNAL(resourcesAcquired()),
  *                  this, SLOT(acquireOkHandler(QList<ResourcePolicy::Resource>)));
@@ -55,7 +55,7 @@
  * This signal tells you when you should stop using the resources you have asked for.
  * So it is important that you connect to it.
  *
- * To modify the properties of the resources you can use the \ref resource() method.
+ * To modify the properties of the resources you can use the ResourcePolicy::ResourceSet::resource() method.
  */
 
 /**
@@ -101,8 +101,8 @@ public:
     * This method adds a resource to the set. A set contains only a single
     * instance of a given resource. If the ResourceSet already contains a
     * resource of the given type it will be overridden.
-    * \param resource The resource to add to the set. The \ref ResourseSet takes
-    * ownership of the pointer. Do NOT free!
+    * \param resource The resource to add to the set.
+    * The ResourcePolicy::ResourseSet takes ownership of the pointer. Do NOT free!
     */
     void addResourceObject(Resource *resource);
 
@@ -119,7 +119,7 @@ public:
     QList<Resource *> resources() const;
     /**
      * This method returns a const pointer to a resource of a specific type.
-     * \type The type of resource we are interested in.
+     * \param type The type of resource we are interested in.
      * \return a pointer to the Resource if it is defined NULL otherwise.
      */
     Resource * resource(ResourceType type) const;
@@ -159,17 +159,17 @@ public:
      */
     bool release();
     /**
-     * Commit changes to the \ref ResourceSet. Remember to call update()
+     * Commit changes to the \ref ResourcePolicy::ResourceSet. Remember to call update()
      * after adding and/or removing resources.
      */
     bool update();
 
     /**
-     * Stes the auto-release. When loosing the resources doue to another
+     * Sets the auto-release. When loosing the resources due to another
      * application with a higher priority the default is that we automatically
      * re-gain our resources without having to re-request them. However if
      * the AutoRelease is set we release the resources and need to re-acquire
-     * them, when the pre-emting application releases it s resources.
+     * them, when the pre-emting application releases its resources.
      *
      * This feature is by default disabled.
      *
@@ -177,6 +177,10 @@ public:
      * and cannot be unset.
      */
     bool setAutoRelease();
+    /**
+     * Check whether we have setAutoRelease().
+     * \return true if auto-release is ennabled.
+     */
     bool willAutoRelease();
     /**
      * Sets that the resourcesGranted() signal is emited even if we already
@@ -186,6 +190,9 @@ public:
      * and cannot be unset.
      */
     bool setAlwaysReply();
+    /**
+     * Check whether the always-get-reply flag has been set.
+     * \return true if we will always get a reply (even if there is no change).
     bool alwaysGetReply();
 
 signals:

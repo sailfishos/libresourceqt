@@ -31,7 +31,7 @@ PROJECT_NAME           = ResourcePolicy
 # This could be handy for archiving the generated documentation or 
 # if some version control system is used.
 
-PROJECT_NUMBER         = 0.1
+PROJECT_NUMBER         = 1.1
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) 
 # base path where the generated documentation will be put. 
@@ -573,8 +573,7 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  = include/resource.h \
-                         include/resource-set.h
+INPUT                  = include/qt4
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
@@ -627,7 +626,7 @@ FILE_PATTERNS          = *.c \
 # should be searched for input files as well. Possible values are YES and NO. 
 # If left blank NO is used.
 
-RECURSIVE              = NO
+RECURSIVE              = YES
 
 # The EXCLUDE tag can be used to specify files and/or directories that should 
 # excluded from the INPUT source files. This way you can easily exclude a 
@@ -923,13 +922,13 @@ GENERATE_QHP           = YES
 # be used to specify the file name of the resulting .qch file. 
 # The path specified is relative to the HTML output folder.
 
-QCH_FILE               = ../libresourceqt.qch
+QCH_FILE               = ../com.nokia.policy.libresourceqt.qch
 
 # The QHP_NAMESPACE tag specifies the namespace to use when generating 
 # Qt Help Project output. For more information please see 
 # http://doc.trolltech.com/qthelpproject.html#namespace
 
-QHP_NAMESPACE          = libresourceqt
+QHP_NAMESPACE          = ResourcePolicy
 
 # The QHP_VIRTUAL_FOLDER tag specifies the namespace to use when generating 
 # Qt Help Project output. For more information please see 
@@ -1349,7 +1348,7 @@ PERL_PATH              = /usr/bin/perl
 # fallback. It is recommended to install and use dot, since it yields more 
 # powerful graphs.
 
-CLASS_DIAGRAMS         = YES
+CLASS_DIAGRAMS         = NO
 
 # You can define message sequence charts within doxygen comments using the \msc 
 # command. Doxygen will then run the mscgen tool (see 
@@ -1371,7 +1370,7 @@ HIDE_UNDOC_RELATIONS   = YES
 # toolkit from AT&T and Lucent Bell Labs. The other options in this section 
 # have no effect if this option is set to NO (the default)
 
-HAVE_DOT               = NO
+HAVE_DOT               = YES
 
 # By default doxygen will write a font called FreeSans.ttf to the output 
 # directory and reference it in all dot files that doxygen generates. This 

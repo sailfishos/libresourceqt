@@ -5,23 +5,26 @@
 
 namespace ResourcePolicy
 {
+/**
+  * This enumeration represents the resources which can be reserved.
+  * \see ResourcePolicy::ResourceSet::AddResource() for info on how to reserve
+  * resources.
+  */
 enum ResourceType {
-    AudioPlaybackType = 0,
-    VideoPlaybackType,
-    AudioRecorderType,
-    VideoRecorderType,
-    VibraType,
-    LedsType,
-    BacklightType,
-    SystemButtonType,
-    LockButtonType,
-    ScaleButtonType,
-    SnapButtonType,
+    AudioPlaybackType = 0, ///< For audio playback
+    VideoPlaybackType,     ///< For video playback
+    AudioRecorderType,     ///< For audio recording (using of the microphone)
+    VideoRecorderType,     ///< For video recording (using the camera)
+    VibraType,             ///< For Vibra
+    LedsType,              ///< For LEDs
+    BacklightType,         ///< For the backlight (of the display)
+    SystemButtonType,      ///< For the system (power) button
+    LockButtonType,        ///< For the lock button
+    ScaleButtonType,       ///< The scale (zoom) button
+    SnapButtonType,        ///< Use this if you are a camera application
     LensCoverType,
     NumberOfTypes
 };
-
-class ResourceSet;
 
 /**
 * This class is the super class for all resources. It represents a generic
@@ -30,7 +33,6 @@ class ResourceSet;
 class Resource
 {
 public:
-    friend class ResourceSet;
     /**
      * Whether or not this resource is optional, in that it doesn't need to
      * be available for the set to be acquired.
@@ -51,6 +53,10 @@ public:
      */
     bool isGranted() const;
 
+    /**
+     * Use this method to check for the type of Resource
+     * \return The ResourceType associated to this resource
+     */
     virtual ResourceType type() const = 0;
     virtual ~Resource();
 protected:
