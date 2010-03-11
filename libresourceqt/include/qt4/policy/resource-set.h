@@ -193,6 +193,7 @@ public:
     /**
      * Check whether the always-get-reply flag has been set.
      * \return true if we will always get a reply (even if there is no change).
+     */
     bool alwaysGetReply();
 
 signals:
