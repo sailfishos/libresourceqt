@@ -1,3 +1,10 @@
+libresourceqt (1.2) unstable; urgency=low
+
+  * Added .pc files
+  * libdbus-qeventloop header is now in /usr/include
+
+ -- Wolf Bergenheim <ext-wolf.2.bergenheim@nokia.com>  Fri, 19 Mar 2010 12:28:19 +0200
+
 libresourceqt (1.1) unstable; urgency=low
 
   * Bugfix release

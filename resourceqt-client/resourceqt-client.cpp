@@ -144,7 +144,7 @@ private:
     }
 
     void usage(int theExitCode) {
-        printf("usage: %s [-h] [-t] [-v] [-m mode-values]"
+        printf("usage: %s [-h] [-m mode-values]"
                "[-o optional-resources] [-s shared-resources -m shared-mask] "
                "class all-resources\n",
                exeName);

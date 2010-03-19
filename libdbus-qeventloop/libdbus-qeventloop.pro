@@ -20,4 +20,7 @@ headers.files  = $$HEADERS
 INSTALLBASE    = /usr
 target.path    = $$INSTALLBASE/lib
 headers.path   = $$INSTALLBASE/include
-INSTALLS       = target headers
+pc.files       = libdbus-qeventloop1.pc
+pc.path        = $${INSTALLBASE}/lib/pkgconfig
+INSTALLS       = target headers pc
+

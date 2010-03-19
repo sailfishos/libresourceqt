@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: libdbus-qeventloop1
+Description: D-Bus - QEventloop binding
+Version: 1.2
+Libs: -L${libdir} -ldbus-qeventloop
+Cflags: -I${includedir}
+Requires: dbus-1

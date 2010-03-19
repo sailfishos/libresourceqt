@@ -1,2 +1,3 @@
 usr/include/dbus*
 usr/lib/libdbus-qeventloop*.so
+usr/lib/pkgconfig/libdbus-qeventloop1.pc
