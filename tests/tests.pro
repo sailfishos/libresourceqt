@@ -16,4 +16,6 @@ testsxml.path    = /usr/share/libresourceqt-tests/
 testsxml.files   = tests.xml
 testrunner.path  = /usr/lib/libresourceqt-tests/
 testrunner.files = test-dbus-qeventloop-runner.sh
-INSTALLS         = testsxml testrunner
+dbusconf.path    = /etc/dbus-1/system.d/
+dbusconf.files   = test-dbus-qeventloop.conf
+INSTALLS         = testsxml testrunner dbusconf

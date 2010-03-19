@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 
     QDBusConnection* myBus;
     if (useSessionBus) {
-        myBus = new QDBusConnection(QDBusConnection::systemBus().sessionBus());
+        myBus = new QDBusConnection(QDBusConnection::sessionBus().sessionBus());
         qDebug("Using session bus ...");
     }
     else {

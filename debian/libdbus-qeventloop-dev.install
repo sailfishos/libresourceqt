@@ -1,2 +1,2 @@
-usr/include/resource/qt4/dbus*
+usr/include/dbus*
 usr/lib/libdbus-qeventloop*.so

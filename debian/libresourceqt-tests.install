@@ -1,2 +1,3 @@
 usr/lib/libresourceqt-tests/*
 usr/share/libresourceqt-tests/*
+etc/dbus-1/system.d/*

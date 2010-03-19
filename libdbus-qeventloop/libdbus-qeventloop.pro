@@ -19,5 +19,5 @@ PKGCONFIG  += dbus-1
 headers.files  = $$HEADERS
 INSTALLBASE    = /usr
 target.path    = $$INSTALLBASE/lib
-headers.path   = $$INSTALLBASE/include/resource/qt4
+headers.path   = $$INSTALLBASE/include
 INSTALLS       = target headers

@@ -26,7 +26,7 @@
   <suite name="libdbus-qeventloop-tests" domain="Multimedia Middleware">
     <set name="libdbus-qeventloop-tests" feature="Resource policy">
 
-      <case name="unit-tests" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libdbus-qeventloop" timeout="15">
+      <case name="DBusQEventLoop functional test" type="Functional" level="Component" subfeature="libresource Qt API" description="Functional tests for libdbus-qeventloop" timeout="25">
         <step expected_result="0">/usr/lib/libresourceqt-tests/test-dbus-qeventloop-runner.sh</step>
       </case>
 
