@@ -1,5 +1,7 @@
 #include "test-resource-set.h"
 
+using namespace ResourcePolicy;
+
 Resource * TestResourceSet::resourceFromType(ResourceType type)
 {
     switch (type) {
@@ -125,5 +127,62 @@ void TestResourceSet::testContainsSet()
     QVERIFY(containsAll);
     QVERIFY(containsSubset);
 }
+
+void TestResourceSet::testConnectToSignals()
+{
+    bool signalConnectionSucceeded=false;
+    signalConnectionSucceeded = QObject::connect(resourceSet,
+        SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)),
+        this, SLOT(handleResourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+
+    QVERIFY(signalConnectionSucceeded);
+
+    signalConnectionSucceeded = QObject::connect(resourceSet,
+        SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)),
+        this, SLOT(handleResourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+
+    QVERIFY(signalConnectionSucceeded);
+
+    signalConnectionSucceeded = QObject::connect(resourceSet,
+        SIGNAL(resourcesDenied()),
+        this, SLOT(handleResourcesDenied()));
+
+    QVERIFY(signalConnectionSucceeded);
+
+    signalConnectionSucceeded = QObject::connect(resourceSet,
+        SIGNAL(resourcesReleased()),
+        this, SLOT(handleResourcesReleased()));
+
+    QVERIFY(signalConnectionSucceeded);
+
+    signalConnectionSucceeded = QObject::connect(resourceSet,
+        SIGNAL(lostResources()),
+        this, SLOT(handleLostResources()));
+
+    QVERIFY(signalConnectionSucceeded);
+
+}
+
+void TestResourceSet::handleResourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &availableResources)
+{
+
+}
+void TestResourceSet::handleResourcesGranted(const QList<ResourcePolicy::ResourceType> &grantedOptionalResources)
+{
+}
+
+void TestResourceSet::handleResourcesDenied()
+{
+}
+
+void TestResourceSet::handleResourcesReleased()
+{
+}
+
+void TestResourceSet::handleLostResources()
+{
+}
+
+
 QTEST_MAIN(TestResourceSet)
 

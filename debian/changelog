@@ -1,3 +1,9 @@
+libresourceqt (1.1) unstable; urgency=low
+
+  * Bugfix release
+
+ -- Wolf Bergenheim <ext-wolf.2.bergenheim@nokia.com>  Fri, 26 Feb 2010 09:21:57 +0200
+
 libresourceqt (1.0) unstable; urgency=low
 
   * First release

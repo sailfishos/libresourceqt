@@ -1,10 +1,12 @@
 #include "test-resource-engine.h"
 #include <dbus/dbus.h>
+#include <string.h>
 
 using namespace ResourcePolicy;
 quint32 theID = 0;
 
 void statusCallbackHandler(resset_t *libresourceSet, resmsg_t *message);
+static bool strverify(const char *a, const char *b);
 
 static void verify_resproto_init(resproto_role_t role,
                                  resproto_transport_t transport,
@@ -129,28 +131,28 @@ void TestResourceEngine::testAcquire()
 
 void TestResourceEngine::handleAcquire(quint32 bitmaskOfGrantedResources)
 {
-    qDebug("Acquired resources: 0x%04x", bitmaskOfGrantedResources);
+    //qDebug("Acquired resources: 0x%04x", bitmaskOfGrantedResources);
     QVERIFY(messageOperationShoulSucceed);
     bool hasOptionalResource = false;
     QList<Resource *> resourceList = resourceSet->resources();
     for (int i=0; i < resourceList.size(); i++) {
         quint32 bitmask = resourceTypeToLibresourceType(resourceList.at(i)->type());
-        qDebug("Checking if resource %x(%x) is in the list", resourceList.at(i)->type(), bitmask);
+        //qDebug("Checking if resource %x(%x) is in the list", resourceList.at(i)->type(), bitmask);
         if ((bitmask & bitmaskOfGrantedResources) == bitmask)
         {
-            qDebug("Yes :)");
+            //qDebug("Yes :)");
             if (resourceList.at(i)->type() == optionalType) {
-                qDebug("Resource is the one we are looking for. :D");
+                //qDebug("Resource is the one we are looking for. :D");
                 hasOptionalResource = true;
                 break;
             }
         }
         else {
-            qDebug("No :(");
+            //qDebug("No :(");
         }
     }
     if ((optionalType == NumberOfTypes) && (bitmaskOfGrantedResources > 0)) {
-        qDebug("Expected to get no optional resources");
+        //qDebug("Expected to get no optional resources");
         hasOptionalResource = true;
     }
     QVERIFY(hasOptionalResource);
@@ -195,6 +197,65 @@ void TestResourceEngine::testRelease()
 
     bool releaseRequestSucceeded = resourceEngine->releaseResources();
     QVERIFY(releaseRequestSucceeded == !requestShouldFail);
+}
+
+void TestResourceEngine::testRegisterAudioProperties_data()
+{
+    QTest::addColumn<QString>("audioGroup");
+    QTest::addColumn<quint32>("pid");
+    QTest::addColumn<QString>("streamName");
+    QTest::addColumn<QString>("streamValue");
+
+    QTest::newRow("'player':12345:'media.role':'music'") << "player" << 12345u << "media.role" << "music";
+    QTest::newRow("'':12345:'media.role':'music'") << "" << 12345u << "media.role" << "music";
+    QTest::newRow(":12345:'media.role':'music'") << QString() << 12345u << "media.role" << "music";
+    QTest::newRow("'player':0:'media.role':'music'") << "player" << 0u << "media.role" << "music";
+    QTest::newRow("'player':12345:'':'music'") << "player" << 12345u << "" << "music";
+    QTest::newRow("'player':12345::'music'") << "player" << 12345u << QString() << "music";
+    QTest::newRow("'player':12345:'':''") << "player" << 12345u << "" << "";
+    QTest::newRow("'player':12345::") << "player" << 12345u << QString() << QString();
+    QTest::newRow("'player':12345:'media.role':''") << "player" << 12345u << "media.role" << "";
+    QTest::newRow("'player':12345:'media.role':") << "player" << 12345u << "media.role" << QString();
+    QTest::newRow("'':0:'':''") << "" << 0u << "" << "";
+    QTest::newRow(":0::") << QString() << 0u << QString() << QString();
+}
+
+char *expectedGroup, *expectedStreamName, *expectedStreamValue;
+
+void TestResourceEngine::testRegisterAudioProperties()
+{
+    QFETCH(QString, audioGroup);
+    QFETCH(quint32, pid);
+    QFETCH(QString, streamName);
+    QFETCH(QString, streamValue);
+
+    requestShouldFail = false;
+
+    if(audioGroup.isEmpty() || audioGroup.isNull()) {
+        expectedGroup = NULL;
+    }
+    else {
+        QByteArray ba = audioGroup.toLatin1();
+        expectedGroup = strdup(ba.data());
+    }
+
+    if(streamName.isEmpty() || streamName.isNull() || streamValue.isEmpty() || streamValue.isNull()) {
+        expectedStreamName = NULL;
+        expectedStreamValue = NULL;
+    }
+    else {
+        QByteArray ba = streamName.toLatin1();
+        expectedStreamName = strdup(ba.data());
+        ba = streamValue.toLatin1();
+        expectedStreamValue = strdup(ba.data());
+    }
+    //qDebug() << "streamValue = " << streamValue;
+    //qDebug("expectedStreamValue = %s", expectedStreamValue);
+
+    resourceEngine->connectToManager();
+
+    bool audioPropertiesSetSucceeded = resourceEngine->registerAudioProperties(audioGroup, pid, streamName, streamValue);
+    QVERIFY(audioPropertiesSetSucceeded);
 }
 
 QTEST_MAIN(TestResourceEngine)
@@ -297,7 +358,7 @@ int resconn_disconnect(resset_t *resSet, resmsg_t *message,
 static void verify_resconn_disconnect(resset_t *resourceSet, resmsg_t *message,
                                       resproto_status_t callbackFunction)
 {
-    qDebug("resourceSet = %p resSet = %p", resourceSet, resSet);
+    //qDebug("resourceSet = %p resSet = %p", resourceSet, resSet);
     QVERIFY(resourceSet == resSet);
     QVERIFY(message->record.type == RESMSG_UNREGISTER);
     QVERIFY(message->record.id == theID);
@@ -309,7 +370,7 @@ int resproto_send_message(resset_t *resourceSet, resmsg_t *message,
                           resproto_status_t  callbackFunction)
 {
     resmsg_t grantMessage, statusMessage;
-    qDebug("%s(): id:%u req#: %u", __FUNCTION__, message->record.id, message->record.reqno);
+    //qDebug("%s(): id:%u req#: %u", __FUNCTION__, message->record.id, message->record.reqno);
 
     verify_resproto_send_message(resourceSet, message, callbackFunction);
 
@@ -348,8 +409,16 @@ int resproto_send_message(resset_t *resourceSet, resmsg_t *message,
         grantMessage.record.reqno = message->record.reqno;
         grantCallback(&grantMessage, resSet, resSet->userdata);
         break;
+    case RESMSG_AUDIO:
+        statusMessage.type = RESMSG_STATUS;
+        statusMessage.status.errcod = 0;
+        statusMessage.status.errmsg = "";
+        statusMessage.record.id = 11;
+        statusMessage.record.reqno = 77;
+        callbackFunction(resSet, &statusMessage);
+        break;
     default:
-        qDebug("Unknown message requested...");
+        //qDebug("Unknown message requested...");
         return 0;
     }
 
@@ -369,10 +438,37 @@ static void verify_resproto_send_message(resset_t *resourceSet, resmsg_t *messag
         QVERIFY(message->possess.id == theID);
         QVERIFY(callbackFunction != NULL);
         break;
+    case RESMSG_AUDIO:
+        QVERIFY(resourceSet == resSet);
+        QVERIFY(message->possess.id == theID);
+        QVERIFY(callbackFunction != NULL);
+        QVERIFY(strverify(expectedGroup, message->audio.group));
+        QVERIFY(strverify(expectedStreamName, message->audio.property.name));
+        QVERIFY(strverify(expectedStreamValue, message->audio.property.match.pattern));
+        break;
     default:
         bool expectedMessageType = false;
         QVERIFY(expectedMessageType);
     }
+}
+
+static bool strverify(const char *a, const char *b)
+{
+    //qDebug("a='%s' b='%s'", a, b);
+    if (a == b) {
+        return true;
+    }
+    else if ((a == NULL) || (b == NULL)) {
+        return false;
+    }
+    else {
+        int i = strcmp(a, b);
+        if (i == 0)
+            return true;
+        else
+            return false;
+    }
+
 }
 
 char *resmsg_dump_message(resmsg_t *resmsg,
@@ -380,5 +476,5 @@ char *resmsg_dump_message(resmsg_t *resmsg,
                            char     *buf,
                            int       len)
 {
-    return "message";
+    char * ret = strdup("message");
 }
