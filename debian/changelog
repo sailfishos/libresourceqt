@@ -1,6 +1,6 @@
 libresourceqt (1.3) unstable; urgency=low
 
-  * Fixes: NB#161198 - Unable to hear audio from any other MAFW player process except for the qmafw-dbus-wrapper
+  * Also Fixes: NB#161198 - Unable to hear audio from any other MAFW player process except for the qmafw-dbus-wrapper
 
  -- Wolf Bergenheim <ext-wolf.2.bergenheim@nokia.com>  Thu, 25 Mar 2010 13:43:48 +0200
 
