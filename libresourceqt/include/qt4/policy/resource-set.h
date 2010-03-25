@@ -243,6 +243,8 @@ private:
     bool pendingUpdate;
     bool pendingAudioProperties;
 
+    void registerAudioProperties();
+
 private slots:
     void connectedHandler();
     void handleGranted(quint32);

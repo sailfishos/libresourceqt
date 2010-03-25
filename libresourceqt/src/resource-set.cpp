@@ -59,7 +59,6 @@ void ResourceSet::addResourceObject(Resource *resource)
     if(resource == NULL)
         return;
     if (resource->type() == AudioPlaybackType) {
-        qDebug("audioResource... %p", resource);
         audioResource = static_cast<AudioResource *>(resource);
         QObject::connect(audioResource,
                           SIGNAL(audioPropertiesChanged(const QString &, quint32,
@@ -70,7 +69,8 @@ void ResourceSet::addResourceObject(Resource *resource)
         if(audioResource->streamTagIsSet() || audioResource->audioGroupIsSet() ||
            (audioResource->processID() > 0))
         {
-            pendingAudioProperties = true;
+            qDebug("registering audio properties");
+            registerAudioProperties();
         }
     }
     delete resourceSet[resource->type()];
@@ -250,16 +250,9 @@ bool ResourceSet::alwaysGetReply()
 
 void ResourceSet::connectedHandler()
 {
+    qDebug("Connected to manager!");
     if (pendingAudioProperties) {
-        qDebug() << "registering audio group: " << audioResource->audioGroup();
-        qDebug() << "registering PID: " << audioResource->processID();
-        qDebug() << "registering audio stream: " << audioResource->streamTagName()
-        << ":" << audioResource->streamTagValue();
-        resourceEngine->registerAudioProperties(audioResource->audioGroup(),
-                                                audioResource->processID(),
-                                                audioResource->streamTagName(),
-                                                audioResource->streamTagValue());
-        pendingAudioProperties = false;
+        registerAudioProperties();
     }
     if (pendingUpdate) {
         resourceEngine->updateResources();
@@ -268,6 +261,35 @@ void ResourceSet::connectedHandler()
     if (pendingAcquire) {
         resourceEngine->acquireResources();
         pendingAcquire = false;
+    }
+}
+
+void ResourceSet::registerAudioProperties()
+{
+    if (!initialized) {
+        qDebug("%s(): initializing...", __FUNCTION__);
+        pendingAudioProperties = true;
+        initialize();
+    }
+    else if (!resourceEngine->isConnectedToManager()) {
+        qDebug("%s(): Connecting to Manager...", __FUNCTION__);
+        pendingAudioProperties = true;
+        resourceEngine->connectToManager();
+    }
+    else {
+        qDebug("Registering new audio settings:");
+        qDebug() << "\taudio group: " << audioResource->audioGroup();
+        qDebug() << "\tPID: " << audioResource->processID();
+        qDebug() << "\taudio stream: " << audioResource->streamTagName()
+                 << ":" << audioResource->streamTagValue();
+        if((audioResource->processID() > 0) && audioResource->streamTagName() != "media.name") {
+            qWarning() << "streamTagName should be 'media.name' it is '" << audioResource->streamTagName() << "'";
+        }
+        resourceEngine->registerAudioProperties(audioResource->audioGroup(),
+                                                audioResource->processID(),
+                                                audioResource->streamTagName(),
+                                                audioResource->streamTagValue());
+        pendingAudioProperties = false;
     }
 }
 
@@ -341,17 +363,8 @@ void ResourceSet::handleResourcesBecameAvailable(quint32 availableResources)
     emit resourcesBecameAvailable(listOfResources);
 }
 
-void ResourceSet::handleAudioPropertiesChanged(const QString &group, quint32 pid,
-                                                const QString &name, const QString &value)
+void ResourceSet::handleAudioPropertiesChanged(const QString &, quint32,
+                                                const QString &, const QString &)
 {
-    qDebug() << "Audio group is: " << group;
-    qDebug("Audio renderer PID = %u", pid);
-    if (initialized && resourceEngine->isConnectedToManager()) {
-        qDebug("registering new audio settings");
-        resourceEngine->registerAudioProperties(group, pid, name, value);
-    }
-    else {
-        qDebug("registering new audio group LATER");
-        pendingAudioProperties = true;
-    }
+    registerAudioProperties();
 }

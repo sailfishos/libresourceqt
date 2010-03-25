@@ -356,7 +356,8 @@ void Client::timerEvent(QTimerEvent*)
                 printf("\t  update\tupdate modified resource set after add or remove command\n");
                 printf("\t  add reslist [-o]\tadd reosurce list, if -o provided, set as optional\n");
                 printf("\t  remove reslist [-o]\tremove reosurce list, if -o provided, removed only optional flag\n");
-                printf("\t  audio pid <pid> | group <audio group> | tag <name> <value>\tset audio properties");
+                printf("\t  audio pid <pid> | group <audio group> | tag <name> <value>\tset audio properties\n");
+                printf("\t  addaudio <audio group> <pid> <tag name> <tag value>\n");
                 printf("\t  show  \tshow resources\n");
             }
             else if (params[0] == "show") {
@@ -460,6 +461,29 @@ void Client::timerEvent(QTimerEvent*)
                         else {
                             printf("Unknown audio command!\n");
                         }
+                    }
+                }
+            }
+            else if (params[0] == "addaudio") {
+                if (params.count() < 5) {
+                    printf("Not enough parameters! See help!\n");
+                }
+                else {
+                    AudioResource *audioResource = new AudioResource(params[1]);
+                    if (audioResource == NULL) {
+                        printf("Failed to create an AudioResource object!\n");
+                    }
+                    else {
+                        bool ok=false;
+                        quint32 pid = (quint32)params[2].toInt(&ok, 10);
+                        if (ok && pid != 0) {
+                            audioResource->setProcessID(pid);
+                        }
+                        else {
+                            printf("Bad pid parameter!\n");
+                        }
+                        audioResource->setStreamTag(params[3], params[4]);
+                        resourceSet->addResourceObject(audioResource);
                     }
                 }
             }
