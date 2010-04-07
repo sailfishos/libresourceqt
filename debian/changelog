@@ -1,6 +1,7 @@
 libresourceqt (1.4) unstable; urgency=low
 
   * libdbus-qeventloop fix
+  * Fixes: Fixes: NB#161198 - Unable to hear audio from any other MAFW player process except for the qmafw-dbus-wrapper
 
  -- Martin Wolf <ext-martin.2.wolf@nokia.com>  Wed, 07 Apr 2010 13:00:00 +0200
 
