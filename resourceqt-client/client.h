@@ -5,6 +5,7 @@
 #include <QtCore/QTextStream>
 
 #include <policy/resource-set.h>
+#include <sys/resource.h>
 
 #define RES_AUDIO_PLAYBACK	(1<<0)
 #define RES_VIDEO_PLAYBACK	(1<<1)
@@ -18,6 +19,64 @@
 #define RES_SCALE_BUTTON	(1<<9)
 #define RES_SNAP_BUTTON		(1<<10)
 #define RES_LENS_COVER		(1<<11)
+
+class TimeStat
+{
+public:
+    double totalTime;
+
+    TimeStat()
+    {
+        running = false;
+        totalTime = 0;
+    };
+
+    inline void markStart()
+    {
+        running = true;
+        getrusage(RUSAGE_SELF, &start);
+    }
+
+    inline bool markEnd()
+    {
+        getrusage(RUSAGE_SELF, &end);
+
+        if( !running )
+            return false;
+
+        running = false;
+        timevalSub(&end.ru_utime, &start.ru_utime, &end.ru_utime);
+        timevalSub(&end.ru_stime, &start.ru_stime, &end.ru_stime);
+
+        double sys = end.ru_stime.tv_sec * 1000.0 + end.ru_stime.tv_usec / 1000.0;
+        double usr = end.ru_utime.tv_sec * 1000.0 + end.ru_utime.tv_usec / 1000.0;
+        totalTime = sys + usr;
+
+        return true;
+    }
+
+    void report(const char* format)
+    {
+        printf(format, totalTime);
+    }
+
+private:
+    bool            running;
+    struct rusage   start;
+    struct rusage   end;
+
+    void timevalSub(struct timeval *a, struct timeval *b, struct timeval *diff)
+    {
+        diff->tv_sec = a->tv_sec - b->tv_sec;
+        if( a->tv_usec < b->tv_usec )
+        {
+            diff->tv_sec--;
+            diff->tv_usec = 1000000 - b->tv_usec + a->tv_usec;
+        }
+        else
+            diff->tv_usec = a->tv_usec - b->tv_usec;
+    }
+};
 
 class Client : public QObject
 {
@@ -46,6 +105,8 @@ private:
 	uint32_t		resourcesAll;
 	uint32_t		resourcesOptional;
 	QString			applicationClass;
+
+	TimeStat        timeStat;
 
 	ResourcePolicy::ResourceSet* 	resourceSet;
 

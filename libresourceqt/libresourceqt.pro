@@ -28,6 +28,7 @@ MOC_DIR = build
 CONFIG  += qt link_pkgconfig dll
 QT = core
 PKGCONFIG += dbus-1 libresource0
+DEFINES   += QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT QT_NO_DEBUG_STREAM
 
 # Install directives
 headers.files  = $${PUBLIC_HEADERS}
