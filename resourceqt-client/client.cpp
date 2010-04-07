@@ -297,6 +297,10 @@ void Client::showResources(const QList<Resource*> resList)
 
 void Client::resourceAcquiredHandler(const QList<ResourceType>& /*grantedResList*/)
 {
+    if( timeStat.markEnd() ) {
+        timeStat.report("\nOperation took %.2f ms\n");
+    }
+
     QList<Resource*> list = resourceSet->resources();
     if (!list.count()) {
         printf("\nGranted resource set is empty. Possible bug?\n");
@@ -311,18 +315,30 @@ void Client::resourceAcquiredHandler(const QList<ResourceType>& /*grantedResList
 
 void Client::resourceDeniedHandler()
 {
+    if( timeStat.markEnd() ) {
+        timeStat.report("\nOperation took %.2f ms\n");
+    }
+
     printf("\nManager denies access to resources!\n");
     showPrompt();
 }
 
 void Client::resourceLostHandler()
 {
+    if( timeStat.markEnd() ) {
+        timeStat.report("\nOperation took %.2f ms\n");
+    }
+
     printf("\nLost resources from manager!\n");
     showPrompt();
 }
 
 void Client::resourceReleasedHandler()
 {
+    if( timeStat.markEnd() ) {
+        timeStat.report("\nOperation took %.2f ms\n");
+    }
+
     printf("\nAll resources released\n");
     showPrompt();
 }
@@ -376,12 +392,22 @@ void Client::timerEvent(QTimerEvent*)
                 }
             }
             else if (params[0] == "acquire") {
+                timeStat.markStart();
                 if (!resourceSet || !resourceSet->acquire()) {
+                    if( timeStat.markEnd() ) {
+                        timeStat.report("Operation took %.2f ms\n");
+                    }
+
                     printf("Acquire failed!\n");
                 }
             }
             else if (params[0] == "release") {
+                timeStat.markStart();
                 if (!resourceSet || !resourceSet->release()) {
+                    if( timeStat.markEnd() ) {
+                        timeStat.report("Operation took %.2f ms\n");
+                    }
+
                     printf("Release failed!\n");
                 }
             }

@@ -61,7 +61,6 @@ private:
     bool connected;
     ResourceSet *resourceSet;
     DBusConnection *dbusConnection;
-    DBUSConnectionEventLoop *dbusEngine;
     resconn_t *libresourceConnection;
     resset_t *libresourceSet;
     quint32 requestId;

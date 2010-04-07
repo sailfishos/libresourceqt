@@ -48,18 +48,24 @@ class DBUSConnectionEventLoop : public QObject
 {
     Q_OBJECT
 private:
+    static DBUSConnectionEventLoop classInstance;
+
     Q_DISABLE_COPY(DBUSConnectionEventLoop)
+    DBUSConnectionEventLoop();
 
 public:
-    DBUSConnectionEventLoop();
     virtual ~DBUSConnectionEventLoop();
 
-public:
     /**
      * Add new dbus connection into handler.
      * \return true if everything went well.
      */
-    bool addConnection(DBusConnection* conn);
+    static bool addConnection(DBusConnection* conn);
+    static void removeConnection(DBusConnection* conn);
+
+private:
+    bool internalAddConnection(DBusConnection* conn);
+    void internalRemoveConnection(DBusConnection* conn);
 
     /**
      * Helper class for dbus watcher
@@ -100,6 +106,7 @@ private slots:
 
 protected:
     void timerEvent(QTimerEvent *e);
+    void cleanup();
 
     static dbus_bool_t addWatch(DBusWatch *watch, void *data);
     static void removeWatch(DBusWatch *watch, void *data);

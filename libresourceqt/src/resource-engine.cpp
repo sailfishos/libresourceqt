@@ -14,7 +14,7 @@ static void handleAdviceMessage(resmsg_t *msg, resset_t *rs, void *data);
 
 ResourceEngine::ResourceEngine(ResourceSet *resourceSet)
         : QObject(resourceSet), connected(false), resourceSet(resourceSet),
-        dbusEngine(NULL), libresourceConnection(NULL), libresourceSet(NULL),
+        libresourceConnection(NULL), libresourceSet(NULL),
         requestId(0), messageMap(), connectionMode(0)
 {
     if (resourceSet->alwaysGetReply()) {
@@ -28,7 +28,6 @@ ResourceEngine::ResourceEngine(ResourceSet *resourceSet)
 
 ResourceEngine::~ResourceEngine()
 {
-    delete dbusEngine;
     if (libresourceSet != NULL)
         libresourceSet->userdata = NULL;
     //need to destroy all libresource structures, but how?
@@ -38,9 +37,6 @@ bool ResourceEngine::initialize()
 {
     DBusError dbusError;
     DBusConnection *dbusConnection;
-    dbusEngine = new DBUSConnectionEventLoop;
-    if(dbusEngine == NULL)
-        return false;
 
     dbus_error_init(&dbusError);
     dbusConnection = dbus_bus_get(DBUS_BUS_SESSION, &dbusError);
@@ -50,7 +46,7 @@ bool ResourceEngine::initialize()
         return false;
     }
     dbus_error_free(&dbusError);
-    dbusEngine->addConnection(dbusConnection);
+    DBUSConnectionEventLoop::addConnection(dbusConnection);
     libresourceConnection = resproto_init(RESPROTO_ROLE_CLIENT, RESPROTO_TRANSPORT_DBUS,
                                           connectionIsUp, dbusConnection);
     if (libresourceConnection == NULL) {
@@ -177,6 +173,9 @@ bool ResourceEngine::connectToManager()
     qDebug("ResourceEngine is now connecting...");
     libresourceSet = resconn_connect(libresourceConnection, &resourceMessage,
                                      statusCallbackHandler);
+
+    if (libresourceSet == NULL)
+        return false;
 
     libresourceSet->userdata = this; //save our context
     return true;

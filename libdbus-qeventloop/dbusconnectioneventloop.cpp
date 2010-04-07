@@ -5,12 +5,41 @@
 
 #include "dbusconnectioneventloop.h"
 
+DBUSConnectionEventLoop DBUSConnectionEventLoop::classInstance;
+
+bool DBUSConnectionEventLoop::addConnection(DBusConnection* conn)
+{
+    return classInstance.internalAddConnection(conn);
+}
+
+void DBUSConnectionEventLoop::removeConnection(DBusConnection* conn)
+{
+    classInstance.internalRemoveConnection(conn);
+}
+
 DBUSConnectionEventLoop::DBUSConnectionEventLoop() : QObject()
 {
+    MYDEBUG();
 }
 
 DBUSConnectionEventLoop::~DBUSConnectionEventLoop()
 {
+    MYDEBUG();
+    cleanup();
+}
+
+void DBUSConnectionEventLoop::cleanup()
+{
+    MYDEBUG();
+
+    Connections::iterator it;
+    for (it = connections.begin(); it != connections.end(); ++it) {
+        MYDEBUGC("Cleaning connection %p", *it);
+
+        dbus_connection_set_watch_functions(*it, NULL, NULL, NULL, NULL, NULL);
+        dbus_connection_set_timeout_functions(*it, NULL, NULL, NULL, NULL, NULL);
+        dbus_connection_set_wakeup_main_function(*it, NULL, NULL, NULL);
+    }
 }
 
 // Handle a socket being ready to read.
@@ -122,11 +151,12 @@ void DBUSConnectionEventLoop::removeWatch(DBusWatch *watch, void *data)
         DBUSConnectionEventLoop::Watcher &watcher = it.value();
 
         if (watcher.watch == watch) {
-            if (watcher.read)
+            if (watcher.read) {
                 delete watcher.read;
-
-            if (watcher.write)
+            }
+            if (watcher.write) {
                 delete watcher.write;
+            }
 
             loop->watchers.erase(it);
 
@@ -229,14 +259,28 @@ void DBUSConnectionEventLoop::wakeupMain(void *data)
 }
 
 // The initialization point
-bool DBUSConnectionEventLoop::addConnection(DBusConnection* conn)
+bool DBUSConnectionEventLoop::internalAddConnection(DBusConnection* conn)
 {
-    bool rc;
+    MYDEBUG();
+
+    bool rc = true;
 
     if (conn == NULL) {
         return false;
     }
 
+    MYDEBUGC("Adding connection %p", conn);
+
+    // Check if connection is in list
+    Connections::iterator it;
+    for (it = connections.begin(); it != connections.end(); ++it) {
+        if( *it == conn ) {
+            MYDEBUGC("Connection already in list, skipping");
+            // Skip adding duplicate connection
+            return true;
+        }
+    }
+    // Add new connection
     connections.append(conn);
 
     if (
@@ -264,4 +308,21 @@ bool DBUSConnectionEventLoop::addConnection(DBusConnection* conn)
     dbus_connection_set_wakeup_main_function(conn, DBUSConnectionEventLoop::wakeupMain, this, 0);
 
     return rc;
+}
+
+void DBUSConnectionEventLoop::internalRemoveConnection(DBusConnection* conn)
+{
+    MYDEBUG();
+
+    Connections::iterator it;
+    for (it = connections.begin(); it != connections.end(); ++it) {
+        if( *it == conn ) {
+            dbus_connection_set_watch_functions(*it, NULL, NULL, NULL, NULL, NULL);
+            dbus_connection_set_timeout_functions(*it, NULL, NULL, NULL, NULL, NULL);
+            dbus_connection_set_wakeup_main_function(*it, NULL, NULL, NULL);
+
+            connections.erase(it);
+            return;
+        }
+    }
 }

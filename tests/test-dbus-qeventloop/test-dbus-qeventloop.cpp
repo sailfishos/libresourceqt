@@ -8,7 +8,6 @@ class TestDbusQEventLoop: public QObject
 private:
     DBusConnection* 			systemBus;
     DBusConnection* 			sessionBus;
-    DBUSConnectionEventLoop* 	dbusEventLoop;
 
     void resetValues() {
         wasInNotifyFnc = 0;
@@ -131,7 +130,6 @@ protected:
 private slots:
     void initTestCase() {
         // First allocate and obtain
-        dbusEventLoop = new DBUSConnectionEventLoop();
         systemBus = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
         sessionBus = dbus_bus_get(DBUS_BUS_SESSION, NULL);;
         // Last check, if server is running
@@ -140,9 +138,8 @@ private slots:
 
 
         // Create event loop ...
-        QVERIFY(dbusEventLoop != NULL);
-        QVERIFY(dbusEventLoop->addConnection(systemBus) == true);
-        QVERIFY(dbusEventLoop->addConnection(sessionBus) == true);
+        QVERIFY(DBUSConnectionEventLoop::addConnection(systemBus) == true);
+        QVERIFY(DBUSConnectionEventLoop::addConnection(sessionBus) == true);
         // Then test ... otherwise something don't have to be allocated (i.e. event loop)
         QVERIFY(systemBus != NULL);
         QVERIFY(sessionBus != NULL);
@@ -182,13 +179,6 @@ private slots:
 
         // Free message, it is not necessary to test, QVERIFY upper will end function
         dbus_message_unref(message);
-
-        // Cleanup allocated pointers
-        QVERIFY(dbusEventLoop != NULL);
-        if (dbusEventLoop) {
-            delete dbusEventLoop;
-            dbusEventLoop = NULL;
-        }
 
         // Check if everything went well
         QVERIFY(systemTimeout == false);
