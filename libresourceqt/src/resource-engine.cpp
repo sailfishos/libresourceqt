@@ -177,7 +177,8 @@ bool ResourceEngine::connectToManager()
     qDebug("ResourceEngine is now connecting...");
     libresourceSet = resconn_connect(libresourceConnection, &resourceMessage,
                                      statusCallbackHandler);
-
+    if (libresourceSet == NULL)
+        return NULL;
     libresourceSet->userdata = this; //save our context
     return true;
 }

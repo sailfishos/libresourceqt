@@ -58,6 +58,8 @@ void ResourceSet::addResourceObject(Resource *resource)
 {
     if(resource == NULL)
         return;
+    delete resourceSet[resource->type()];
+    resourceSet[resource->type()] = resource;
     if (resource->type() == AudioPlaybackType) {
         audioResource = static_cast<AudioResource *>(resource);
         QObject::connect(audioResource,
@@ -73,8 +75,6 @@ void ResourceSet::addResourceObject(Resource *resource)
             registerAudioProperties();
         }
     }
-    delete resourceSet[resource->type()];
-    resourceSet[resource->type()] = resource;
 }
 
 bool ResourceSet::addResource(ResourceType type)
