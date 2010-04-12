@@ -173,8 +173,8 @@ public:
      *
      * This feature is by default disabled.
      *
-     * This flag should be set once only before the first acquire is called,
-     * and cannot be unset.
+     * This flag should be set once only before calling anything else
+     * (excluding setAlwaysReply()), and cannot be unset.
      */
     bool setAutoRelease();
     /**
@@ -186,8 +186,8 @@ public:
      * Sets that the resourcesGranted() signal is emited even if we already
      * have the requested resources granted. By default this feature is off.
      *
-     * This flag should be set once only before the first acquire is called,
-     * and cannot be unset.
+     * This flag should be set once only before calling anything else
+     * (excluding setAutoRelease()), and cannot be unset.
      */
     bool setAlwaysReply();
     /**
