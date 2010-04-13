@@ -38,7 +38,7 @@ public:
     bool registerAudioProperties(const QString &audioGroup, quint32 pid,
                                   const QString &name, const QString &value);
 
-    void handleConnectionIsUp();
+    void handleConnectionIsUp(resconn_t *connection);
 
     void disconnected();
     void receivedGrant(resmsg_notify_t *notifyMessage);
@@ -46,6 +46,8 @@ public:
 
     void handleStatusMessage(quint32 requestNo);
     void handleError(quint32 requestNo, qint32 code, const char *message);
+
+    quint32 id();
 
 signals:
     void resourcesBecameAvailable(quint32 bitmaskOfAvailableResources);

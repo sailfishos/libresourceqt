@@ -60,13 +60,19 @@ bool ResourceEngine::initialize()
     return true;
 }
 
-static void handleUnregisterMessage(resmsg_t *, resset_t *libresourceSet, void *)
+static void handleUnregisterMessage(resmsg_t *message, resset_t *libresourceSet, void *)
 {
     if (NULL == libresourceSet->userdata) {
         qDebug("IGNORING unregister, no context");
         return;
     }
     ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(libresourceSet->userdata);
+    qDebug("recv: unregister: id=%d, engine->id() = %d", message->any.id, engine->id());
+    if(engine->id() != message->any.id) {
+        qDebug("Received an unregister notification, but it is not for us. Ignoring (%d != %d)",
+               message->any.id, engine->id());
+        return;
+    }
 
     engine->disconnected();
 }
@@ -86,6 +92,14 @@ static void handleGrantMessage(resmsg_t *message, resset_t *libresourceSet, void
         return;
     }
     ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(libresourceSet->userdata);
+    qDebug("recv: grant: type=%d, id=%d, reqno=%d, resc=0x%04x engine->id() = %d",
+           message->notify.type, message->notify.id, message->notify.reqno,
+           message->notify.resrc, engine->id());
+    if(engine->id() != message->any.id) {
+        qDebug("Received a grant message, but it is not for us. Ignoring (%d != %d)",
+               engine->id(), message->any.id);
+        return;
+    }
     engine->receivedGrant(&(message->notify));
 }
 
@@ -122,14 +136,19 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
 
 static void handleAdviceMessage(resmsg_t *message, resset_t *libresourceSet, void *)
 {
-    qDebug("ADVICE: type=0x%04x, id=0x%04x, reqno=0x%04x, resc=0x%04x",
-           message->notify.type, message->notify.id, message->notify.reqno, message->notify.resrc);
-
     if (NULL == libresourceSet->userdata) {
         qDebug("IGNORING advice, no context");
         return;
     }
     ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(libresourceSet->userdata);
+    qDebug("recv: advice: type=%d, id=%d, reqno=%d, resc=0x%04x engine->id() = %d",
+           message->notify.type, message->notify.id, message->notify.reqno,
+           message->notify.resrc, engine->id());
+    if(engine->id() != message->any.id) {
+        qDebug("Received an advice message, but it is not for us. Ignoring (%d != %d)",
+               engine->id(), message->any.id);
+        return;
+    }
 
     engine->receivedAdvice(&(message->notify));
 }
@@ -264,6 +283,12 @@ static void statusCallbackHandler(resset_t *libresourceSet, resmsg_t *message)
         return;
     }
     ResourceEngine *resourceEngine = reinterpret_cast<ResourceEngine *>(libresourceSet->userdata);
+    qDebug("recv: status: id=%d, engine->id() = %d", message->any.id, resourceEngine->id());
+    if(resourceEngine->id() != libresourceSet->id) {
+        qDebug("Received a status notification, but it is not for us. Ignoring (%d != %d)",
+               resourceEngine->id(), libresourceSet->id);
+        return;
+    }
     qDebug("Received a status notification");
     if (message->type != RESMSG_STATUS) {
         qDebug("Invalid message type.. (got %x, expected %x", message->type, RESMSG_STATUS);
@@ -439,12 +464,21 @@ static void connectionIsUp(resconn_t *connection)
     ResourceEngine *resourceEngine;
 
     resourceEngine = reinterpret_cast<ResourceEngine *>(connection->dbus.rsets->userdata);
-
-    resourceEngine->handleConnectionIsUp();
+    qDebug("connection is up");
+    resourceEngine->handleConnectionIsUp(connection);
 }
 
-void ResourceEngine::handleConnectionIsUp()
+void ResourceEngine::handleConnectionIsUp(resconn_t *connection)
 {
-    emit connectedToManager();
+    if(libresourceConnection == connection)
+        emit connectedToManager();
+    else {
+        qDebug("ignoring Connection is up, it is not for us (%p != %p)",
+               libresourceConnection, connection);
+    }
 }
 
+quint32 ResourceEngine::id()
+{
+    return resourceSet->id();
+}
