@@ -21,13 +21,13 @@ else
 endif
 
 # shared library versions, option 1
-version=2.0.5
-major=2
+#version=2.0.5
+#major=2
 # option 2, assuming the library is created as src/.libs/libfoo.so.2.0.5 or so
-#version=`ls src/build/lib*.so.* | \
-# awk '{if (match($$0,/[0-9]+\.[0-9]+\.[0-9]+$$/)) print substr($$0,RSTART)}'`
-#major=`ls src/build/lib*.so.* | \
-# awk '{if (match($$0,/\.so\.[0-9]+$$/)) print substr($$0,RSTART+4)}'`
+version=`ls libresourceqt/build/libresourceqt.so.* | \
+ awk '{if (match($$0,/[0-9]+\.[0-9]+\.[0-9]+$$/)) print substr($$0,RSTART)}'`
+major=`ls libresourceqt/build/libresourceqt.so.* | \
+ awk '{if (match($$0,/\.so\.[0-9]+$$/)) print substr($$0,RSTART+4)}'`
 
 configure: configure-stamp
 configure-stamp:
