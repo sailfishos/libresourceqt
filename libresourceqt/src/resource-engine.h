@@ -48,6 +48,7 @@ public:
     void handleError(quint32 requestNo, qint32 code, const char *message);
 
     quint32 id();
+    static resconn_t *libresourceConnection;
 
 signals:
     void resourcesBecameAvailable(quint32 bitmaskOfAvailableResources);
@@ -63,7 +64,6 @@ private:
     bool connected;
     ResourceSet *resourceSet;
     DBusConnection *dbusConnection;
-    resconn_t *libresourceConnection;
     resset_t *libresourceSet;
     quint32 requestId;
     QMap<quint32, resmsg_type_t> messageMap;

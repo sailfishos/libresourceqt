@@ -3,6 +3,8 @@
 
 using namespace ResourcePolicy;
 
+resconn_t *ResourceEngine::libresourceConnection = NULL;
+
 static inline quint32 allResourcesToBitmask(const ResourceSet *resourceSet);
 static inline quint32 optionalResourcesToBitmask(const ResourceSet *resourceSet);
 
@@ -14,8 +16,7 @@ static void handleAdviceMessage(resmsg_t *msg, resset_t *rs, void *data);
 
 ResourceEngine::ResourceEngine(ResourceSet *resourceSet)
         : QObject(resourceSet), connected(false), resourceSet(resourceSet),
-        libresourceConnection(NULL), libresourceSet(NULL),
-        requestId(0), messageMap(), connectionMode(0)
+        libresourceSet(NULL), requestId(0), messageMap(), connectionMode(0)
 {
     if (resourceSet->alwaysGetReply()) {
         connectionMode += RESMSG_MODE_ALWAYS_REPLY;
@@ -38,24 +39,28 @@ bool ResourceEngine::initialize()
     DBusError dbusError;
     DBusConnection *dbusConnection;
 
-    dbus_error_init(&dbusError);
-    dbusConnection = dbus_bus_get(DBUS_BUS_SESSION, &dbusError);
-    if (dbus_error_is_set(&dbusError)) {
-        qDebug("Error getting the session bus: %s", dbusError.message);
+    if (ResourceEngine::libresourceConnection == NULL) {
+
+        dbus_error_init(&dbusError);
+        dbusConnection = dbus_bus_get(DBUS_BUS_SESSION, &dbusError);
+        if (dbus_error_is_set(&dbusError)) {
+            qDebug("Error getting the session bus: %s", dbusError.message);
+            dbus_error_free(&dbusError);
+            return false;
+        }
         dbus_error_free(&dbusError);
-        return false;
-    }
-    dbus_error_free(&dbusError);
-    DBUSConnectionEventLoop::addConnection(dbusConnection);
-    libresourceConnection = resproto_init(RESPROTO_ROLE_CLIENT, RESPROTO_TRANSPORT_DBUS,
-                                          connectionIsUp, dbusConnection);
-    if (libresourceConnection == NULL) {
-        return NULL;
+        DBUSConnectionEventLoop::addConnection(dbusConnection);
+
+        ResourceEngine::libresourceConnection = resproto_init(RESPROTO_ROLE_CLIENT, RESPROTO_TRANSPORT_DBUS,
+                                              connectionIsUp, dbusConnection);
+        if (ResourceEngine::libresourceConnection == NULL) {
+            return NULL;
+        }
+        resproto_set_handler(ResourceEngine::libresourceConnection, RESMSG_UNREGISTER, handleUnregisterMessage);
+        resproto_set_handler(ResourceEngine::libresourceConnection, RESMSG_GRANT, handleGrantMessage);
+        resproto_set_handler(ResourceEngine::libresourceConnection, RESMSG_ADVICE, handleAdviceMessage);
     }
 
-    resproto_set_handler(libresourceConnection, RESMSG_UNREGISTER, handleUnregisterMessage);
-    resproto_set_handler(libresourceConnection, RESMSG_GRANT, handleGrantMessage);
-    resproto_set_handler(libresourceConnection, RESMSG_ADVICE, handleAdviceMessage);
     qDebug("ResourceEngine (%p) is now initialized.", this);
     return true;
 }
@@ -190,7 +195,7 @@ bool ResourceEngine::connectToManager()
     resourceMessage.record.mode = connectionMode;
 
     qDebug("ResourceEngine is now connecting...");
-    libresourceSet = resconn_connect(libresourceConnection, &resourceMessage,
+    libresourceSet = resconn_connect(ResourceEngine::libresourceConnection, &resourceMessage,
                                      statusCallbackHandler);
     if (libresourceSet == NULL)
         return false;
@@ -470,11 +475,11 @@ static void connectionIsUp(resconn_t *connection)
 
 void ResourceEngine::handleConnectionIsUp(resconn_t *connection)
 {
-    if(libresourceConnection == connection)
+    if(ResourceEngine::libresourceConnection == connection)
         emit connectedToManager();
     else {
         qDebug("ignoring Connection is up, it is not for us (%p != %p)",
-               libresourceConnection, connection);
+               ResourceEngine::libresourceConnection, connection);
     }
 }
 
