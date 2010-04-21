@@ -20,7 +20,7 @@ ResourceSet::~ResourceSet()
     }
     if(resourceEngine != NULL) {
         resourceEngine->disconnect(this);
-        //resourceEngine->disconnectFromManager();
+        resourceEngine->disconnectFromManager();
         delete resourceEngine;
     }
 }

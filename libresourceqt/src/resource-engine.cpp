@@ -4,6 +4,7 @@
 using namespace ResourcePolicy;
 
 resconn_t *ResourceEngine::libresourceConnection = NULL;
+quint32 ResourceEngine::libresourceUsers = 0;
 
 static inline quint32 allResourcesToBitmask(const ResourceSet *resourceSet);
 static inline quint32 optionalResourcesToBitmask(const ResourceSet *resourceSet);
@@ -29,8 +30,10 @@ ResourceEngine::ResourceEngine(ResourceSet *resourceSet)
 
 ResourceEngine::~ResourceEngine()
 {
-    if (libresourceSet != NULL)
+    libresourceUsers--;
+    if (libresourceUsers == 0) {
         libresourceSet->userdata = NULL;
+    }
     //need to destroy all libresource structures, but how?
 }
 
@@ -56,9 +59,13 @@ bool ResourceEngine::initialize()
         if (ResourceEngine::libresourceConnection == NULL) {
             return NULL;
         }
+        ResourceEngine::libresourceUsers = 1;
         resproto_set_handler(ResourceEngine::libresourceConnection, RESMSG_UNREGISTER, handleUnregisterMessage);
         resproto_set_handler(ResourceEngine::libresourceConnection, RESMSG_GRANT, handleGrantMessage);
         resproto_set_handler(ResourceEngine::libresourceConnection, RESMSG_ADVICE, handleAdviceMessage);
+    }
+    else {
+        ResourceEngine::libresourceUsers += 1;
     }
 
     qDebug("ResourceEngine (%p) is now initialized.", this);

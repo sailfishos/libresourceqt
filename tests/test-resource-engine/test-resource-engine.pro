@@ -21,7 +21,7 @@ SOURCES +=  $${LIBRESOURCEQT}/src/resource.cpp \
             test-resource-engine.cpp
 
 OBJECTS_DIR = build
-MOC_DIR = build
+MOC_DIR = build/moc
 QMAKE_CXXFLAGS += -Wall
 LIBS += -L$${LIBDBUSQEVENTLOOP}/build -ldbus-qeventloop
 

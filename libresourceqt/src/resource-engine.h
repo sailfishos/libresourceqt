@@ -48,7 +48,6 @@ public:
     void handleError(quint32 requestNo, qint32 code, const char *message);
 
     quint32 id();
-    static resconn_t *libresourceConnection;
 
 signals:
     void resourcesBecameAvailable(quint32 bitmaskOfAvailableResources);
@@ -68,6 +67,8 @@ private:
     quint32 requestId;
     QMap<quint32, resmsg_type_t> messageMap;
     quint32 connectionMode;
+    static quint32 libresourceUsers;
+    static resconn_t *libresourceConnection;
 
 };
 }

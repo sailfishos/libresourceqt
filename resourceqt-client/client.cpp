@@ -367,6 +367,7 @@ void Client::timerEvent(QTimerEvent*)
                 printf("Available commands:\n");
                 printf("\t  help   \tprint this help message\n");
                 printf("\t  quit   \texit application\n");
+                printf("\t  free   \tdestroy and free the resources\n");
                 printf("\t  acquire\tacquire required resources\n");
                 printf("\t  release\trelease resources\n");
                 printf("\t  update\tupdate modified resource set after add or remove command\n");
@@ -512,6 +513,10 @@ void Client::timerEvent(QTimerEvent*)
                         resourceSet->addResourceObject(audioResource);
                     }
                 }
+            }
+            else if (params[0] == "free") {
+                delete resourceSet;
+                resourceSet = new ResourceSet(applicationClass);
             }
             else if (!params[0].isEmpty()) {
                 QByteArray ba = line.toLatin1();

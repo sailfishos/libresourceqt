@@ -23,7 +23,7 @@ QMAKE_CXXFLAGS += -Wall
 LIBS += -L$${LIBDBUSQEVENTLOOP}/build -ldbus-qeventloop
 
 OBJECTS_DIR = build
-MOC_DIR = build
+MOC_DIR = moc
 
 CONFIG  += qt link_pkgconfig dll
 QT = core
