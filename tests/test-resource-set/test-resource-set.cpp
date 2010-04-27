@@ -60,8 +60,6 @@ void TestResourceSet::testIdentifier()
 
     bool identifiersAreUnique = (resourceSet->id() != otherSet.id());
     QVERIFY(identifiersAreUnique);
-    QVERIFY(resourceSet->id() == (quint32)resourceSet);
-    QVERIFY(otherSet.id() == (quint32)&otherSet);
 }
 
 void TestResourceSet::testAddResource()
