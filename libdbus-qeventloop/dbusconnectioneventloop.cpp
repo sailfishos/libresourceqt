@@ -53,9 +53,7 @@ void DBUSConnectionEventLoop::readSocket(int fd)
         const Watcher &watcher = it.value();
 
         if (watcher.read && watcher.read->isEnabled()) {
-            watcher.read->setEnabled(false);
             dbus_watch_handle(watcher.watch, DBUS_WATCH_READABLE);
-            watcher.read->setEnabled(true);
             break;
         }
 
@@ -76,9 +74,7 @@ void DBUSConnectionEventLoop::writeSocket(int fd)
         const Watcher &watcher = it.value();
 
         if (watcher.write && watcher.write->isEnabled()) {
-            watcher.write->setEnabled(false);
             dbus_watch_handle(watcher.watch, DBUS_WATCH_WRITABLE);
-            watcher.write->setEnabled(true);
             break;
         }
 
