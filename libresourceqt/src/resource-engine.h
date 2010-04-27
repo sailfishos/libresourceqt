@@ -48,6 +48,7 @@ public:
     void handleError(quint32 requestNo, qint32 code, const char *message);
 
     quint32 id();
+    bool toBeDeleted();
 
 signals:
     void resourcesBecameAvailable(quint32 bitmaskOfAvailableResources);
@@ -59,7 +60,6 @@ signals:
     void disconnectedFromManager();
 
 private:
-
     bool connected;
     ResourceSet *resourceSet;
     DBusConnection *dbusConnection;
@@ -69,7 +69,8 @@ private:
     quint32 connectionMode;
     static quint32 libresourceUsers;
     static resconn_t *libresourceConnection;
-
+    quint32 identifier;
+    bool aboutToBeDeleted;
 };
 }
 

@@ -4,6 +4,7 @@
 
 using namespace ResourcePolicy;
 quint32 theID = 0;
+quint32 resproto_init_calls = 0;
 
 void statusCallbackHandler(resset_t *libresourceSet, resmsg_t *message);
 static bool strverify(const char *a, const char *b);
@@ -47,11 +48,22 @@ TestResourceEngine::~TestResourceEngine()
 
 void TestResourceEngine::init()
 {
+    resproto_init_calls=0;
     resourceEngine = new ResourceEngine(resourceSet);
     bool initializeSucceeded = resourceEngine->initialize();
     acquireOrDenyWasCalled = false;
     QVERIFY(!resourceEngine->isConnectedToManager());
     QVERIFY(initializeSucceeded);
+    QVERIFY(resourceSet->id() == theID);
+}
+
+void TestResourceEngine::cleanup()
+{
+    delete(resourceEngine);    
+
+    QVERIFY(ResourceEngine::libresourceConnection == NULL);
+    QVERIFY(ResourceEngine::libresourceUsers == 0);
+    resproto_init_calls=0;
 }
 
 void TestResourceEngine::testConnect()
@@ -258,6 +270,27 @@ void TestResourceEngine::testRegisterAudioProperties()
     QVERIFY(audioPropertiesSetSucceeded);
 }
 
+void TestResourceEngine::testMultipleInstences()
+{
+    ResourceSet *resSet;
+    ResourceEngine *resEngine;
+    resconn_t * resConn = ResourceEngine::libresourceConnection;
+    resSet = new ResourceSet("background", this);
+    resEngine = new ResourceEngine(resSet);
+    bool initializeSucceeded = resEngine->initialize();
+    acquireOrDenyWasCalled = false;
+
+    QVERIFY(!resEngine->isConnectedToManager());
+    QVERIFY(initializeSucceeded);
+    QVERIFY(resEngine->id() != theID);
+    QVERIFY(ResourceEngine::libresourceConnection == resConn);
+    QVERIFY(ResourceEngine::libresourceUsers == 2);
+
+    delete(resEngine);
+    QVERIFY(ResourceEngine::libresourceConnection == resConn);
+    delete(resSet);
+}
+
 QTEST_MAIN(TestResourceEngine)
 
 ////////////////////////////////////////////////////////////////
@@ -271,6 +304,8 @@ resconn_t* resproto_init(resproto_role_t role, resproto_transport_t transport, .
     resconn_linkup_t callbackFunction;
     DBusConnection *dbusConnection;
     va_list args;
+
+    resproto_init_calls += 1;
 
     va_start(args, transport);
     callbackFunction = va_arg(args, resconn_linkup_t);
@@ -296,6 +331,8 @@ static void verify_resproto_init(resproto_role_t role,
     QVERIFY(dbusConnection == sessionBus);
     QVERIFY(role == RESPROTO_ROLE_CLIENT);
     QVERIFY(transport == RESPROTO_TRANSPORT_DBUS);
+    qDebug("resproto_init_calls==%u", resproto_init_calls);
+    QVERIFY(resproto_init_calls==1);
 }
 
 resset_t  *resconn_connect(resconn_t *connection, resmsg_t *message,
@@ -477,4 +514,6 @@ char *resmsg_dump_message(resmsg_t *resmsg,
                            int       len)
 {
     char * ret = strdup("message");
+    return ret;
 }
+

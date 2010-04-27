@@ -2,6 +2,7 @@
 #include "resource-engine.h"
 using namespace ResourcePolicy;
 
+static quint32 resourceSetId=1;
 
 ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
         : QObject(parent), resourceClass(applicationClass), resourceEngine(NULL),
@@ -9,20 +10,22 @@ ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
         initialized(false), pendingAcquire(false), pendingUpdate(false),
         pendingAudioProperties(false)
 {
-    identifier = (quint32)this;
+    identifier = resourceSetId++;
     memset(resourceSet, 0, sizeof(QPointer<Resource *>)*NumberOfTypes);
 }
 
 ResourceSet::~ResourceSet()
 {
+    qDebug("ResourceSet::%s(%d)", __FUNCTION__, identifier);
     for (int i = 0;i < NumberOfTypes;i++) {
         delete resourceSet[i];
     }
     if(resourceEngine != NULL) {
+        qDebug("ResourceSet::%s(%d) - resourceEngine->disconnectFromManager()", __FUNCTION__, identifier);
         resourceEngine->disconnect(this);
         resourceEngine->disconnectFromManager();
-        delete resourceEngine;
     }
+    qDebug("ResourceSet::%s(%d) - deleted!", __FUNCTION__, identifier);
 }
 
 bool ResourceSet::initialize()
@@ -43,24 +46,30 @@ bool ResourceSet::initialize()
                      this, SLOT(handleResourcesLost(quint32)));
     QObject::connect(resourceEngine, SIGNAL(resourcesBecameAvailable(quint32)),
                      this, SLOT(handleResourcesBecameAvailable(quint32)));
+    qDebug("initializing resource engine...");
     if (!resourceEngine->initialize()) {
         return false;
     }
+    qDebug("resourceEngine->initialize() returned true");
     if (!resourceEngine->connectToManager()) {
         return false;
     }
     qDebug("ResourceSet is initialized engine=%p", resourceEngine);
     initialized = true;
+    qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
     return true;
 }
 
 void ResourceSet::addResourceObject(Resource *resource)
 {
+    qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
     if(resource == NULL)
         return;
+    qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
     delete resourceSet[resource->type()];
     resourceSet[resource->type()] = resource;
-    if (resource->type() == AudioPlaybackType) {
+    if ((resource->type() == AudioPlaybackType)) {
+        qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
         audioResource = static_cast<AudioResource *>(resource);
         QObject::connect(audioResource,
                           SIGNAL(audioPropertiesChanged(const QString &, quint32,
@@ -68,11 +77,14 @@ void ResourceSet::addResourceObject(Resource *resource)
                           this,
                           SLOT(handleAudioPropertiesChanged(const QString &, quint32,
                                                              const QString &, const QString &)));
-        if(audioResource->streamTagIsSet() || audioResource->audioGroupIsSet() ||
-           (audioResource->processID() > 0))
+        if(audioResource->streamTagIsSet() && (audioResource->processID() > 0))
         {
             qDebug("registering audio properties");
             registerAudioProperties();
+        }
+        else if (audioResource->audioGroupIsSet()) {
+            qDebug("ResourceSet::%s().... %d registering audio proprerties later", __FUNCTION__, __LINE__);
+            pendingAudioProperties = true;            
         }
     }
 }
@@ -181,16 +193,19 @@ Resource * ResourceSet::resource(ResourceType type) const
 bool ResourceSet::acquire()
 {
     if (!initialized) {
+        qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
         pendingAcquire = true;
         return initialize();
     }
 
     if (!resourceEngine->isConnectedToManager()) {
+        qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
         pendingAcquire = true;
         resourceEngine->connectToManager();
         return true;
     }
     else {
+        qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
         return resourceEngine->acquireResources();
     }
 }
@@ -250,6 +265,7 @@ bool ResourceSet::alwaysGetReply()
 
 void ResourceSet::connectedHandler()
 {
+    qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
     qDebug("Connected to manager!");
     if (pendingAudioProperties) {
         registerAudioProperties();

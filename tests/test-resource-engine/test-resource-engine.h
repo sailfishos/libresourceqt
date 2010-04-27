@@ -34,6 +34,7 @@ public slots:
 
 private slots:
     void init();
+    void cleanup();
 
     void testConnect();
     void testDisconnect();
@@ -48,6 +49,8 @@ private slots:
 
     void testRegisterAudioProperties_data();
     void testRegisterAudioProperties();
+
+    void testMultipleInstences();
 };
 
 #endif
