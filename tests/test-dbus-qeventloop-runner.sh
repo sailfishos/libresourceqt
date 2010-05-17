@@ -1,10 +1,7 @@
 #!/bin/sh
 
 # Source and export D-Bus session info 
-. /tmp/dbus-info
-export DBUS_SESSION_BUS_ADDRESS
-export DBUS_SESSION_BUS_PID
-export DBUS_SESSION_BUS_WINDOWID
+. /tmp/session_bus_address.user 
 
 # Run pong server on system bus
 /usr/lib/libresourceqt-tests/test-dbus-pong &

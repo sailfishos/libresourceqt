@@ -9,7 +9,8 @@ SUBDIRS = test-dbus-qeventloop	\
           test-dbus-pong		\
           test-resource			\
           test-resource-set     \
-          test-resource-engine
+          test-resource-engine	\
+          test-performance
 
 # Install options
 testsxml.path    = /usr/share/libresourceqt-tests/

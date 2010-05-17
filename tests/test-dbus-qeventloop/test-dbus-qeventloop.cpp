@@ -131,7 +131,7 @@ private slots:
     void initTestCase() {
         // First allocate and obtain
         systemBus = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
-        sessionBus = dbus_bus_get(DBUS_BUS_SESSION, NULL);;
+        sessionBus = dbus_bus_get(DBUS_BUS_SESSION, NULL);
         // Last check, if server is running
         pongServerRunningSystem = dbus_bus_name_has_owner(systemBus, "com.nokia.dbusqeventloop.test", NULL);
         pongServerRunningSession = dbus_bus_name_has_owner(sessionBus, "com.nokia.dbusqeventloop.test", NULL);
