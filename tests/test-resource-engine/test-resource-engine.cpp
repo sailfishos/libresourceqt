@@ -508,10 +508,7 @@ static bool strverify(const char *a, const char *b)
 
 }
 
-char *resmsg_dump_message(resmsg_t *resmsg,
-                           int       indent,
-                           char     *buf,
-                           int       len)
+char *resmsg_dump_message(resmsg_t *, int, char *, int)
 {
     char * ret = strdup("message");
     return ret;

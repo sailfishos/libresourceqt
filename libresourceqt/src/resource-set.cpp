@@ -384,3 +384,4 @@ void ResourceSet::handleAudioPropertiesChanged(const QString &, quint32,
 {
     registerAudioProperties();
 }
+

@@ -161,11 +161,11 @@ void TestResourceSet::testConnectToSignals()
 
 }
 
-void TestResourceSet::handleResourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &availableResources)
+void TestResourceSet::handleResourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)
 {
 
 }
-void TestResourceSet::handleResourcesGranted(const QList<ResourcePolicy::ResourceType> &grantedOptionalResources)
+void TestResourceSet::handleResourcesGranted(const QList<ResourcePolicy::ResourceType> &)
 {
 }
 
