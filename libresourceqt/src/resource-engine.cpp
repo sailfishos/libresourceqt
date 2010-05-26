@@ -42,12 +42,23 @@ ResourceEngine::~ResourceEngine()
         qDebug("ResourceEngine::~ResourceEngine(%d) - unset userdata", identifier);
     }
     if (libresourceUsers==0) {
+//	DBusError dbusError;
+//	DBusConnection *dbusConnection;
         qDebug("ResourceEngine::~ResourceEngine(%d) - last libresourceUser!", identifier);
         ResourceEngine::libresourceConnection = NULL;
+//        dbus_error_init(&dbusError);
+//        dbusConnection = dbus_bus_get(DBUS_BUS_SESSION, &dbusError);
+//        if (dbus_error_is_set(&dbusError)) {
+//            qDebug("Error getting the session bus: %s", dbusError.message);
+//            dbus_error_free(&dbusError);
+//            return;
+//        }
+//        dbus_error_free(&dbusError);
+//        DBUSConnectionEventLoop::removeConnection(dbusConnection);
     }
     qDebug("ResourceEngine::~ResourceEngine(%d) is no more!", identifier);
 }
-
+	
 bool ResourceEngine::initialize()
 {
     qDebug("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
@@ -166,6 +177,7 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
                identifier, notifyMessage->resrc);
         emit resourcesGranted(notifyMessage->resrc);
     }
+    messageMap.remove(notifyMessage->reqno);
 }
 
 static void handleAdviceMessage(resmsg_t *message, resset_t *libresourceSet, void *)
@@ -391,6 +403,9 @@ void ResourceEngine::handleStatusMessage(quint32 requestNo)
     else if(originalMessageType == RESMSG_RELEASE) {
         qDebug("ResourceEngine(%d) - Release status", identifier);
     }
+    else {
+        messageMap.remove(requestNo);
+    }
 }
 
 void ResourceEngine::handleError(quint32 requestNo, qint32 code, const char *message)
@@ -398,6 +413,7 @@ void ResourceEngine::handleError(quint32 requestNo, qint32 code, const char *mes
     resmsg_type_t originalMessageType = messageMap.take(requestNo);
     qDebug("ResourceEngine(%d) - Error on request %u(0x%02x): %d - %s",
            identifier, requestNo, originalMessageType, code, message);
+    messageMap.remove(requestNo);
 }
 
 bool ResourceEngine::isConnectedToManager()
