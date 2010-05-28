@@ -20,7 +20,7 @@ static void handleAdviceMessage(resmsg_t *msg, resset_t *rs, void *data);
 ResourceEngine::ResourceEngine(ResourceSet *resourceSet)
         : QObject(), connected(false), resourceSet(resourceSet),
         libresourceSet(NULL), requestId(0), messageMap(), connectionMode(0),
-        identifier(resourceSet->id()), aboutToBeDeleted(false)
+        identifier(resourceSet->id()), aboutToBeDeleted(false), isConnecting(false)
 {
     if (resourceSet->alwaysGetReply()) {
         connectionMode += RESMSG_MODE_ALWAYS_REPLY;
@@ -205,6 +205,11 @@ bool ResourceEngine::connectToManager()
 {
     qDebug("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
     QMutexLocker locker(&mutex);
+    if (isConnecting) {
+        qDebug("ResourceEngine::%s().... allready connecting, ignoring request", __FUNCTION__);
+        return true;
+    }
+    isConnecting = true;
     resmsg_t resourceMessage;
     memset(&resourceMessage, 0, sizeof(resmsg_t));
     resourceMessage.record.type = RESMSG_REGISTER;
@@ -373,6 +378,7 @@ void ResourceEngine::handleStatusMessage(quint32 requestNo)
     if (originalMessageType == RESMSG_REGISTER) {
         qDebug("ResourceEngine(%d) - connected!", identifier);
         connected = true;
+        isConnecting = false;
         emit connectedToManager();
         messageMap.remove(requestNo);
     }
@@ -403,6 +409,11 @@ void ResourceEngine::handleError(quint32 requestNo, qint32 code, const char *mes
 bool ResourceEngine::isConnectedToManager()
 {
     return connected;
+}
+
+bool ResourceEngine::isConnectingToManager()
+{
+    return isConnecting;
 }
 
 bool ResourceEngine::acquireResources()

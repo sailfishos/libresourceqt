@@ -193,19 +193,19 @@ Resource * ResourceSet::resource(ResourceType type) const
 bool ResourceSet::acquire()
 {
     if (!initialized) {
-        qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
+        qDebug("ResourceSet::%s().... initializing...", __FUNCTION__);
         pendingAcquire = true;
         return initialize();
     }
 
     if (!resourceEngine->isConnectedToManager()) {
-        qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
+        qDebug("ResourceSet::%s().... connecting...", __FUNCTION__);
         pendingAcquire = true;
         resourceEngine->connectToManager();
         return true;
     }
     else {
-        qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
+        qDebug("ResourceSet::%s().... acquiring", __FUNCTION__);
         return resourceEngine->acquireResources();
     }
 }
@@ -216,6 +216,7 @@ bool ResourceSet::release()
         return true;
     }
 
+    qDebug("ResourceSet::%s().... releasing...", __FUNCTION__);
     return resourceEngine->releaseResources();
 }
 
@@ -227,8 +228,10 @@ bool ResourceSet::update()
 
     if (!resourceEngine->isConnectedToManager()) {
         pendingUpdate = true;
+        resourceEngine->connectToManager();
         return true;
     }
+    qDebug("ResourceSet::%s().... updating...", __FUNCTION__);
     return resourceEngine->updateResources();
 }
 
@@ -267,6 +270,7 @@ void ResourceSet::connectedHandler()
 {
     qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
     qDebug("Connected to manager!");
+
     if (pendingAudioProperties) {
         registerAudioProperties();
     }
@@ -287,8 +291,9 @@ void ResourceSet::registerAudioProperties()
         pendingAudioProperties = true;
         initialize();
     }
-    else if (!resourceEngine->isConnectedToManager()) {
+    if (!resourceEngine->isConnectedToManager() && !resourceEngine->isConnectingToManager()) {
         qDebug("%s(): Connecting to Manager...", __FUNCTION__);
+
         pendingAudioProperties = true;
         resourceEngine->connectToManager();
     }

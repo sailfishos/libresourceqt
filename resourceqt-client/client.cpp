@@ -101,7 +101,7 @@ void Client::updateSet(uint32_t list, uint32_t optional, bool remove)
 
     int pos = 0;
     while (resources[pos]) {
-        if (list & resources[pos]) {
+        if ((list & resources[pos]) == resources[pos]) {
             Resource* resource = NULL;
             ResourceType res = getResourceType(resources[pos]);
             bool opt = (optional & resources[pos]) == resources[pos];
