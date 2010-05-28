@@ -1,6 +1,6 @@
 Source: libresourceqt
 Priority: extra
-Maintainer: Martin Wolf <resource-policy@projects.maemo.org>
+Maintainer: Resource Policy Team <resource-policy@projects.maemo.org>
 Build-Depends: debhelper (>= 5), libqt4-dev (>> 4.6.0), libdbus-1-dev, libresource0-dev
 Standards-Version: 3.8.0
 Section: libs
@@ -49,13 +49,3 @@ XB-Maemo-CI-Stage: fast, staging, acceptance, validation
 Architecture: any
 Description: libresourceqt1 and libdbus-qeventloop test package
  This package contains tests which can be used in CI environment
-
-Package: libresourceqt-performance-tests
-Section: misc
-Depends: ci-testing, libdbus-qeventloop1, libresourceqt1, ${shlibs:Depends}
-XB-Maemo-CI-Packages: libdbus-qeventloop1, libresourceqt1
-XB-Maemo-CI-Stage: staging, acceptance, validation
-Architecture: any
-Description: libresourceqt1 performance test package
- This package contains performance tests which can be used in CI environment
-

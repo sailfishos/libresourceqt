@@ -1,6 +1,9 @@
 libresourceqt (1.8) unstable; urgency=low
 
-    * Fixes: NB#171161 - Multiple acquire and set audio properties confuse the libresourceqt library
+  * Fixes: NB#171161 - Multiple acquire and set audio properties confuse the libresourceqt library
+
+  [Martin Wolf]
+  * Removed binary package libresourceqt-performance-tests
 
  -- Wolf Bergenheim <ext-wolf.2.bergenheim@nokia.com>  Fri, 28 May 2010 10:57:40 +0300
 
