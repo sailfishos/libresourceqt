@@ -58,9 +58,9 @@ bool ResourceEngine::initialize()
     if (ResourceEngine::libresourceConnection == NULL) {
 
         dbus_error_init(&dbusError);
-        dbusConnection = dbus_bus_get(DBUS_BUS_SESSION, &dbusError);
+        dbusConnection = dbus_bus_get(DBUS_BUS_SYSTEM, &dbusError);
         if (dbus_error_is_set(&dbusError)) {
-            qDebug("Error getting the session bus: %s", dbusError.message);
+            qDebug("Error getting the system bus: %s", dbusError.message);
             dbus_error_free(&dbusError);
             return false;
         }
