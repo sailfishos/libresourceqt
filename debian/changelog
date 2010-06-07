@@ -1,3 +1,9 @@
+libresourceqt (1.9) unstable; urgency=low
+
+  * Fixes: NB#164531 - instead of B-Bus session bus start to use system bus to make resource management available even if the session bus were not up
+
+ -- Janos Kovacs <janos.f.kovacs@nokia.com>  Mon, 07 Jun 2010 08:19:21 +0300
+
 libresourceqt (1.8) unstable; urgency=low
 
   * Fixes: NB#171161 - Multiple acquire and set audio properties confuse the libresourceqt library
