@@ -324,11 +324,11 @@ static void verify_resproto_init(resproto_role_t role,
                                  resconn_linkup_t callbackFunction,
                                  DBusConnection *dbusConnection)
 {
-    DBusConnection *sessionBus;
-    sessionBus = dbus_bus_get(DBUS_BUS_SESSION, NULL);
+    DBusConnection *systemBus;
+    systemBus = dbus_bus_get(DBUS_BUS_SYSTEM, NULL);
 
     QVERIFY(callbackFunction != NULL);
-    QVERIFY(dbusConnection == sessionBus);
+    QVERIFY(dbusConnection == systemBus);
     QVERIFY(role == RESPROTO_ROLE_CLIENT);
     QVERIFY(transport == RESPROTO_TRANSPORT_DBUS);
     qDebug("resproto_init_calls==%u", resproto_init_calls);
