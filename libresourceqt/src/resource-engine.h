@@ -30,6 +30,7 @@ public:
     bool connectToManager();
     bool disconnectFromManager();
     bool isConnectedToManager();
+    bool isConnectingToManager();
 
     bool acquireResources();
     bool releaseResources();
@@ -71,6 +72,7 @@ private:
     static resconn_t *libresourceConnection;
     quint32 identifier;
     bool aboutToBeDeleted;
+    bool isConnecting;
 };
 }
 
