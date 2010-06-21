@@ -8,7 +8,7 @@ void MemoryLeakTest::test() {
 
   iterations = ITERATIONS;
 
-  AudioResource *audioResource = new ResourcePolicy::AudioResource("player");
+  AudioResource *audioResource = new ResourcePolicy::AudioResource();
   set->addResourceObject(audioResource);
 
   connect(set,  SIGNAL(resourcesGranted(QList<ResourcePolicy::ResourceType>)),
@@ -46,6 +46,33 @@ void MemoryLeakTest::resourceReleasedHandler()
 
 }
 
+#define STATUS_BUF_SIZE 2047
+static char status_buf[STATUS_BUF_SIZE+1];
+
+void MemoryLeakTest::update_memory_stat()
+{
+    const int MAX_NAME = 100;
+    char filename[MAX_NAME + 1];
+    filename[MAX_NAME] = '\0';
+
+    snprintf(filename, MAX_NAME, "/proc/%d/status", getpid());
+    FILE* status = fopen(filename, "r");
+    fread(status_buf, 1, STATUS_BUF_SIZE, status);
+    fclose(status);
+
+    char *ptr = strstr(status_buf, "VmSize:");
+
+    int retcnt = 0;
+
+    assert(ptr);
+/*
+    if (ptr)  retcnt = sscanf(ptr+7, "%d", &vm_size);
+
+    if( retcnt != 1 )
+        return FALSE;
+
+    return TRUE;*/
+}
 
 
 int main(int argc, char* argv[]) {
