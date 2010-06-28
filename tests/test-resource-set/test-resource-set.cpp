@@ -29,6 +29,8 @@ Resource * TestResourceSet::resourceFromType(ResourceType type)
         return new SnapButtonResource;
     case LensCoverType:
         return new LensCoverResource;
+    case HeadsetButtonsType:
+        return headsetButtonsResource;
     default:
         return NULL;
     }
@@ -180,7 +182,6 @@ void TestResourceSet::handleResourcesReleased()
 void TestResourceSet::handleLostResources()
 {
 }
-
 
 QTEST_MAIN(TestResourceSet)
 

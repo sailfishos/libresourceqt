@@ -23,6 +23,7 @@ enum ResourceType {
     ScaleButtonType,       ///< The scale (zoom) button
     SnapButtonType,        ///< Use this if you are a camera application
     LensCoverType,
+    HeadsetButtonsType,    ///< Use this to reserve the headset buttons
     NumberOfTypes
 };
 

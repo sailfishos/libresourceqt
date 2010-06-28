@@ -19,6 +19,7 @@
 #define RES_SCALE_BUTTON	(1<<9)
 #define RES_SNAP_BUTTON		(1<<10)
 #define RES_LENS_COVER		(1<<11)
+#define RES_HEADSET_BUTTONS (1<<12)
 
 class TimeStat
 {
@@ -94,6 +95,7 @@ private slots:
 	void resourceDeniedHandler();
 	void resourceLostHandler();
 	void resourceReleasedHandler();
+	void resourcesBecameAvailableHandler(const QList<ResourcePolicy::ResourceType> &availableResources);
 
 protected:
     void timerEvent(QTimerEvent *e);

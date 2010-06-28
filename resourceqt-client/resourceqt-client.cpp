@@ -178,6 +178,7 @@ private:
         printf("\t\tScaleButton\n");
         printf("\t\tSnapButton\n");
         printf("\t\tLensCover\n");
+        printf("\t\tHeadsetButtons\n");
         printf("\t  no whitespace allowed in the resource list.\n");
         printf("\tmodes:\n");
         printf("\t  comma separated list of the following modes\n");

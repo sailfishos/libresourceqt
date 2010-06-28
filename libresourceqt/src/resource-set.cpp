@@ -84,7 +84,7 @@ void ResourceSet::addResourceObject(Resource *resource)
         }
         else if (audioResource->audioGroupIsSet()) {
             qDebug("ResourceSet::%s().... %d registering audio proprerties later", __FUNCTION__, __LINE__);
-            pendingAudioProperties = true;            
+            pendingAudioProperties = true;
         }
     }
 }
@@ -128,6 +128,9 @@ bool ResourceSet::addResource(ResourceType type)
             break;
         case LensCoverType:
             resource = new LensCoverResource;
+            break;
+        case HeadsetButtonsType:
+            resource = new HeadsetButtonsResource;
             break;
         default:
             return false;
@@ -290,14 +293,9 @@ void ResourceSet::registerAudioProperties()
         qDebug("%s(): initializing...", __FUNCTION__);
         pendingAudioProperties = true;
         initialize();
+        return;
     }
-    if (!resourceEngine->isConnectedToManager() && !resourceEngine->isConnectingToManager()) {
-        qDebug("%s(): Connecting to Manager...", __FUNCTION__);
-
-        pendingAudioProperties = true;
-        resourceEngine->connectToManager();
-    }
-    else {
+    else if (resourceEngine->isConnectedToManager()) {
         qDebug("Registering new audio settings:");
         qDebug() << "\taudio group: " << audioResource->audioGroup();
         qDebug() << "\tPID: " << audioResource->processID();
@@ -306,11 +304,20 @@ void ResourceSet::registerAudioProperties()
         if((audioResource->processID() > 0) && audioResource->streamTagName() != "media.name") {
             qWarning() << "streamTagName should be 'media.name' it is '" << audioResource->streamTagName() << "'";
         }
-        resourceEngine->registerAudioProperties(audioResource->audioGroup(),
-                                                audioResource->processID(),
-                                                audioResource->streamTagName(),
-                                                audioResource->streamTagValue());
+        bool r = resourceEngine->registerAudioProperties(audioResource->audioGroup(),
+                                                         audioResource->processID(),
+                                                         audioResource->streamTagName(),
+                                                         audioResource->streamTagValue());
+        qDebug("resourceEngine->registerAudioProperties returned %s", r?"true":"false");
+
         pendingAudioProperties = false;
+    }
+    else { //if (!resourceEngine->isConnectedToManager() && !resourceEngine->isConnectingToManager()) {
+        qDebug("%s(): Connecting to Manager...", __FUNCTION__);
+
+        pendingAudioProperties = true;
+        resourceEngine->connectToManager();
+        return;
     }
 }
 

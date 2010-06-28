@@ -22,6 +22,7 @@ private:
     ResourcePolicy::Resource *scaleButtonResource;
     ResourcePolicy::Resource *snapButtonResource;
     ResourcePolicy::Resource *lensCoverResource;
+    ResourcePolicy::Resource *headsetButtonsResource;
 
     ResourcePolicy::Resource * resourceFromType(ResourcePolicy::ResourceType type);
 public:

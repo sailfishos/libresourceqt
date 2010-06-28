@@ -120,6 +120,17 @@ public:
 
     virtual ResourceType type() const;
 };
+
+class HeadsetButtonsResource: public Resource
+{
+public:
+    HeadsetButtonsResource();
+    HeadsetButtonsResource(const HeadsetButtonsResource &other);
+    virtual ~HeadsetButtonsResource();
+
+    virtual ResourceType type() const;
+};
+
 }
 #endif
 

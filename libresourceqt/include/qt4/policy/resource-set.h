@@ -242,6 +242,7 @@ private:
     bool pendingAcquire;
     bool pendingUpdate;
     bool pendingAudioProperties;
+    bool haveAudioProperties;
 
     void registerAudioProperties();
 

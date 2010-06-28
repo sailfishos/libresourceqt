@@ -26,6 +26,7 @@ private:
     Resource *scaleButtonResource;
     Resource *snapButtonResource;
     Resource *lensCoverResource;
+    Resource *headsetButtonsResource;
 
     Resource * resourceFromType(ResourceType type);
     const char * stringFromType(ResourceType type);

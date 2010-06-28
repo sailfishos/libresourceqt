@@ -52,6 +52,7 @@ uint32_t Client::parseResourceList(QString resourceListStr)
         { RES_SCALE_BUTTON   ,  "ScaleButton"    },
         { RES_SNAP_BUTTON    ,  "SnapButton"     },
         { RES_LENS_COVER     ,  "LensCover"      },
+        { RES_HEADSET_BUTTONS,  "HeadsetButtons" },
         {        0           ,       NULL        }
     };
 
@@ -96,7 +97,7 @@ void Client::updateSet(uint32_t list, uint32_t optional, bool remove)
     uint32_t resources[] = {
         RES_AUDIO_PLAYBACK, RES_VIDEO_PLAYBACK, RES_AUDIO_RECORDING, RES_VIDEO_RECORDING,
         RES_VIBRA, RES_LEDS, RES_BACKLIGHT, RES_SYSTEM_BUTTON, RES_LOCK_BUTTON,
-        RES_SCALE_BUTTON, RES_SNAP_BUTTON, RES_LENS_COVER, 0
+        RES_SCALE_BUTTON, RES_SNAP_BUTTON, RES_LENS_COVER, RES_HEADSET_BUTTONS, 0
     };
 
     int pos = 0;
@@ -174,6 +175,9 @@ bool Client::initialize(uint32_t all, uint32_t optional, bool alwaysReply, bool 
     }
     connect(resourceSet, SIGNAL(resourcesReleased()), this, SLOT(resourceReleasedHandler()));
 
+    connect(resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)),
+            this, SLOT(resourcesBecameAvailableHandler(const QList<ResourcePolicy::ResourceType> &)));
+
     showPrompt();
 
     return true;
@@ -220,6 +224,9 @@ Resource* Client::allocateResource(ResourceType resource, bool optional)
     case LensCoverType:
         retValue = new LensCoverResource();
         break;
+    case HeadsetButtonsType:
+        retValue = new HeadsetButtonsResource();
+        break;
     case NumberOfTypes:
         return NULL;
     }
@@ -261,6 +268,8 @@ ResourceType Client::getResourceType(uint32_t resource)
         return SnapButtonType;
     case RES_LENS_COVER:
         return LensCoverType;
+    case RES_HEADSET_BUTTONS:
+        return HeadsetButtonsType;
     }
 
     return NumberOfTypes;
@@ -271,7 +280,7 @@ void Client::showResources(const QList<ResourceType> resList)
     const char* resTypes[] = {
         "AudioPlayback", "VideoPlayback", "AudioRecorder", "VideoRecorder", "Vibra",
         "Leds", "Backlight", "SystemButton", "LockButton", "ScaleButton", "SnapButton",
-        "LensCover"
+        "LensCover", "HeadsetButtons"
     };
 
     for (int i = 0; i < resList.count(); i++) {
@@ -284,7 +293,7 @@ void Client::showResources(const QList<Resource*> resList)
     const char* resTypes[] = {
         "AudioPlayback", "VideoPlayback", "AudioRecorder", "VideoRecorder", "Vibra",
         "Leds", "Backlight", "SystemButton", "LockButton", "ScaleButton", "SnapButton",
-        "LensCover"
+        "LensCover", "HeadsetButtons"
     };
 
     for (int i = 0; i < resList.count(); i++) {
@@ -340,6 +349,14 @@ void Client::resourceReleasedHandler()
     }
 
     printf("\nAll resources released\n");
+    showPrompt();
+}
+
+void Client::resourcesBecameAvailableHandler(const QList<ResourcePolicy::ResourceType> &availableResources)
+{
+    printf("\nManager advice: These resources are available:\n");
+    printf("Resource set:\n");
+    showResources(availableResources);
     showPrompt();
 }
 
@@ -530,3 +547,4 @@ void Client::timerEvent(QTimerEvent*)
         }
     }
 }
+

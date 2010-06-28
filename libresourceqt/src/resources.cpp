@@ -210,3 +210,23 @@ ResourceType LensCoverResource::type() const
 {
     return LensCoverType;
 }
+
+HeadsetButtonsResource::HeadsetButtonsResource()
+        :   Resource()
+{
+}
+
+HeadsetButtonsResource::HeadsetButtonsResource(const HeadsetButtonsResource &other)
+        :    Resource(other)
+{
+}
+
+HeadsetButtonsResource::~HeadsetButtonsResource()
+{
+}
+
+ResourceType HeadsetButtonsResource::type() const
+{
+    return HeadsetButtonsType;
+}
+

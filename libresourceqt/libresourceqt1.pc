@@ -5,7 +5,7 @@ includedir=${prefix}/include/resource/qt4
 
 Name: libresourceqt1
 Description: Maemo resource management Qt API
-Version: 1.8
+Version: 1.10
 Libs: -L${libdir} -lresourceqt
 Cflags: -I${includedir}
 Requires: dbus-1 libdbus-qeventloop1 libresource0

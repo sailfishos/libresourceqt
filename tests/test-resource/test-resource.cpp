@@ -30,6 +30,8 @@ Resource * TestResource::resourceFromType(ResourceType type)
         return snapButtonResource;
     case LensCoverType:
         return lensCoverResource;
+    case HeadsetButtonsType:
+        return headsetButtonsResource;
     default:
         return NULL;
     }
@@ -62,6 +64,8 @@ const char * TestResource::stringFromType(ResourceType type)
         return "SnapButtonType";
     case LensCoverType:
         return "LensCoverType";
+    case HeadsetButtonsType:
+        return "HeadsetButtonsType";
     default:
         qDebug("Unknown Type 0x%02x requested", type);
         return NULL;
@@ -90,6 +94,7 @@ void TestResource::init()
     scaleButtonResource = new ScaleButtonResource;
     snapButtonResource = new SnapButtonResource;
     lensCoverResource = new LensCoverResource;
+    headsetButtonsResource = new HeadsetButtonsResource;
 }
 
 void TestResource::cleanup()
@@ -106,6 +111,7 @@ void TestResource::cleanup()
     delete scaleButtonResource;
     delete snapButtonResource;
     delete lensCoverResource;
+    delete headsetButtonsResource;
 }
 
 void TestResource::testType()
@@ -151,6 +157,8 @@ void TestResource::testOptional_data()
     QTest::newRow("Resource is not optional") << SnapButtonType << false << false;
     QTest::newRow("Resource is optional") << LensCoverType << true << true;
     QTest::newRow("Resource is not optional") << LensCoverType << false << false;
+    QTest::newRow("Resource is optional") << HeadsetButtonsType << true << true;
+    QTest::newRow("Resource is not optional") << HeadsetButtonsType << false << false;
 }
 
 void TestResource::testOptional()

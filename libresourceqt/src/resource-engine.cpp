@@ -237,7 +237,7 @@ bool ResourceEngine::connectToManager()
     resourceMessage.record.rset.all = allResources;
     resourceMessage.record.rset.opt = optionalResources;
     resourceMessage.record.rset.share = 0;
-    resourceMessage.record.rset.mask = connectionMode;
+    resourceMessage.record.rset.mask = 0;
 
     QByteArray ba = resourceSet->applicationClass().toLatin1();
     resourceMessage.record.klass = ba.data();
@@ -325,6 +325,8 @@ quint32 ResourcePolicy::resourceTypeToLibresourceType(ResourceType type)
         return RESMSG_SNAP_BUTTON;
     case LensCoverType:
         return RESMSG_LENS_COVER;
+    case HeadsetButtonsType:
+        return RESMSG_HEADSET_BUTTONS;
     default:
         return 0;
     }
@@ -492,7 +494,7 @@ bool ResourceEngine::updateResources()
     message.record.rset.all = allResources;
     message.record.rset.opt = optionalResources;
     message.record.rset.share = 0;
-    message.record.rset.mask = connectionMode;
+    message.record.rset.mask = 0;
 
     QByteArray ba = resourceSet->applicationClass().toLatin1();
     message.record.klass = ba.data();
@@ -548,6 +550,7 @@ bool ResourceEngine::registerAudioProperties(const QString &audioGroup, quint32 
 
     qDebug("ResourceEngine(%d) - audio %u:%u", identifier, resourceSet->id(), requestId);
     int success = resproto_send_message(libresourceSet, &message, statusCallbackHandler);
+    qDebug("ResourceEngine(%d) - resproto_send_message returned %d", identifier, success);
 
     if(!success)
         return false;
