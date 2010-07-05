@@ -30,7 +30,7 @@ Resource * TestResourceSet::resourceFromType(ResourceType type)
     case LensCoverType:
         return new LensCoverResource;
     case HeadsetButtonsType:
-        return headsetButtonsResource;
+        return new HeadsetButtonsResource;
     default:
         return NULL;
     }
