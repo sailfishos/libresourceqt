@@ -172,7 +172,7 @@ void PlayerPage::openFile(QString dir) {
                                                   dir,
                                                   tr("All Files (*.*)"));
 
-  if (fileName) {
+  if (fileName != "") {
     playerWidget->open(fileName);
 
     QString prettyName = fileName;
