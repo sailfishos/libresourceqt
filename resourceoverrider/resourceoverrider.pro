@@ -20,5 +20,9 @@ QMAKE_DISTCLEAN += -r moc build
 # Install options
 
 target.path = /usr/bin/
-INSTALLS    = target
+
+desktop.path  = /usr/share/applications/
+desktop.files = resourceoverrider.desktop
+
+INSTALLS    = target desktop
 
