@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include/resource/qt4
+
+Name: libresource-overridesqt1
+Description: Maemo resource management Qt API
+Version: 1.11
+Libs: -L${libdir}
+Cflags: -I${includedir}
+Requires: QtDbus
+
