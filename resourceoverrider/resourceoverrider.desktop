@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Policy Resource Overrider
+Icon=icon-l-music
+Exec=/usr/bin/resourceoverrider
+OnlyShowIn=X-MeeGo;
+
