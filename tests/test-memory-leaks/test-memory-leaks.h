@@ -8,6 +8,7 @@ class MemoryLeakTest : public QObject {
 public:
   MemoryLeakTest(QObject *parent = NULL) : QObject(parent)  {}
 
+  void update_memory_stat();
   void test();
 
 private:
