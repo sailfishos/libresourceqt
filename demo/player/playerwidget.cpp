@@ -32,7 +32,7 @@ PlayerWidget::PlayerWidget(QGraphicsItem *parent)
   resourceSet = new ResourceSet("player", this);
   resourceSet->setAlwaysReply();
 
-  audioResource = new ResourcePolicy::AudioResource();
+  audioResource = new ResourcePolicy::AudioResource("player");
   audioResource->setProcessID(QCoreApplication::applicationPid());
   audioResource->setStreamTag("media.name", "*");
   resourceSet->addResourceObject(audioResource);
