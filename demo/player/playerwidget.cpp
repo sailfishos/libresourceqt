@@ -128,7 +128,7 @@ void PlayerWidget::pause(bool releaseResources) {
   *
   * \see signal ResourcePolicy::ResourceSet::resourcesGranted().
   */
-void PlayerWidget::resourceAcquiredHandler(const QList<ResourcePolicy::ResourceType>& grantedResList) {
+void PlayerWidget::resourceAcquiredHandler(const QList<ResourcePolicy::ResourceType>& /*grantedOptionalResList*/) {
 
   qDebug("PlayerWidget::resourceAcquiredHandler()");
   QList<Resource*> list = resourceSet->resources();
@@ -139,7 +139,7 @@ void PlayerWidget::resourceAcquiredHandler(const QList<ResourcePolicy::ResourceT
     for (int i = 0; i < list.count(); i++) {
       qDebug("Granted resource %d", (int)list[i]);
     }
-    if (filetype == AUDIO || (filetype == VIDEO && grantedResList.size() > 1))
+    if (filetype == AUDIO || (filetype == VIDEO && list.count() > 1))
       beginPlayback();
   }
 }

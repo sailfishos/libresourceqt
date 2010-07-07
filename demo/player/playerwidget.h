@@ -51,7 +51,7 @@ private:
   void timerEvent(QTimerEvent *event);
 
 private slots:
-  void resourceAcquiredHandler(const QList<ResourcePolicy::ResourceType>& /*grantedResList*/);
+  void resourceAcquiredHandler(const QList<ResourcePolicy::ResourceType>& /*grantedOptionalResList*/);
   void resourceReleasedHandler();
   void resourceLostHandler();
 
