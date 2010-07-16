@@ -275,12 +275,11 @@ bool ResourceEngine::disconnectFromManager()
 
 //    messageMap.insert(requestId, RESMSG_UNREGISTER);
 
-    int r = resconn_disconnect(libresourceSet, &resourceMessage,
-                               statusCallbackHandler);
-    if (r)
-        return true;
-    else
-        return false;
+    bool ret = true;
+    if (libresourceSet != NULL) {
+      r = resconn_disconnect(libresourceSet, &resourceMessage, statusCallbackHandler) != 0;
+    }
+    return ret;
 }
 
 bool ResourceEngine::toBeDeleted()
