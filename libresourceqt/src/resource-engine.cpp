@@ -277,7 +277,7 @@ bool ResourceEngine::disconnectFromManager()
 
     bool ret = true;
     if (libresourceSet != NULL) {
-      r = resconn_disconnect(libresourceSet, &resourceMessage, statusCallbackHandler) != 0;
+      ret = resconn_disconnect(libresourceSet, &resourceMessage, statusCallbackHandler) != 0;
     }
     return ret;
 }
