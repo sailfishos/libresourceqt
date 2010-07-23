@@ -63,6 +63,10 @@ public:
     static bool addConnection(DBusConnection* conn);
     static void removeConnection(DBusConnection* conn);
 
+    static DBUSConnectionEventLoop &getInstance(void) {
+      return classInstance;
+    }
+
 private:
     bool internalAddConnection(DBusConnection* conn);
     void internalRemoveConnection(DBusConnection* conn);
