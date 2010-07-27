@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QtCore/QTextStream>
 
+#include <stdint.h>
 #include <policy/resource-set.h>
 #include <sys/resource.h>
 

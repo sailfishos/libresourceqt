@@ -1,4 +1,5 @@
 #include "dbusconnectioneventloop.h"
+#include <stdint.h>
 #include <QtTest/QtTest>
 
 class TestDbusQEventLoop: public QObject
