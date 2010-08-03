@@ -272,18 +272,40 @@ bool ResourceSet::alwaysGetReply()
 void ResourceSet::connectedHandler()
 {
     qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
-    qDebug("Connected to manager!");
+    if (resourceEngine->isConnectedToManager()) {
+        qDebug("ResourceSet::%s() Connected to manager!", __FUNCTION__);
 
-    if (pendingAudioProperties) {
-        registerAudioProperties();
+        if (pendingAudioProperties) {
+            registerAudioProperties();
+        }
+        if (pendingUpdate) {
+            resourceEngine->updateResources();
+            pendingUpdate = false;
+        }
+        if (pendingAcquire) {
+            resourceEngine->acquireResources();
+            pendingAcquire = false;
+        }
     }
-    if (pendingUpdate) {
-        resourceEngine->updateResources();
-        pendingUpdate = false;
-    }
-    if (pendingAcquire) {
-        resourceEngine->acquireResources();
-        pendingAcquire = false;
+    else { // assuming reconnecting
+        qDebug("ResourceSet::%s() Reconnecting to manager...", __FUNCTION__);
+
+        // first check if we have any acquired resources
+        for (int i = 0; i < NumberOfTypes; i++) {
+            if (resourceSet[i] != NULL) {
+                if (resourceSet[i]->isGranted()) {
+                    if (i == AudioPlaybackType) {
+                        pendingAudioProperties = true;
+                        qDebug("ResourceSet::%s() We have audio", __FUNCTION__);
+                    }
+                    qDebug("ResourceSet::%s() We have acquired resources. Re-acquire", __FUNCTION__);
+                    pendingAcquire = true;
+                    resourceSet[i]->unsetGranted();
+                }
+            }
+        }
+        // now reconnect
+        resourceEngine->connectToManager();
     }
 }
 
