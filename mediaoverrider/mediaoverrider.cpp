@@ -1,9 +1,9 @@
-#include "resourceoverrider.h"
+#include "mediaoverrider.h"
 
-ResourceOverrider::ResourceOverrider(int argc, char **argv, QObject *parent):
+MediaOverrider::MediaOverrider(int argc, char **argv, QObject *parent):
     QObject(parent), app(argc, argv)
 {
-//    MTheme::loadCSS("resourceoverrider.css");
+//    MTheme::loadCSS("MediaOverrider.css");
     window = new MApplicationWindow;
     page = new MApplicationPage;
 
@@ -21,7 +21,7 @@ ResourceOverrider::ResourceOverrider(int argc, char **argv, QObject *parent):
     muteButton->setText("Mute");
     muteButton->setViewType(MButton::toggleType);
     muteButton->setCheckable(true);
-    policy->addItem(muteButton, 1,0);
+    policy->addItem(muteButton, 1, 0);
     muteButton->setObjectName("button");
 
     privacyButton = new MButton(page->centralWidget());
@@ -55,10 +55,10 @@ ResourceOverrider::ResourceOverrider(int argc, char **argv, QObject *parent):
 
 }
 
-ResourceOverrider::~ResourceOverrider()
+MediaOverrider::~MediaOverrider()
 {}
 
-int ResourceOverrider::run()
+int MediaOverrider::run()
 {
     page->appear();
     window->show();
@@ -66,17 +66,17 @@ int ResourceOverrider::run()
     return app.exec();
 }
 
-void ResourceOverrider::handleMuteChange(bool newState)
+void MediaOverrider::handleMuteChange(bool newState)
 {
     muteButton->setChecked(newState);
 }
 
-void ResourceOverrider::handlePrivacyChange(bool newState)
+void MediaOverrider::handlePrivacyChange(bool newState)
 {
     privacyButton->setChecked(newState);
 }
 
-void ResourceOverrider::handleBtChange(bool newState)
+void MediaOverrider::handleBtChange(bool newState)
 {
     btButton->setChecked(newState);
 }

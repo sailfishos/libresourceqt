@@ -1,6 +1,6 @@
 include(../common.pri)
 TEMPLATE = lib
-TARGET = resource-overridesqt
+TARGET = mediaoverridesqt
 DESTDIR = build
 DEPENDPATH += .
 INCLUDEPATH += .
@@ -29,7 +29,7 @@ headers.files  = $${PUBLIC_HEADERS}
 INSTALLBASE    = /usr
 target.path    = $${INSTALLBASE}/lib
 headers.path   = $${INSTALLBASE}/include/resource/qt4/policy
-pc.files       = libresource-overridesqt1.pc
+pc.files       = libmediaoverridesqt1.pc
 pc.path        = $${INSTALLBASE}/lib/pkgconfig
 
 INSTALLS       = target headers pc

@@ -5,10 +5,10 @@
 CONFIG += ordered
 TEMPLATE = subdirs
 
-SUBDIRS = libdbus-qeventloop	  \
-          libresourceqt			  \
-          libresource-overridesqt \
-          resourceqt-client		  \
-          resourceoverrider       \
+SUBDIRS = libdbus-qeventloop  \
+          libresourceqt	      \
+          libmediaoverridesqt \
+          resourceqt-client   \
+          mediaoverrider      \
           tests
 

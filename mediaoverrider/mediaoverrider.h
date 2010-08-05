@@ -9,12 +9,12 @@
 
 #include <override.h>
 
-class ResourceOverrider: public QObject
+class MediaOverrider: public QObject
 {
     Q_OBJECT
 public:
-    ResourceOverrider(int argc, char **argv, QObject *parent=NULL);
-    ~ResourceOverrider();
+    MediaOverrider(int argc, char **argv, QObject *parent=NULL);
+    ~MediaOverrider();
     int run();
 private slots:
     void handleMuteChange(bool newState);
