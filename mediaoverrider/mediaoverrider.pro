@@ -1,19 +1,19 @@
 include(../common.pri)
 
 TEMPLATE = app
-TARGET = resourceoverrider
+TARGET = mediaoverrider
 MOC_DIR = moc
 OBJECTS_DIR = build
 DEPENDPATH += .
-INCLUDEPATH += $${LIBRESOURCEOVERRIDESQT}
+INCLUDEPATH += $${LIBMEDIAOVERRIDESQT}
 CONFIG += qt meegotouch
 QT += dbus
 
-LIBS += -L$${LIBRESOURCEOVERRIDESQT}/build -lresource-overridesqt
+LIBS += -L$${LIBMEDIAOVERRIDESQT}/build -lmediaoverridesqt
 
 # Input
-HEADERS += resourceoverrider.h
-SOURCES += main.cpp resourceoverrider.cpp
+HEADERS += mediaoverrider.h
+SOURCES += main.cpp mediaoverrider.cpp
 
 QMAKE_DISTCLEAN += -r moc build
 
@@ -22,7 +22,7 @@ QMAKE_DISTCLEAN += -r moc build
 target.path = /usr/bin/
 
 desktop.path  = /usr/share/applications/
-desktop.files = resourceoverrider.desktop
+desktop.files = mediaoverrider.desktop
 
 INSTALLS    = target desktop
 

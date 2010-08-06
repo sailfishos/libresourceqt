@@ -3,6 +3,8 @@
 
 using namespace ResourcePolicy;
 
+static QMultiMap<resconn_t *, ResourceEngine *> engineMap;
+
 resconn_t *ResourceEngine::libresourceConnection = NULL;
 quint32 ResourceEngine::libresourceUsers = 0;
 
@@ -88,9 +90,11 @@ bool ResourceEngine::initialize()
         resproto_set_handler(ResourceEngine::libresourceConnection, RESMSG_UNREGISTER, handleUnregisterMessage);
         resproto_set_handler(ResourceEngine::libresourceConnection, RESMSG_GRANT, handleGrantMessage);
         resproto_set_handler(ResourceEngine::libresourceConnection, RESMSG_ADVICE, handleAdviceMessage);
+        engineMap.insert(ResourceEngine::libresourceConnection, this);
     }
     else {
         ResourceEngine::libresourceUsers += 1;
+        engineMap.insert(ResourceEngine::libresourceConnection, this);
     }
 
     qDebug("ResourceEngine (%u, %p) is now initialized. %d users",
@@ -277,7 +281,7 @@ bool ResourceEngine::disconnectFromManager()
 
     bool ret = true;
     if (libresourceSet != NULL) {
-      ret = resconn_disconnect(libresourceSet, &resourceMessage, statusCallbackHandler) != 0;
+        ret = resconn_disconnect(libresourceSet, &resourceMessage, statusCallbackHandler)?true:false;
     }
     return ret;
 }
@@ -561,15 +565,14 @@ static void connectionIsUp(resconn_t *connection)
 {
     qDebug("**************** %s() - locking....", __FUNCTION__);
     QMutexLocker locker(&mutex);
-    if (NULL == connection->dbus.rsets->userdata) {
-        qDebug("IGNORING connectionIsUp");
-        return;
-    }
-    ResourceEngine *resourceEngine;
 
-    resourceEngine = reinterpret_cast<ResourceEngine *>(connection->dbus.rsets->userdata);
     qDebug("connection is up");
-    resourceEngine->handleConnectionIsUp(connection);
+
+    QList<ResourceEngine*> engines = engineMap.values(connection);
+    for (int i = 0; i < engines.size(); ++i) {
+        ResourceEngine *resourceEngine = engines.at(i);
+        resourceEngine->handleConnectionIsUp(connection);
+    }
 }
 
 void ResourceEngine::handleConnectionIsUp(resconn_t *connection)
