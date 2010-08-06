@@ -110,7 +110,7 @@ void PlayerPage::makeControlBar(MLinearLayoutPolicy *controlBarPolicy) {
   * \see PlayerPage::updateLabelsVisibility()
   */
 void PlayerPage::orientationChangeEvent(MOrientationChangeEvent */*event*/) {
-  updateLabelsVisibility();
+  if (isContentCreated())  updateLabelsVisibility();
 }
 
 /**
