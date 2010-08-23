@@ -9,12 +9,9 @@
 
 using namespace ResourcePolicy;
 
-Client::Client(QString appClass) : QObject()
+Client::Client()
+    : QObject(), standardInput(stdin, QFile::ReadOnly), applicationClass(), resourceSet(NULL)
 {
-    applicationClass 	= appClass;
-    resourceSet			= NULL;
-
-    standardInput = new QTextStream(stdin, QFile::ReadOnly);
     mainTimerID   = startTimer(0);
 }
 
@@ -22,68 +19,7 @@ Client::~Client()
 {
     killTimer(mainTimerID);
 
-    if (resourceSet != NULL) {
-        delete resourceSet;
-        resourceSet = NULL;
-    }
-
-    if (standardInput != NULL) {
-        delete standardInput;
-        standardInput = NULL;
-    }
-}
-
-uint32_t Client::parseResourceList(QString resourceListStr)
-{
-    struct {
-        uint32_t	resourceType;
-        const char*	resourceName;
-    }
-    resourceDef[] = {
-        { RES_AUDIO_PLAYBACK ,  "AudioPlayback"  },
-        { RES_VIDEO_PLAYBACK ,  "VideoPlayback"  },
-        { RES_AUDIO_RECORDING,  "AudioRecording" },
-        { RES_VIDEO_RECORDING,  "VideoRecording" },
-        { RES_VIBRA          ,  "Vibra"          },
-        { RES_LEDS           ,  "Leds"           },
-        { RES_BACKLIGHT      ,  "BackLight"      },
-        { RES_SYSTEM_BUTTON  ,  "SystemButton"   },
-        { RES_LOCK_BUTTON    ,  "LockButton"     },
-        { RES_SCALE_BUTTON   ,  "ScaleButton"    },
-        { RES_SNAP_BUTTON    ,  "SnapButton"     },
-        { RES_LENS_COVER     ,  "LensCover"      },
-        { RES_HEADSET_BUTTONS,  "HeadsetButtons" },
-        {        0           ,       NULL        }
-    };
-
-    uint32_t  resourceList = 0;
-
-    if (resourceListStr.isEmpty() || resourceListStr.isNull()) {
-        return 0;
-    }
-    else {
-        QStringList resList = resourceListStr.split(",", QString::SkipEmptyParts);
-
-        for (int i = 0; i < resList.count(); i++) {
-            int pos = 0;
-            while (resourceDef[pos].resourceName != NULL) {
-                if (resList[i] == resourceDef[pos].resourceName)
-                    break;
-
-                pos++;
-            }
-
-            if (!resourceDef[pos].resourceName) {
-                const char* res = qPrintable(resList[i]);
-                printf("Ignoring invalid resource name '%s'\n", res);
-            }
-            else {
-                resourceList |= resourceDef[pos].resourceType;
-            }
-        }
-    }
-
-    return resourceList;
+    delete resourceSet;
 }
 
 void Client::showPrompt()
@@ -92,73 +28,33 @@ void Client::showPrompt()
     fflush(stdout);
 }
 
-void Client::updateSet(uint32_t list, uint32_t optional, bool remove)
+bool Client::initialize(const CommandLineParser &parser)
 {
-    uint32_t resources[] = {
-        RES_AUDIO_PLAYBACK, RES_VIDEO_PLAYBACK, RES_AUDIO_RECORDING, RES_VIDEO_RECORDING,
-        RES_VIBRA, RES_LEDS, RES_BACKLIGHT, RES_SYSTEM_BUTTON, RES_LOCK_BUTTON,
-        RES_SCALE_BUTTON, RES_SNAP_BUTTON, RES_LENS_COVER, RES_HEADSET_BUTTONS, 0
-    };
-
-    int pos = 0;
-    while (resources[pos]) {
-        if ((list & resources[pos]) == resources[pos]) {
-            Resource* resource = NULL;
-            ResourceType res = getResourceType(resources[pos]);
-            bool opt = (optional & resources[pos]) == resources[pos];
-
-            if (remove) {
-                if (!resourceSet->contains(res)) {
-                    continue;
-                }
-
-                if (optional) {
-                    resource = resourceSet->resource(res);
-                    resource->setOptional(false);
-                }
-                else {
-                    resourceSet->deleteResource(res);
-                }
-            }
-            else {
-                if (resourceSet->contains(res)) {
-                    resource = resourceSet->resource(res);
-                    if (resource->isOptional() != opt) {
-                        resource->setOptional(opt);
-                    }
-
-                    continue;
-                }
-
-                resource = allocateResource(res, opt);
-                if (resource) {
-                    resourceSet->addResourceObject(resource);
-                }
-            }
-        }
-
-        pos++;
-    }
-}
-
-bool Client::initialize(uint32_t all, uint32_t optional, bool alwaysReply, bool autoRelease)
-{
-    resourceSet = new ResourceSet(applicationClass);
+	QSet<ResourcePolicy::ResourceType> allResources;
+	QSet<ResourcePolicy::ResourceType> optionalResources;
+    resourceSet = new ResourceSet(parser.resourceApplicationClass());
     if (resourceSet == NULL) {
         return false;
     }
 
-    if (alwaysReply) {
-        qDebug("client: alwaysReply");
+    if (parser.shouldAlwaysReply()) {
+        qDebug("client: AlwaysReply");
         resourceSet->setAlwaysReply();
     }
 
-    if (autoRelease) {
-        qDebug("client: autoRelease");
+    if (parser.shouldAutoRelease()) {
+        qDebug("client: AutoRelease");
         resourceSet->setAutoRelease();
     }
 
-    updateSet(all, optional, false);
+    allResources.unite(parser.resources());
+    optionalResources.unite(parser.optionalResources());
+    foreach (ResourcePolicy::ResourceType resource, allResources) {
+        resourceSet->addResource(resource);
+        if (optionalResources.contains(resource)) {
+            resourceSet->resource(resource)->setOptional();
+        }
+    }
 
     if (!connect(resourceSet, SIGNAL(resourcesGranted(QList<ResourcePolicy::ResourceType>)),
                  this, SLOT(resourceAcquiredHandler(QList<ResourcePolicy::ResourceType>))))
@@ -173,141 +69,75 @@ bool Client::initialize(uint32_t all, uint32_t optional, bool alwaysReply, bool 
     if (!connect(resourceSet, SIGNAL(lostResources()), this, SLOT(resourceLostHandler()))) {
         return false;
     }
-    connect(resourceSet, SIGNAL(resourcesReleased()), this, SLOT(resourceReleasedHandler()));
-
-    connect(resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)),
-            this, SLOT(resourcesBecameAvailableHandler(const QList<ResourcePolicy::ResourceType> &)));
+    if (!connect(resourceSet, SIGNAL(resourcesReleased()), this, SLOT(resourceReleasedHandler()))) {
+        return false;
+    }
+    if (!connect(resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)),
+                 this, SLOT(resourcesBecameAvailableHandler(const QList<ResourcePolicy::ResourceType> &))))
+    {
+        return false;
+    }
 
     showPrompt();
 
     return true;
 }
 
-Resource* Client::allocateResource(ResourceType resource, bool optional)
+const char * resourceTypeToString(ResourceType type)
 {
-    Resource* retValue = NULL;
-
-    switch (resource) {
-    case AudioPlaybackType:
-        retValue = new AudioResource();
-        break;
-    case VideoPlaybackType:
-        retValue = new VideoResource();
-        break;
-    case AudioRecorderType:
-        retValue = new AudioRecorderResource();
-        break;
-    case VideoRecorderType:
-        retValue = new VideoRecorderResource();
-        break;
-    case VibraType:
-        retValue = new VibraResource();
-        break;
-    case LedsType:
-        retValue = new LedsResource();
-        break;
-    case BacklightType:
-        retValue = new BacklightResource();
-        break;
-    case SystemButtonType:
-        retValue = new SystemButtonResource();
-        break;
-    case LockButtonType:
-        retValue = new LockButtonResource();
-        break;
-    case ScaleButtonType:
-        retValue = new ScaleButtonResource();
-        break;
-    case SnapButtonType:
-        retValue = new SnapButtonResource();
-        break;
-    case LensCoverType:
-        retValue = new LensCoverResource();
-        break;
-    case HeadsetButtonsType:
-        retValue = new HeadsetButtonsResource();
-        break;
-    case NumberOfTypes:
-        return NULL;
+    switch (type) {
+        case AudioPlaybackType:
+            return "AudioPlayback";
+        case AudioRecorderType:
+            return "AudioRecording";
+        case VideoPlaybackType:
+            return "VideoPlayback";
+        case VideoRecorderType:
+            return "VideoRegording";
+        case VibraType:
+            return "Vibra";
+        case LedsType:
+            return "Leds";
+        case BacklightType:
+            return "Backlight";
+        case SystemButtonType:
+            return "SystemButton";
+        case LockButtonType:
+            return "LockButton";
+        case ScaleButtonType:
+            return "ScaleButton";
+        case SnapButtonType:
+            return "SnapButton";
+        case LensCoverType:
+            return "LensCover";
+        case HeadsetButtonsType:
+            return "HeadsetButtons";
+        default:
+            return "Unknown/Invalid Resource";
     }
-
-    if (retValue) {
-        retValue->setOptional(optional);
-    }
-    else {
-        printf("Unknown resource type - %d\n", resource);
-    }
-
-    return retValue;
-}
-
-ResourceType Client::getResourceType(uint32_t resource)
-{
-    switch (resource) {
-    case RES_AUDIO_PLAYBACK:
-        return AudioPlaybackType;
-    case RES_VIDEO_PLAYBACK:
-        return VideoPlaybackType;
-    case RES_AUDIO_RECORDING:
-        return AudioRecorderType;
-    case RES_VIDEO_RECORDING:
-        return VideoRecorderType;
-    case RES_VIBRA:
-        return VibraType;
-    case RES_LEDS:
-        return LedsType;
-    case RES_BACKLIGHT:
-        return BacklightType;
-    case RES_SYSTEM_BUTTON:
-        return SystemButtonType;
-    case RES_LOCK_BUTTON:
-        return LockButtonType;
-    case RES_SCALE_BUTTON:
-        return ScaleButtonType;
-    case RES_SNAP_BUTTON:
-        return SnapButtonType;
-    case RES_LENS_COVER:
-        return LensCoverType;
-    case RES_HEADSET_BUTTONS:
-        return HeadsetButtonsType;
-    }
-
-    return NumberOfTypes;
 }
 
 void Client::showResources(const QList<ResourceType> resList)
 {
-    const char* resTypes[] = {
-        "AudioPlayback", "VideoPlayback", "AudioRecorder", "VideoRecorder", "Vibra",
-        "Leds", "Backlight", "SystemButton", "LockButton", "ScaleButton", "SnapButton",
-        "LensCover", "HeadsetButtons"
-    };
-
-    for (int i = 0; i < resList.count(); i++) {
-        printf("\t%s\n", resTypes[resList[i]]);
+    foreach (ResourceType resource, resList) {
+        printf("\t%s\n", resourceTypeToString(resource));
     }
 }
 
 void Client::showResources(const QList<Resource*> resList)
 {
-    const char* resTypes[] = {
-        "AudioPlayback", "VideoPlayback", "AudioRecorder", "VideoRecorder", "Vibra",
-        "Leds", "Backlight", "SystemButton", "LockButton", "ScaleButton", "SnapButton",
-        "LensCover", "HeadsetButtons"
-    };
-
-    for (int i = 0; i < resList.count(); i++) {
-        Resource* r = resList[i];
-        printf("\t%s%s%s\n", resTypes[r->type()],
-               r->isOptional() ? " (optional)" : "",
-               r->isGranted() ? " (granted)" : "");
+    foreach (Resource* resource, resList) {
+        printf("\t%s%s%s\n", resourceTypeToString(resource->type()),
+               resource->isOptional() ? " (optional)" : "",
+               resource->isGranted() ? " (granted)" : "");
     }
 }
 
 void Client::resourceAcquiredHandler(const QList<ResourceType>& /*grantedResList*/)
 {
-    if( timeStat.markEnd() ) {
-        timeStat.report("\nOperation took %.2f ms\n");
+    double ms = stop_timer();
+    if( ms > 0.0 ) {
+        printf("Operation took %.2f ms\n", ms);
     }
 
     QList<Resource*> list = resourceSet->resources();
@@ -324,8 +154,9 @@ void Client::resourceAcquiredHandler(const QList<ResourceType>& /*grantedResList
 
 void Client::resourceDeniedHandler()
 {
-    if( timeStat.markEnd() ) {
-        timeStat.report("\nOperation took %.2f ms\n");
+    double ms = stop_timer();
+    if( ms > 0.0 ) {
+        printf("Operation took %.2f ms\n", ms);
     }
 
     printf("\nManager denies access to resources!\n");
@@ -334,8 +165,9 @@ void Client::resourceDeniedHandler()
 
 void Client::resourceLostHandler()
 {
-    if( timeStat.markEnd() ) {
-        timeStat.report("\nOperation took %.2f ms\n");
+    double ms = stop_timer();
+    if( ms > 0.0 ) {
+        printf("Operation took %.2f ms\n", ms);
     }
 
     printf("\nLost resources from manager!\n");
@@ -344,8 +176,9 @@ void Client::resourceLostHandler()
 
 void Client::resourceReleasedHandler()
 {
-    if( timeStat.markEnd() ) {
-        timeStat.report("\nOperation took %.2f ms\n");
+    double ms = stop_timer();
+    if( ms > 0.0 ) {
+        printf("Operation took %.2f ms\n", ms);
     }
 
     printf("\nAll resources released\n");
@@ -373,7 +206,7 @@ void Client::timerEvent(QTimerEvent*)
 
     int ready = select(1, &stdinfd, NULL, NULL, &tv);
     if (ready > 0) {
-        QString line = standardInput->readLine();
+        QString line = standardInput.readLine();
         if (!line.isNull()) {
             QStringList params = line.split(" ");
             if (params[0] == "quit") {
@@ -410,20 +243,22 @@ void Client::timerEvent(QTimerEvent*)
                 }
             }
             else if (params[0] == "acquire") {
-                timeStat.markStart();
+                start_timer();
                 if (!resourceSet || !resourceSet->acquire()) {
-                    if( timeStat.markEnd() ) {
-                        timeStat.report("Operation took %.2f ms\n");
+                    double ms = stop_timer();
+                    if( ms > 0.0 ) {
+                        printf("Operation took %.2f ms\n", ms);
                     }
 
                     printf("Acquire failed!\n");
                 }
             }
             else if (params[0] == "release") {
-                timeStat.markStart();
+                start_timer();
                 if (!resourceSet || !resourceSet->release()) {
-                    if( timeStat.markEnd() ) {
-                        timeStat.report("Operation took %.2f ms\n");
+                    double ms = stop_timer();
+                    if( ms > 0.0 ) {
+                        printf("Operation took %.2f ms\n", ms);
                     }
 
                     printf("Release failed!\n");
@@ -431,35 +266,47 @@ void Client::timerEvent(QTimerEvent*)
             }
             else if (params[0] == "add") {
                 if (!resourceSet) {
-                    printf("Update failed!\n");
+                    printf("Add failed!\n");
                 }
                 else if (params.count() == 1 || params[1].isEmpty() || params[1].isNull()) {
                     printf("List of desired resources is missing. See help ...\n");
                 }
                 else {
-                    uint32_t temp = Client::parseResourceList(params[1]);
-                    if (params.count() > 2 && params[2] == "-o") {
-                        updateSet(temp, temp, false);
+                    bool optional=false;
+                    QSet<ResourcePolicy::ResourceType> resToAdd;
+                    CommandLineParser::parseResourceList(params[1], resToAdd);
+                    if ((params.count() > 2) && (params[2] == "-o")) {
+                        optional = true;
                     }
-                    else {
-                        updateSet(temp, 0, false);
+                    foreach (ResourcePolicy::ResourceType resource, resToAdd) {
+                        if (!resourceSet->contains(resource)) {
+                            resourceSet->addResource(resource);
+                        }
+                        if (optional) {
+                            resourceSet->resource(resource)->setOptional();
+                        }
                     }
                 }
             }
             else if (params[0] == "remove") {
                 if (!resourceSet || params.count() == 1) {
-                    printf("Update failed!\n");
+                    printf("Remove failed!\n");
                 }
                 else if (params.count() == 1 || params[1].isEmpty() || params[1].isNull()) {
                     printf("List of desired resources is missing. See help ...\n");
                 }
                 else {
-                    uint32_t temp = Client::parseResourceList(params[1]);
+                    QSet<ResourcePolicy::ResourceType> resToRemove;
+                    CommandLineParser::parseResourceList(params[1], resToRemove);
                     if (params.count() > 2 && params[2] == "-o") {
-                        updateSet(temp, temp, true);
+                        foreach (ResourcePolicy::ResourceType resource, resToRemove) {
+                            resourceSet->resource(resource)->setOptional(false);
+                        }
                     }
                     else {
-                        updateSet(temp, 0, true);
+                        foreach (ResourcePolicy::ResourceType resource, resToRemove) {
+                            resourceSet->deleteResource(resource);
+                        }
                     }
                 }
             }

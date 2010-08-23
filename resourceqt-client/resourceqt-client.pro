@@ -14,8 +14,8 @@ QMAKE_CXXFLAGS += -Wall
 LIBS += -L$${LIBRESOURCEQT}/build -lresourceqt -L$${LIBDBUSQEVENTLOOP}/build -ldbus-qeventloop
 
 # Input 
-HEADERS     = client.h
-SOURCES    += resourceqt-client.cpp client.cpp
+HEADERS     = client.h commandlineparser.h time-stat.h
+SOURCES    += resourceqt-client.cpp commandlineparser.cpp client.cpp time-stat.c
 
 QMAKE_DISTCLEAN += -r .moc .obj
 
