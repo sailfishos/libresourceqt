@@ -375,6 +375,7 @@ void ResourceSet::handleReleased()
             resourceSet[i]->unsetGranted();
         }
     }
+    qDebug("ResourceSet(%d) - resourcesReleased!", identifier);
     emit resourcesReleased();
 }
 

@@ -207,8 +207,8 @@ static void handleAdviceMessage(resmsg_t *message, resset_t *libresourceSet, voi
 
 void ResourceEngine::receivedAdvice(resmsg_notify_t *message)
 {
-    qDebug("ResourceEngine(%d) - %s: %04x", identifier, __FUNCTION__, message->resrc);
     uint32_t allResources = allResourcesToBitmask(resourceSet);
+    qDebug("ResourceEngine(%d) - %s: have: %02x got %02x", identifier, __FUNCTION__, allResources, message->resrc);
     if(message->resrc < allResources) {
         emit resourcesLost(allResources-message->resrc);
     }
@@ -296,8 +296,11 @@ static inline quint32 allResourcesToBitmask(const ResourceSet *resourceSet)
     QList<Resource *> resourceList = resourceSet->resources();
     quint32 bitmask = 0;
     for (int i = 0; i < resourceList.size(); i++) {
-        bitmask += resourceTypeToLibresourceType(resourceList[i]->type());
+        quint32 bits = resourceTypeToLibresourceType(resourceList[i]->type());
+        qDebug("Converted Resource 0x%02x to 0x%02x", resourceList[i]->type(), bits);
+        bitmask += bits;
     }
+    qDebug("All resources as bitmask is 0x%04x", bitmask);
     return bitmask;
 }
 
@@ -331,7 +334,8 @@ quint32 ResourcePolicy::resourceTypeToLibresourceType(ResourceType type)
     case HeadsetButtonsType:
         return RESMSG_HEADSET_BUTTONS;
     default:
-        return 0;
+        qDebug("Unknown resource Type %d", quint32(type));
+        return 0xffff;
     }
 }
 
