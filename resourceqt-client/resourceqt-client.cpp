@@ -20,7 +20,7 @@ void debugOutput(QtMsgType type, const char *msg)
         fprintf(stderr, "Critical: %s\n", msg);
         break;
     case QtFatalMsg:
-        fprintf(stderr, "Fatal: %s\n", msg);
+        fprintf(stderr, "Fatal Error: %s\n", msg);
         abort();
     }
 }
@@ -37,8 +37,7 @@ int main(int argc, char *argv[])
     }
 
     if (!client.initialize(parser)) {
-        printf("Initialization failed\n");
-        return 2;
+        qFatal("Initialization failed\n");
     }
 
     return app.exec();

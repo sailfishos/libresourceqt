@@ -11,6 +11,16 @@
 #include "commandlineparser.h"
 #include "time-stat.h"
 
+class CommandListArgs
+{
+public:
+    CommandListArgs(const QString &arguments, const QString &helpText);
+    CommandListArgs();
+    ~CommandListArgs();
+    QString args;
+    QString help;
+};
+
 class Client : public QObject
 {
 	Q_OBJECT
@@ -35,18 +45,18 @@ protected:
 private:
     QTextStream standardInput;
     int mainTimerID;
-
 	QString	applicationClass;
-
 	ResourcePolicy::ResourceSet *resourceSet;
+    QTextStream output;
+
+    static QMap<QString, CommandListArgs> commandList;
 
 	ResourcePolicy::Resource* allocateResource(ResourcePolicy::ResourceType resource, bool optional);
 	ResourcePolicy::ResourceType getResourceType(uint32_t resource);
 
 	void showPrompt();
-	void showResources(const QList<ResourcePolicy::ResourceType> resList);
-	void showResources(const QList<ResourcePolicy::Resource*> resList);
-	void updateSet(uint32_t list, uint32_t optional, bool remove);
+	void showResources(const QList<ResourcePolicy::ResourceType> &resList);
+	void showResources(const QList<ResourcePolicy::Resource*> &resList);
 };
 
 #endif
