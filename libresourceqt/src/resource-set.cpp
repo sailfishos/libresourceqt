@@ -4,11 +4,12 @@ using namespace ResourcePolicy;
 
 static quint32 resourceSetId=1;
 
-ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
+ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent,
+                         bool initialAlwaysReply, bool initialAutoRelease)
         : QObject(parent), resourceClass(applicationClass), resourceEngine(NULL),
-        audioResource(NULL), autoRelease(false), alwaysReply(false),
-        initialized(false), pendingAcquire(false), pendingUpdate(false),
-        pendingAudioProperties(false)
+        audioResource(NULL), autoRelease(initialAutoRelease),
+        alwaysReply(initialAlwaysReply), initialized(false), pendingAcquire(false),
+        pendingUpdate(false), pendingAudioProperties(false)
 {
     identifier = resourceSetId++;
     memset(resourceSet, 0, sizeof(QPointer<Resource *>)*NumberOfTypes);

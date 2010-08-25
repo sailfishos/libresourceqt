@@ -82,7 +82,8 @@ public:
      * application.
      * \param parent The optional parent of of this class.
      */
-    ResourceSet(const QString &applicationClass, QObject *parent = NULL);
+    ResourceSet(const QString &applicationClass, QObject *parent = NULL,
+                bool alwaysReply = false, bool autoRelease = false);
     /**
      * The destructor
      */
