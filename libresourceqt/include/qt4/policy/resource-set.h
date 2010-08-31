@@ -205,27 +205,33 @@ signals:
      */
     void resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &availableResources);
     /**
-     * This signal is emited as a response to the acquire() request.
+     * This signal is emitted as a response to the acquire() request.
      * \param grantedOptionalResources The list of granted optional resources.
-     * All the mandatory resources have also been aquired.
+     * All the mandatory resources have also been acquired.
      */
     void resourcesGranted(const QList<ResourcePolicy::ResourceType> &grantedOptionalResources);
     /**
-     * This signal is emited as a response to the acquire() request, in the
-     * case where one or more of the mandatroy resources were not availalble.
+     * This signal is emitted as a response to the acquire() request, in the
+     * case where one or more of the mandatory resources were not available.
      */
     void resourcesDenied();
     /**
-     * This signal is emited as a response to the release() request.
+     * This signal is emitted as a response to the release() request.
      */
     void resourcesReleased();
     /**
-     * This signal is emited when some other program with a higher priority
-     * superseeds us, and as a result we loose (some of) our resources.
+     * This signal is emitted when some other program with a higher priority
+     * supersedes us, and as a result we loose (some of) our resources.
      * It is very important to connect to this signal as it is signaling when
      * the acquired resources shouldn't be used anymore.
      */
     void lostResources();
+
+    /**
+     * Subscribe to this signal to receive error notifications,
+     * particularly security errors.
+     */
+    void errorCallback(quint32, const char*);
 
 private:
 

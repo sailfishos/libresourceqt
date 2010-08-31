@@ -9,7 +9,9 @@ SUBDIRS = test-dbus-qeventloop	\
           test-dbus-pong		\
           test-resource			\
           test-resource-set     \
-          test-resource-engine
+          test-resource-engine  \
+          test-security-with-aegis-token \
+          test-security-without-aegis-token
 
 # Install options
 testsxml.path    = /usr/share/libresourceqt-tests/
