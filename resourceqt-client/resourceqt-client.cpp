@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
     }
 
     if (!client.initialize(parser)) {
-        qFatal("Initialization failed\n");
+        qFatal("Initialization failed");
     }
 
     return app.exec();

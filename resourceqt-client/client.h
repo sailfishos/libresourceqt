@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QtCore/QTextStream>
+#include <QSocketNotifier>
 
 #include <stdint.h>
 #include <policy/resource-set.h>
@@ -38,12 +39,12 @@ private slots:
 	void resourceLostHandler();
 	void resourceReleasedHandler();
 	void resourcesBecameAvailableHandler(const QList<ResourcePolicy::ResourceType> &availableResources);
-
-protected:
-    void timerEvent(QTimerEvent *e);
+    void readLine(int);
+    void doExit();
 
 private:
     QTextStream standardInput;
+    QSocketNotifier stdInNotifier;
     int mainTimerID;
 	QString	applicationClass;
 	ResourcePolicy::ResourceSet *resourceSet;

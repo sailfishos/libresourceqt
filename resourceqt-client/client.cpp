@@ -28,7 +28,7 @@ CommandListArgs::~CommandListArgs()
 }
 
 Client::Client()
-    : QObject(), standardInput(stdin, QFile::ReadOnly), applicationClass(),
+    : QObject(), standardInput(stdin, QIODevice::ReadOnly), stdInNotifier(0, QSocketNotifier::Read), applicationClass(),
       resourceSet(NULL), output(stdout)
 {
     mainTimerID   = startTimer(0);
@@ -108,10 +108,24 @@ bool Client::initialize(const CommandLineParser &parser)
     {
         return false;
     }
+    if (!connect(&stdInNotifier, SIGNAL(activated(int)), this, SLOT(readLine(int)))) {
+        return false;
+    }
+    if (!connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()),
+        this, SLOT(doExit())))
+    {
+        return false;
+    }
 
     showPrompt();
 
     return true;
+}
+
+void Client::doExit ()
+{
+    if (resourceSet != NULL)
+        resourceSet->release();
 }
 
 const char * resourceTypeToString(ResourceType type)
@@ -173,7 +187,7 @@ void Client::resourceAcquiredHandler(const QList<ResourceType>& /*grantedResList
 {
     double ms = stop_timer();
     if( ms > 0.0 ) {
-        output << "Operation took " << qSetRealNumberPrecision(2) << ms << "ms";
+        output << "Operation took " << (quint32)ms << "ms";
     }
 
     QList<Resource*> list = resourceSet->resources();
@@ -191,7 +205,7 @@ void Client::resourceDeniedHandler()
 {
     double ms = stop_timer();
     if( ms > 0.0 ) {
-        output << "Operation took " << qSetRealNumberPrecision(2) << ms << "ms";
+        output << "Operation took " << (quint32)ms << "ms";
     }
 
     output << "\nManager denies access to resources!" << endl;
@@ -202,7 +216,7 @@ void Client::resourceLostHandler()
 {
     double ms = stop_timer();
     if( ms > 0.0 ) {
-        output << "Operation took " << qSetRealNumberPrecision(2) << ms << "ms";
+        output << "Operation took " << (quint32)ms << "ms";
     }
 
     output << "\nLost resources from manager!" << endl;
@@ -213,7 +227,7 @@ void Client::resourceReleasedHandler()
 {
     double ms = stop_timer();
     if( ms > 0.0 ) {
-        output << "Operation took " << qSetRealNumberPrecision(2) << ms << "ms";
+        output << "Operation took " << (quint32)ms << "ms";
     }
 
     output << "\nAll resources released" << endl;
@@ -227,194 +241,197 @@ void Client::resourcesBecameAvailableHandler(const QList<ResourcePolicy::Resourc
     showPrompt();
 }
 
-void Client::timerEvent(QTimerEvent*)
+void Client::readLine(int)
 {
-    bool quitFlag = false;
+    QString line = standardInput.readLine();
+    if (line.isNull() || line.isEmpty()) {
+        showPrompt();
+        return;
+    }
+    QTextStream input(&line, QIODevice::ReadOnly);
+    QString command;
+    input >> command;
+    if (command.isNull() || command.isEmpty()) {
+        qDebug("Unable to read a command");
+        return;
+    }
 
-    fd_set stdinfd;
-    FD_ZERO(&stdinfd);
-    FD_SET(0, &stdinfd);
-    timeval tv;
-    tv.tv_sec = 0;
-    tv.tv_usec = 0;
-
-    int ready = select(1, &stdinfd, NULL, NULL, &tv);
-    if (ready > 0) {
-        QString line = standardInput.readLine();
-        if (!line.isNull()) {
-            QStringList params = line.split(" ");
-            if (params[0] == "quit") {
-                quitFlag = true;
-                QMetaObject::invokeMethod(QCoreApplication::instance(), "quit");
+    if ((command == "quit") || (command == "exit")) {
+        QCoreApplication::quit();
+        return;
+    }
+    else if (command == "help") {
+        output << "Available commands:\n";
+        QMap<QString, CommandListArgs>::const_iterator i =
+            commandList.constBegin();
+        while (i != commandList.constEnd()) {
+            output << qSetFieldWidth (10) << right << i.key()
+                   << qSetFieldWidth (1) << " "
+                   << qSetFieldWidth (55) << left << i.value().args
+                   << qSetFieldWidth (0) << i.value().help << endl;
+            ++i;
+        }
+    }
+    else if (command == "show") {
+        if (!resourceSet) {
+            qCritical("%s failed!", qPrintable(command));
+        }
+        else {
+            QList<Resource*> list = resourceSet->resources();
+            if (!list.count()) {
+                output << "Resource set is empty, use add command to add some."
+                       << endl;
             }
-            else if (params[0] == "help") {
-                output << "Available commands:\n";
-                QMap<QString, CommandListArgs>::const_iterator i = 
-                    commandList.constBegin();
-                while (i != commandList.constEnd()) {
-                    output << qSetFieldWidth (10) << right << i.key()
-                           << qSetFieldWidth (45) << left << i.value().args
-                           << qSetFieldWidth (0) << i.value().help << endl;
-                }
-            }
-            else if (params[0] == "show") {
-                if (!resourceSet) {
-                    qCritical("%s failed!", qPrintable(params[0]));
-                }
-                else {
-                    QList<Resource*> list = resourceSet->resources();
-                    if (!list.count()) {
-                        output << "Resource set is empty, use add command to add some."
-                               << endl;
-                    }
-                    else {
-                        showResources(list);
-                    }
-                }
-            }
-            else if (params[0] == "acquire") {
-                start_timer();
-                if (!resourceSet || !resourceSet->acquire()) {
-                    stop_timer();
-                    qCritical("%s failed!", qPrintable(params[0]));
-                }
-            }
-            else if (params[0] == "release") {
-                start_timer();
-                if (!resourceSet || !resourceSet->release()) {
-                    stop_timer();
-                    qCritical("%s failed!", qPrintable(params[0]));
-                }
-            }
-            else if (params[0] == "add") {
-                if (!resourceSet) {
-                    qCritical("%s failed!", qPrintable(params[0]));
-                }
-                else if (params.count() < 2 || params[1].isEmpty() || params[1].isNull()) {
-                    output << "List of desired resources is missing. Use help.";
-                }
-                else {
-                    bool optional=false;
-                    QSet<ResourcePolicy::ResourceType> resToAdd;
-                    CommandLineParser::parseResourceList(params[1], resToAdd);
-                    if ((params.count() > 2) && (params[2] == "-o")) {
-                        optional = true;
-                    }
-                    foreach (ResourcePolicy::ResourceType resource, resToAdd) {
-                        if (!resourceSet->contains(resource)) {
-                            resourceSet->addResource(resource);
-                        }
-                        if (optional) {
-                            resourceSet->resource(resource)->setOptional();
-                        }
-                    }
-                }
-            }
-            else if (params[0] == "remove") {
-                if (!resourceSet || params.count() == 1) {
-                    qCritical("%s failed!", qPrintable(params[0]));
-                }
-                else if (params.count() == 1 || params[1].isEmpty() || params[1].isNull()) {
-                    output << "List of desired resources is missing. Use Help." << endl;
-                }
-                else {
-                    QSet<ResourcePolicy::ResourceType> resToRemove;
-                    CommandLineParser::parseResourceList(params[1], resToRemove);
-                    if (params.count() > 2 && params[2] == "-o") {
-                        foreach (ResourcePolicy::ResourceType resource, resToRemove) {
-                            resourceSet->resource(resource)->setOptional(false);
-                        }
-                    }
-                    else {
-                        foreach (ResourcePolicy::ResourceType resource, resToRemove) {
-                            resourceSet->deleteResource(resource);
-                        }
-                    }
-                }
-            }
-            else if (params[0] == "update") {
-                if (!resourceSet || !resourceSet->update()) {
-                    qCritical("%s failed!", qPrintable(params[0]));
-                }
-            }
-            else if (params[0] == "audio") {
-                if (params.count() < 3) {
-                    output << "Not enough parameters! See help" << endl;
-                }
-                else {
-                    Resource *resource = resourceSet->resource(AudioPlaybackType);
-                    AudioResource *audioResource = static_cast<AudioResource*>(resource);
-                    qDebug("resource = %p audioResource = %p", resource, audioResource);
-                    if (audioResource == NULL) {
-                        output << "No AudioResource available in set!" << endl;
-                    }
-                    else {
-                        if (params[1] == "group") {
-                            audioResource->setAudioGroup(params[2]);
-                        }
-                        else if (params[1] == "pid") {
-                            bool ok=false;
-                            quint32 pid = (quint32)params[2].toInt(&ok, 10);
-                            if (ok && pid != 0) {
-                                qDebug("Setting audio PID to %u", pid);
-                                audioResource->setProcessID(pid);
-                            }
-                            else {
-                                output << "Bad pid parameter!" << endl;
-                            }
-                        }
-                        else if (params[1] == "tag") {
-                            if (params.count() < 4) {
-                                output << "tag requires 2 parameters name and value. See help"
-                                       << endl;
-                            }
-                            else {
-                                audioResource->setStreamTag(params[2], params[3]);
-                            }
-                        }
-                        else {
-                            output << "Unknown audio command!";
-                        }
-                    }
-                }
-            }
-            else if (params[0] == "addaudio") {
-                if (params.count() < 5) {
-                    output << "Not enough parameters! See help!" << endl;
-                }
-                else {
-                    AudioResource *audioResource = new AudioResource(params[1]);
-                    if (audioResource == NULL) {
-                        output << "Failed to create an AudioResource object!" << endl;
-                    }
-                    else {
-                        bool ok=false;
-                        quint32 pid = (quint32)params[2].toInt(&ok, 10);
-                        if (ok && pid != 0) {
-                            audioResource->setProcessID(pid);
-                        }
-                        else {
-                            output << "Bad pid parameter!" << endl;
-                        }
-                        audioResource->setStreamTag(params[3], params[4]);
-                        resourceSet->addResourceObject(audioResource);
-                    }
-                }
-            }
-            else if (params[0] == "free") {
-                delete resourceSet;
-                resourceSet = new ResourceSet(applicationClass);
-            }
-            else if (!params[0].isEmpty()) {
-                QByteArray ba = line.toLatin1();
-                const char *c_line = ba.data();
-                output << "unknown command '" << c_line << "'" << endl;
-            }
-
-            if (!quitFlag) {
-                showPrompt();
+            else {
+                showResources(list);
             }
         }
     }
+    else if (command == "acquire") {
+        start_timer();
+        if (!resourceSet || !resourceSet->acquire()) {
+            stop_timer();
+            qCritical("%s failed!", qPrintable(command));
+        }
+    }
+    else if (command == "release") {
+        start_timer();
+        if (!resourceSet || !resourceSet->release()) {
+            stop_timer();
+            qCritical("%s failed!", qPrintable(command));
+        }
+    }
+    else if (command == "add") {
+        QString resourceList, flag;
+        input >> resourceList >> flag;
+        if (!resourceSet) {
+            qCritical("%s failed!", qPrintable(command));
+        }
+        else if (resourceList.isEmpty() || resourceList.isNull()) {
+            output << "List of desired resources is missing. Use help.";
+        }
+        else {
+            bool optional=false;
+            QSet<ResourcePolicy::ResourceType> resToAdd;
+            CommandLineParser::parseResourceList(resourceList, resToAdd);
+            if (flag == "-o") {
+                optional = true;
+            }
+            foreach (ResourcePolicy::ResourceType resource, resToAdd) {
+                if (!resourceSet->contains(resource)) {
+                    resourceSet->addResource(resource);
+                }
+                if (optional) {
+                    resourceSet->resource(resource)->setOptional();
+                }
+            }
+        }
+    }
+    else if (command == "remove") {
+        QString resourceList, flag;
+        input >> resourceList >> flag;
+        if (!resourceSet) {
+            qCritical("%s failed!", qPrintable(command));
+        }
+        else if (resourceList.isEmpty() || resourceList.isNull()) {
+            output << "List of desired resources is missing. Use help.";
+        }
+        else {
+            QSet<ResourcePolicy::ResourceType> resToRemove;
+            CommandLineParser::parseResourceList(resourceList, resToRemove);
+            if (flag == "-o") {
+                foreach (ResourcePolicy::ResourceType resource, resToRemove) {
+                    resourceSet->resource(resource)->setOptional(false);
+                }
+            }
+            else {
+                foreach (ResourcePolicy::ResourceType resource, resToRemove) {
+                    resourceSet->deleteResource(resource);
+                }
+            }
+        }
+    }
+    else if (command == "update") {
+        if (!resourceSet || !resourceSet->update()) {
+            qCritical("%s failed!", qPrintable(command));
+        }
+    }
+    else if (command == "audio") {
+        QString what, group, tagName, tagValue;
+        quint32 pid=0;
+        input >> what;
+
+        if (what.isEmpty() || what.isNull()) {
+            output << "Not enough parameters! See help" << endl;
+        }
+        else {
+            Resource *resource = resourceSet->resource(AudioPlaybackType);
+            AudioResource *audioResource = static_cast<AudioResource*>(resource);
+            qDebug("resource = %p audioResource = %p", resource, audioResource);
+            if (audioResource == NULL) {
+                output << "No AudioResource available in set!" << endl;
+            }
+            else {
+                if (what == "group") {
+                    input >> group;
+                    audioResource->setAudioGroup(group);
+                }
+                else if (what == "pid") {
+                    input >> pid;
+                    if (pid != 0) {
+                        qDebug("Setting audio PID to %u", pid);
+                        audioResource->setProcessID(pid);
+                    }
+                    else {
+                        output << "Bad pid parameter!" << endl;
+                    }
+                }
+                else if (what == "tag") {
+                    input >> tagName >> tagValue;
+                    if (tagName.isEmpty() || tagName.isNull() ||
+                        tagValue.isEmpty() || tagValue.isNull())
+                    {
+                        output << "tag requires 2 parameters name and value. See help"
+                               << endl;
+                    }
+                    else {
+                        audioResource->setStreamTag(tagValue, tagName);
+                    }
+                }
+                else {
+                    output << "Unknown audio command!";
+                }
+            }
+        }
+    }
+    else if (command == "addaudio") {
+        QString group, tagName, tagValue;
+        quint32 pid=0;
+        input >> group >> pid >> tagName >> tagValue;
+
+        if (group.isEmpty() || (pid == 0) || tagName.isEmpty() || tagValue.isEmpty()) {
+            output << "Invalid parameters! See help!" << endl;
+        }
+        else {
+            AudioResource *audioResource = new AudioResource(group);
+            if (audioResource == NULL) {
+                output << "Failed to create an AudioResource object!" << endl;
+            }
+            else {
+                audioResource->setProcessID(pid);
+                audioResource->setStreamTag(tagName, tagValue);
+                resourceSet->addResourceObject(audioResource);
+            }
+        }
+    }
+    else if (command == "free") {
+        delete resourceSet;
+        resourceSet = new ResourceSet(applicationClass);
+    }
+    else {
+        output << "unknown command '" << command << "'" << endl;
+    }
+
+    showPrompt();
 }
 
