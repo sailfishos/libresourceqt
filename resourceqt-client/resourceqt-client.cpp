@@ -4,7 +4,7 @@
 #include "client.h"
 #include "commandlineparser.h"
 
-bool verbose = true;
+bool verbose = false;
 
 void debugOutput(QtMsgType type, const char *msg)
 {

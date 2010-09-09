@@ -36,10 +36,10 @@ bool CommandLineParser::parseArguments()
         if ((*ci).at(0) == QChar('-')) {
             switch ((*ci).at(1).toAscii()) {
             case 'd':
+                ++ci;
             case 'm':
             case 's':
             case 't':
-                output << "The switch '" << (*ci).at(1) << "' is only present for compatibility reasons." << endl;
                 break;
             case 'f':
                 if (!parseModeValues(*(++ci))) {
