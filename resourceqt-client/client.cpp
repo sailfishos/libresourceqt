@@ -185,9 +185,9 @@ void Client::showResources(const QList<Resource*> &resList)
 
 void Client::resourceAcquiredHandler(const QList<ResourceType>& /*grantedResList*/)
 {
-    double ms = stop_timer();
-    if( ms > 0.0 ) {
-        output << "Operation took " << (quint32)ms << "ms";
+    long int ms = stop_timer();
+    if( ms > 0 ) {
+        output << "Operation took " << ms << "ms";
     }
 
     QList<Resource*> list = resourceSet->resources();
@@ -203,9 +203,9 @@ void Client::resourceAcquiredHandler(const QList<ResourceType>& /*grantedResList
 
 void Client::resourceDeniedHandler()
 {
-    double ms = stop_timer();
-    if( ms > 0.0 ) {
-        output << "Operation took " << (quint32)ms << "ms";
+    long int ms = stop_timer();
+    if( ms > 0 ) {
+        output << "Operation took " << ms << "ms";
     }
 
     output << "\nManager denies access to resources!" << endl;
@@ -214,9 +214,9 @@ void Client::resourceDeniedHandler()
 
 void Client::resourceLostHandler()
 {
-    double ms = stop_timer();
-    if( ms > 0.0 ) {
-        output << "Operation took " << (quint32)ms << "ms";
+    long int ms = stop_timer();
+    if( ms > 0 ) {
+        output << "Operation took " << ms << "ms";
     }
 
     output << "\nLost resources from manager!" << endl;
@@ -225,9 +225,9 @@ void Client::resourceLostHandler()
 
 void Client::resourceReleasedHandler()
 {
-    double ms = stop_timer();
-    if( ms > 0.0 ) {
-        output << "Operation took " << (quint32)ms << "ms";
+    long int ms = stop_timer();
+    if( ms > 0 ) {
+        output << "Operation took " << ms << "ms";
     }
 
     output << "\nAll resources released" << endl;

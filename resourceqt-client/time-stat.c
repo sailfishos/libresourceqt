@@ -1,6 +1,7 @@
+#include <math.h>
 #include "time-stat.h"
 
-static struct timespec start_time = {0,0};
+static struct timespec start_time;
 
 int start_timer(void)
 {
@@ -13,7 +14,7 @@ int start_timer(void)
         return 0;
 }
 
-double stop_timer(void)
+long int stop_timer(void)
 {
     struct timespec end_time;
     int r;
@@ -28,6 +29,6 @@ double stop_timer(void)
     start_time.tv_sec = 0;
     start_time.tv_nsec = 0;
 
-    return milliseconds;
+    return lround(milliseconds);
 }
 

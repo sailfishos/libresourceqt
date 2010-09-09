@@ -7,7 +7,7 @@ extern "C" {
 #endif
 int start_timer(void);
 
-double stop_timer(void);
+long int stop_timer(void);
 #ifdef __cplusplus
 }
 #endif

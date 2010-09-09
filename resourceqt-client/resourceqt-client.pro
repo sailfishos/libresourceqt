@@ -11,7 +11,8 @@ CONFIG      -= app_bundle
 
 INCLUDEPATH += $${LIBRESOURCEINC}
 QMAKE_CXXFLAGS += -Wall
-LIBS += -L$${LIBRESOURCEQT}/build -lresourceqt -L$${LIBDBUSQEVENTLOOP}/build -ldbus-qeventloop
+QMAKE_CFLAGS += -std=c99 -D_POSIX_C_SOURCE=199309L
+LIBS += -L$${LIBRESOURCEQT}/build -lresourceqt -L$${LIBDBUSQEVENTLOOP}/build -ldbus-qeventloop -lm -lrt
 
 # Input 
 HEADERS     = client.h commandlineparser.h time-stat.h
