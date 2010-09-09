@@ -24,21 +24,21 @@ public:
 
 class Client : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	Client();
-	~Client();
+    Client();
+    ~Client();
 
-	bool initialize(const CommandLineParser &commandParser);
-	static uint32_t parseResourceList(QString resourceListStr);
+    bool initialize(const CommandLineParser &commandParser);
+    static uint32_t parseResourceList(QString resourceListStr);
 
 private slots:
-	void resourceAcquiredHandler(const QList<ResourcePolicy::ResourceType>& grantedResList);
-	void resourceDeniedHandler();
-	void resourceLostHandler();
-	void resourceReleasedHandler();
-	void resourcesBecameAvailableHandler(const QList<ResourcePolicy::ResourceType> &availableResources);
+    void resourceAcquiredHandler(const QList<ResourcePolicy::ResourceType>& grantedResList);
+    void resourceDeniedHandler();
+    void resourceLostHandler();
+    void resourceReleasedHandler();
+    void resourcesBecameAvailableHandler(const QList<ResourcePolicy::ResourceType> &availableResources);
     void readLine(int);
     void doExit();
 
@@ -46,18 +46,18 @@ private:
     QTextStream standardInput;
     QSocketNotifier stdInNotifier;
     int mainTimerID;
-	QString	applicationClass;
-	ResourcePolicy::ResourceSet *resourceSet;
+    QString applicationClass;
+    ResourcePolicy::ResourceSet *resourceSet;
     QTextStream output;
 
     static QMap<QString, CommandListArgs> commandList;
 
-	ResourcePolicy::Resource* allocateResource(ResourcePolicy::ResourceType resource, bool optional);
-	ResourcePolicy::ResourceType getResourceType(uint32_t resource);
+    ResourcePolicy::Resource* allocateResource(ResourcePolicy::ResourceType resource, bool optional);
+    ResourcePolicy::ResourceType getResourceType(uint32_t resource);
 
-	void showPrompt();
-	void showResources(const QList<ResourcePolicy::ResourceType> &resList);
-	void showResources(const QList<ResourcePolicy::Resource*> &resList);
+    void showPrompt();
+    void showResources(const QList<ResourcePolicy::ResourceType> &resList);
+    void showResources(const QList<ResourcePolicy::Resource*> &resList);
 };
 
 #endif

@@ -5,9 +5,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-int start_timer(void);
+    int start_timer(void);
 
-long int stop_timer(void);
+    long int stop_timer(void);
 #ifdef __cplusplus
 }
 #endif

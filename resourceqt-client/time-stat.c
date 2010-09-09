@@ -24,7 +24,7 @@ long int stop_timer(void)
 
     if (r == 0) {
         milliseconds = 1000.0 * (end_time.tv_sec - start_time.tv_sec) +
-                   (end_time.tv_nsec - start_time.tv_nsec) / 1000000.0;
+                       (end_time.tv_nsec - start_time.tv_nsec) / 1000000.0;
     }
     start_time.tv_sec = 0;
     start_time.tv_nsec = 0;

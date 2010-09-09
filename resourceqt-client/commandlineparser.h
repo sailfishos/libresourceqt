@@ -17,7 +17,7 @@ public:
     bool parseArguments();
 
     static bool parseResourceList(const QString &resourceListStr,
-                           QSet<ResourcePolicy::ResourceType> &resourceList);
+                                  QSet<ResourcePolicy::ResourceType> &resourceList);
 
     const QSet<ResourcePolicy::ResourceType>& resources() const;
     const QSet<ResourcePolicy::ResourceType>& optionalResources() const;

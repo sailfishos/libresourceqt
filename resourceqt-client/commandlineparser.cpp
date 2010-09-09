@@ -4,8 +4,8 @@
 QHash<QString, ResourcePolicy::ResourceType> CommandLineParser::resourceValues;
 
 CommandLineParser::CommandLineParser():
-    allResources(), optResources(), autoRelease(false), alwaysReply(false),
-    verbose(false), allowUnkownResourceClass(false), output(stdout)
+        allResources(), optResources(), autoRelease(false), alwaysReply(false),
+        verbose(false), allowUnkownResourceClass(false), output(stdout)
 {
     resourceValues["AudioPlayback"] = ResourcePolicy::AudioPlaybackType;
     resourceValues["VideoPlayback"] = ResourcePolicy::VideoPlaybackType;
@@ -94,17 +94,16 @@ bool CommandLineParser::parseArguments()
 bool CommandLineParser::parseClassString(const QString &str)
 {
     if (!allowUnkownResourceClass &&
-        (str != "call") &&
-        (str != "camera") &&
-        (str != "ringtone") &&
-        (str != "alarm") &&
-        (str != "navigator") &&
-        (str != "game") &&
-        (str != "player") &&
-        (str != "event") &&
-        (str != "background") &&
-        (str != "videoeditor") )
-    {
+            (str != "call") &&
+            (str != "camera") &&
+            (str != "ringtone") &&
+            (str != "alarm") &&
+            (str != "navigator") &&
+            (str != "game") &&
+            (str != "player") &&
+            (str != "event") &&
+            (str != "background") &&
+            (str != "videoeditor")) {
         output << "invalid class " << str;
         return false;
     }
@@ -114,7 +113,7 @@ bool CommandLineParser::parseClassString(const QString &str)
 }
 
 bool CommandLineParser::parseResourceList(const QString &resourceListStr,
-                                          QSet<ResourcePolicy::ResourceType> &resources)
+        QSet<ResourcePolicy::ResourceType> &resources)
 {
     if (resourceListStr.isEmpty() || resourceListStr.isNull()) {
         return false;
@@ -128,7 +127,7 @@ bool CommandLineParser::parseResourceList(const QString &resourceListStr,
             }
         }
     }
-    
+
     return true;
 }
 
@@ -137,7 +136,7 @@ bool CommandLineParser::parseModeValues(const QString &modeListStr)
     if (modeListStr.isEmpty() || modeListStr.isNull()) {
         return false;
     }
-    
+
     QStringList modeList = modeListStr.split(",", QString::SkipEmptyParts);
 
     foreach(QString mode, modeList) {
@@ -157,14 +156,14 @@ bool CommandLineParser::parseModeValues(const QString &modeListStr)
 void CommandLineParser::usage()
 {
     output << "usage: resourceqt-client [-h] [-m mode-values]" <<
-           "[-o optional-resources] [-s shared-resources -m shared-mask] " <<
-           "class all-resources" << endl;
+    "[-o optional-resources] [-s shared-resources -m shared-mask] " <<
+    "class all-resources" << endl;
     output << "\toptions:" << endl;
     output << "\t  h\tprint this help message and exit" << endl;
     output << "\t  f\tmode values. See 'modes' below for the "
-           "\n\t\tsyntax of <mode-values>" << endl;
+    "\n\t\tsyntax of <mode-values>" << endl;
     output << "\t  o\toptional resources. See 'resources' below for the "
-           "syntax of\n\t\t<optional-resources>" << endl;
+    "syntax of\n\t\t<optional-resources>" << endl;
     output << "\tclass:" << endl;
     output << "\t\tcall\t  - for native or 3rd party telephony" << endl;
     output << "\t\tcamera\t  - for photo applications" << endl;

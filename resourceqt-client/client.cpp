@@ -13,13 +13,13 @@ using namespace ResourcePolicy;
 QMap<QString, CommandListArgs> Client::commandList;
 
 CommandListArgs::CommandListArgs()
-    :args(), help()
+        : args(), help()
 {
 }
 
 
 CommandListArgs::CommandListArgs(const QString &arguments, const QString &helpText)
-    :args(arguments), help(helpText)
+        : args(arguments), help(helpText)
 {
 }
 
@@ -28,8 +28,8 @@ CommandListArgs::~CommandListArgs()
 }
 
 Client::Client()
-    : QObject(), standardInput(stdin, QIODevice::ReadOnly), stdInNotifier(0, QSocketNotifier::Read), applicationClass(),
-      resourceSet(NULL), output(stdout)
+        : QObject(), standardInput(stdin, QIODevice::ReadOnly), stdInNotifier(0, QSocketNotifier::Read), applicationClass(),
+        resourceSet(NULL), output(stdout)
 {
     mainTimerID   = startTimer(0);
     commandList["help"] = CommandListArgs("", "print this help message");
@@ -38,10 +38,10 @@ Client::Client()
     commandList["acquire"] = CommandListArgs("", "acquire required resources");
     commandList["release"] = CommandListArgs("", "release resources");
     commandList["update"] = CommandListArgs("", "update modified resource set after add or remove command");
-    commandList["add"] = CommandListArgs("reslist [-o]","add reosurce list, if -o provided, set as optional");
-    commandList["remove"] = CommandListArgs("reslist [-o]","remove reosurce list, if -o provided, removed only optional flag");
-    commandList["audio"] = CommandListArgs("pid <pid> | group <audio group> | tag <name> <value>","set audio properties");
-    commandList["addaudio"] = CommandListArgs("<audio group> <pid> <tag name> <tag value>","Add an audio resource and set the porpoerties");
+    commandList["add"] = CommandListArgs("reslist [-o]", "add reosurce list, if -o provided, set as optional");
+    commandList["remove"] = CommandListArgs("reslist [-o]", "remove reosurce list, if -o provided, removed only optional flag");
+    commandList["audio"] = CommandListArgs("pid <pid> | group <audio group> | tag <name> <value>", "set audio properties");
+    commandList["addaudio"] = CommandListArgs("<audio group> <pid> <tag name> <tag value>", "Add an audio resource and set the porpoerties");
     commandList["show"] = CommandListArgs("", "show resources");
 
 }
@@ -60,8 +60,8 @@ void Client::showPrompt()
 
 bool Client::initialize(const CommandLineParser &parser)
 {
-	QSet<ResourcePolicy::ResourceType> allResources;
-	QSet<ResourcePolicy::ResourceType> optionalResources;
+    QSet<ResourcePolicy::ResourceType> allResources;
+    QSet<ResourcePolicy::ResourceType> optionalResources;
 
     if (parser.shouldAlwaysReply()) {
         output << "client: AlwaysReply" << endl;
@@ -80,7 +80,7 @@ bool Client::initialize(const CommandLineParser &parser)
 
     allResources.unite(parser.resources());
     optionalResources.unite(parser.optionalResources());
-    foreach (ResourcePolicy::ResourceType resource, allResources) {
+    foreach(ResourcePolicy::ResourceType resource, allResources) {
         resourceSet->addResource(resource);
         if (optionalResources.contains(resource)) {
             resourceSet->resource(resource)->setOptional();
@@ -88,8 +88,7 @@ bool Client::initialize(const CommandLineParser &parser)
     }
 
     if (!connect(resourceSet, SIGNAL(resourcesGranted(QList<ResourcePolicy::ResourceType>)),
-                 this, SLOT(resourceAcquiredHandler(QList<ResourcePolicy::ResourceType>))))
-    {
+                 this, SLOT(resourceAcquiredHandler(QList<ResourcePolicy::ResourceType>)))) {
         return false;
     }
 
@@ -104,16 +103,14 @@ bool Client::initialize(const CommandLineParser &parser)
         return false;
     }
     if (!connect(resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)),
-                 this, SLOT(resourcesBecameAvailableHandler(const QList<ResourcePolicy::ResourceType> &))))
-    {
+                 this, SLOT(resourcesBecameAvailableHandler(const QList<ResourcePolicy::ResourceType> &)))) {
         return false;
     }
     if (!connect(&stdInNotifier, SIGNAL(activated(int)), this, SLOT(readLine(int)))) {
         return false;
     }
     if (!connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()),
-        this, SLOT(doExit())))
-    {
+                 this, SLOT(doExit()))) {
         return false;
     }
 
@@ -122,7 +119,7 @@ bool Client::initialize(const CommandLineParser &parser)
     return true;
 }
 
-void Client::doExit ()
+void Client::doExit()
 {
     if (resourceSet != NULL)
         resourceSet->release();
@@ -131,41 +128,41 @@ void Client::doExit ()
 const char * resourceTypeToString(ResourceType type)
 {
     switch (type) {
-        case AudioPlaybackType:
-            return "AudioPlayback";
-        case AudioRecorderType:
-            return "AudioRecording";
-        case VideoPlaybackType:
-            return "VideoPlayback";
-        case VideoRecorderType:
-            return "VideoRegording";
-        case VibraType:
-            return "Vibra";
-        case LedsType:
-            return "Leds";
-        case BacklightType:
-            return "Backlight";
-        case SystemButtonType:
-            return "SystemButton";
-        case LockButtonType:
-            return "LockButton";
-        case ScaleButtonType:
-            return "ScaleButton";
-        case SnapButtonType:
-            return "SnapButton";
-        case LensCoverType:
-            return "LensCover";
-        case HeadsetButtonsType:
-            return "HeadsetButtons";
-        default:
-            return "Unknown/Invalid Resource";
+    case AudioPlaybackType:
+        return "AudioPlayback";
+    case AudioRecorderType:
+        return "AudioRecording";
+    case VideoPlaybackType:
+        return "VideoPlayback";
+    case VideoRecorderType:
+        return "VideoRegording";
+    case VibraType:
+        return "Vibra";
+    case LedsType:
+        return "Leds";
+    case BacklightType:
+        return "Backlight";
+    case SystemButtonType:
+        return "SystemButton";
+    case LockButtonType:
+        return "LockButton";
+    case ScaleButtonType:
+        return "ScaleButton";
+    case SnapButtonType:
+        return "SnapButton";
+    case LensCoverType:
+        return "LensCover";
+    case HeadsetButtonsType:
+        return "HeadsetButtons";
+    default:
+        return "Unknown/Invalid Resource";
     }
 }
 
 void Client::showResources(const QList<ResourceType> &resList)
 {
     output << "Resource Set:\n";
-    foreach (ResourceType resource, resList) {
+    foreach(ResourceType resource, resList) {
         output << "\t" << resourceTypeToString(resource) << endl;
     }
 }
@@ -173,7 +170,7 @@ void Client::showResources(const QList<ResourceType> &resList)
 void Client::showResources(const QList<Resource*> &resList)
 {
     output << "Resource Set:\n";
-    foreach (Resource* resource, resList) {
+    foreach(Resource* resource, resList) {
         output << "\t" << resourceTypeToString(resource->type());
         if (resource->isOptional())
             output << " (optional)";
@@ -186,7 +183,7 @@ void Client::showResources(const QList<Resource*> &resList)
 void Client::resourceAcquiredHandler(const QList<ResourceType>& /*grantedResList*/)
 {
     long int ms = stop_timer();
-    if( ms > 0 ) {
+    if (ms > 0) {
         output << "Operation took " << ms << "ms";
     }
 
@@ -204,7 +201,7 @@ void Client::resourceAcquiredHandler(const QList<ResourceType>& /*grantedResList
 void Client::resourceDeniedHandler()
 {
     long int ms = stop_timer();
-    if( ms > 0 ) {
+    if (ms > 0) {
         output << "Operation took " << ms << "ms";
     }
 
@@ -215,7 +212,7 @@ void Client::resourceDeniedHandler()
 void Client::resourceLostHandler()
 {
     long int ms = stop_timer();
-    if( ms > 0 ) {
+    if (ms > 0) {
         output << "Operation took " << ms << "ms";
     }
 
@@ -226,7 +223,7 @@ void Client::resourceLostHandler()
 void Client::resourceReleasedHandler()
 {
     long int ms = stop_timer();
-    if( ms > 0 ) {
+    if (ms > 0) {
         output << "Operation took " << ms << "ms";
     }
 
@@ -265,10 +262,10 @@ void Client::readLine(int)
         QMap<QString, CommandListArgs>::const_iterator i =
             commandList.constBegin();
         while (i != commandList.constEnd()) {
-            output << qSetFieldWidth (10) << right << i.key()
-                   << qSetFieldWidth (1) << " "
-                   << qSetFieldWidth (55) << left << i.value().args
-                   << qSetFieldWidth (0) << i.value().help << endl;
+            output << qSetFieldWidth(10) << right << i.key()
+            << qSetFieldWidth(1) << " "
+            << qSetFieldWidth(55) << left << i.value().args
+            << qSetFieldWidth(0) << i.value().help << endl;
             ++i;
         }
     }
@@ -280,7 +277,7 @@ void Client::readLine(int)
             QList<Resource*> list = resourceSet->resources();
             if (!list.count()) {
                 output << "Resource set is empty, use add command to add some."
-                       << endl;
+                << endl;
             }
             else {
                 showResources(list);
@@ -311,13 +308,13 @@ void Client::readLine(int)
             output << "List of desired resources is missing. Use help.";
         }
         else {
-            bool optional=false;
+            bool optional = false;
             QSet<ResourcePolicy::ResourceType> resToAdd;
             CommandLineParser::parseResourceList(resourceList, resToAdd);
             if (flag == "-o") {
                 optional = true;
             }
-            foreach (ResourcePolicy::ResourceType resource, resToAdd) {
+            foreach(ResourcePolicy::ResourceType resource, resToAdd) {
                 if (!resourceSet->contains(resource)) {
                     resourceSet->addResource(resource);
                 }
@@ -340,12 +337,12 @@ void Client::readLine(int)
             QSet<ResourcePolicy::ResourceType> resToRemove;
             CommandLineParser::parseResourceList(resourceList, resToRemove);
             if (flag == "-o") {
-                foreach (ResourcePolicy::ResourceType resource, resToRemove) {
+                foreach(ResourcePolicy::ResourceType resource, resToRemove) {
                     resourceSet->resource(resource)->setOptional(false);
                 }
             }
             else {
-                foreach (ResourcePolicy::ResourceType resource, resToRemove) {
+                foreach(ResourcePolicy::ResourceType resource, resToRemove) {
                     resourceSet->deleteResource(resource);
                 }
             }
@@ -358,7 +355,7 @@ void Client::readLine(int)
     }
     else if (command == "audio") {
         QString what, group, tagName, tagValue;
-        quint32 pid=0;
+        quint32 pid = 0;
         input >> what;
 
         if (what.isEmpty() || what.isNull()) {
@@ -389,10 +386,9 @@ void Client::readLine(int)
                 else if (what == "tag") {
                     input >> tagName >> tagValue;
                     if (tagName.isEmpty() || tagName.isNull() ||
-                        tagValue.isEmpty() || tagValue.isNull())
-                    {
+                            tagValue.isEmpty() || tagValue.isNull()) {
                         output << "tag requires 2 parameters name and value. See help"
-                               << endl;
+                        << endl;
                     }
                     else {
                         audioResource->setStreamTag(tagValue, tagName);
@@ -406,7 +402,7 @@ void Client::readLine(int)
     }
     else if (command == "addaudio") {
         QString group, tagName, tagValue;
-        quint32 pid=0;
+        quint32 pid = 0;
         input >> group >> pid >> tagName >> tagValue;
 
         if (group.isEmpty() || (pid == 0) || tagName.isEmpty() || tagValue.isEmpty()) {
