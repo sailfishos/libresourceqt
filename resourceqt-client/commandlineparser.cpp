@@ -1,5 +1,5 @@
-#include "commandlineparser.h"
 #include <QDebug>
+#include "commandlineparser.h"
 
 QHash<QString, ResourcePolicy::ResourceType> CommandLineParser::resourceValues;
 
