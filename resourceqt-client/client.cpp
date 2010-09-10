@@ -38,10 +38,10 @@ Client::Client()
     commandList["acquire"] = CommandListArgs("", "acquire required resources");
     commandList["release"] = CommandListArgs("", "release resources");
     commandList["update"] = CommandListArgs("", "update modified resource set after add or remove command");
-    commandList["add"] = CommandListArgs("reslist [-o]", "add reosurce list, if -o provided, set as optional");
-    commandList["remove"] = CommandListArgs("reslist [-o]", "remove reosurce list, if -o provided, removed only optional flag");
+    commandList["add"] = CommandListArgs("reslist [-o]", "add resource list, if -o provided, set as optional");
+    commandList["remove"] = CommandListArgs("reslist [-o]", "remove resource list, if -o provided, removed only optional flag");
     commandList["audio"] = CommandListArgs("pid <pid> | group <audio group> | tag <name> <value>", "set audio properties");
-    commandList["addaudio"] = CommandListArgs("<audio group> <pid> <tag name> <tag value>", "Add an audio resource and set the porpoerties");
+    commandList["addaudio"] = CommandListArgs("<audio group> <pid> <tag name> <tag value>", "Add an audio resource and set the properties");
     commandList["show"] = CommandListArgs("", "show resources");
 
 }
