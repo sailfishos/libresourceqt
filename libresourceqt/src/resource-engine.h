@@ -59,6 +59,7 @@ signals:
     void resourcesLost(quint32 bitmaskOfGrantedResources);
     void connectedToManager();
     void disconnectedFromManager();
+    void errorCallback(quint32 code, const char* );
 
 private:
     bool connected;

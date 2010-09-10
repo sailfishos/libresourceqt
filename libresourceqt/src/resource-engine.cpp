@@ -429,6 +429,9 @@ void ResourceEngine::handleError(quint32 requestNo, qint32 code, const char *mes
     qDebug("ResourceEngine(%d) - Error on request %u(0x%02x): %d - %s",
            identifier, requestNo, originalMessageType, code, message);
     messageMap.remove(requestNo);
+
+    qDebug("emitting errorCallback");
+    emit errorCallback(code, message);
 }
 
 bool ResourceEngine::isConnectedToManager()
