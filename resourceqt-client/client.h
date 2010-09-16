@@ -60,5 +60,9 @@ private:
     void showResources(const QList<ResourcePolicy::Resource*> &resList);
 };
 
+QTextStream & operator<< (QTextStream &output,
+                          const QList<ResourcePolicy::Resource*>resources);
+QTextStream & operator<< (QTextStream &output,
+                          const QList<ResourcePolicy::ResourceType>resources);
 #endif
 

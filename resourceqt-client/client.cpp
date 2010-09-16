@@ -8,6 +8,8 @@
 
 #include "client.h"
 
+#define outputln output << "\n"
+
 using namespace ResourcePolicy;
 
 QMap<QString, CommandListArgs> Client::commandList;
@@ -55,7 +57,7 @@ Client::~Client()
 
 void Client::showPrompt()
 {
-    output << "res-client> " << flush;
+    output << "resource-Qt> " << flush;
 }
 
 bool Client::initialize(const CommandLineParser &parser)
@@ -113,7 +115,7 @@ bool Client::initialize(const CommandLineParser &parser)
                  this, SLOT(doExit()))) {
         return false;
     }
-
+    output << "accepting input" << endl;
     showPrompt();
 
     return true;
@@ -161,7 +163,7 @@ const char * resourceTypeToString(ResourceType type)
 
 void Client::showResources(const QList<ResourceType> &resList)
 {
-    output << "Resource Set:\n";
+    outputln << "Resource Set:\n";
     foreach(ResourceType resource, resList) {
         output << "\t" << resourceTypeToString(resource) << endl;
     }
@@ -169,7 +171,7 @@ void Client::showResources(const QList<ResourceType> &resList)
 
 void Client::showResources(const QList<Resource*> &resList)
 {
-    output << "Resource Set:\n";
+    outputln << "Resource Set:\n";
     foreach(Resource* resource, resList) {
         output << "\t" << resourceTypeToString(resource->type());
         if (resource->isOptional())
@@ -180,20 +182,25 @@ void Client::showResources(const QList<Resource*> &resList)
     }
 }
 
-void Client::resourceAcquiredHandler(const QList<ResourceType>& /*grantedResList*/)
+void Client::resourceAcquiredHandler(const QList<ResourceType>&)
 {
     long int ms = stop_timer();
     if (ms > 0) {
-        output << "Operation took " << ms << "ms";
+        outputln << "Operation took " << ms << "ms" << endl;
     }
 
     QList<Resource*> list = resourceSet->resources();
     if (!list.count()) {
-        qFatal("Granted resource set is empty. Possible bug?");
+        qFatal("Resource set is empty, but we received a grant. Possible bug?");
     }
     else {
-        output << "\nReceived a grant.\n";
-        showResources(list);
+        QList<ResourceType> grantedResources;
+        foreach(ResourcePolicy::Resource *resource, list) {
+            if (resource->isGranted()) {
+                grantedResources << resource->type();
+            }
+        }
+        output << "granted:" << grantedResources << endl;
     }
     showPrompt();
 }
@@ -202,10 +209,10 @@ void Client::resourceDeniedHandler()
 {
     long int ms = stop_timer();
     if (ms > 0) {
-        output << "Operation took " << ms << "ms";
+        outputln << "Operation took " << ms << "ms" << endl;
     }
-
-    output << "\nManager denies access to resources!" << endl;
+    QList<Resource*> allResources = resourceSet->resources();
+    output << "denied:" << allResources << endl;
     showPrompt();
 }
 
@@ -213,10 +220,11 @@ void Client::resourceLostHandler()
 {
     long int ms = stop_timer();
     if (ms > 0) {
-        output << "Operation took " << ms << "ms";
+        outputln << "Operation took " << ms << "ms" << endl;
     }
 
-    output << "\nLost resources from manager!" << endl;
+    QList<Resource*> allResources = resourceSet->resources();
+    outputln << "lost:" << allResources << endl;
     showPrompt();
 }
 
@@ -224,17 +232,17 @@ void Client::resourceReleasedHandler()
 {
     long int ms = stop_timer();
     if (ms > 0) {
-        output << "Operation took " << ms << "ms";
+        outputln << "Operation took " << ms << "ms" << endl;
     }
 
-    output << "\nAll resources released" << endl;
+    QList<Resource*> allResources = resourceSet->resources();
+    outputln << "released:"<< allResources << endl;
     showPrompt();
 }
 
 void Client::resourcesBecameAvailableHandler(const QList<ResourcePolicy::ResourceType> &availableResources)
 {
-    output << "Manager advice: These resources are available:\n";
-    showResources(availableResources);
+    outputln << "advice:" << availableResources << endl;
     showPrompt();
 }
 
@@ -429,5 +437,27 @@ void Client::readLine(int)
     }
 
     showPrompt();
+}
+
+QTextStream & operator<<(QTextStream &output,
+                         const QList<ResourcePolicy::Resource *>resources)
+{
+    char separator = ' ';
+    foreach(Resource* resource, resources) {
+        output << separator << resourceTypeToString(resource->type());
+        separator = ',';
+    }
+    return output;
+}
+
+QTextStream & operator<< (QTextStream &output,
+                          const QList<ResourcePolicy::ResourceType>resources)
+{
+    char separator = ' ';
+    foreach(ResourceType resource, resources) {
+        output << separator << resourceTypeToString(resource);
+        separator = ',';
+    }
+    return output;
 }
 
