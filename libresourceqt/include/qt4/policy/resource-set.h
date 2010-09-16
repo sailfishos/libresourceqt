@@ -31,7 +31,7 @@
  * resources->addResource(VideoPlaybackType);
  * \endcode
  * If you want to pre-populate the AudioResource with the audio group (it is a good idea)
- * and other oudio parameters you can create an audio object yourself and then
+ * and other audio parameters you can create an audio object yourself and then
  * give that to the ResourcePolicy::ResourceSet. Note that you should NOT free this object.
  * The ResourcePolicy::ResourceSet takes ownership of this pointer.
  * \code
@@ -59,7 +59,8 @@
  */
 
 /**
- * The Namespace for Resource Policy.
+ * \brief The Namespace for Resource Policy.
+ * All Resource Policy Qt APIs reside under the ResourcePolicy namespace.
  */
 namespace ResourcePolicy
 {
@@ -81,6 +82,8 @@ public:
      * The application class is used to determine the priority order of the
      * application.
      * \param parent The optional parent of of this class.
+     * \param alwaysReply Set this to true to always get a reply from the
+     * Resource Manager. This optional parameter defaults to false.
      */
     ResourceSet(const QString &applicationClass, QObject *parent = NULL,
                 bool alwaysReply = false, bool autoRelease = false);
