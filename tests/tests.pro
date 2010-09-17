@@ -16,8 +16,8 @@ SUBDIRS = test-dbus-qeventloop	\
 # Install options
 testsxml.path    = /usr/share/libresourceqt-tests/
 testsxml.files   = tests.xml
-testrunner.path  = /usr/lib/libresourceqt-tests/
-testrunner.files = test-dbus-qeventloop-runner.sh
+citesting.path  = /usr/lib/libresourceqt-tests/
+citesting.files = test-dbus-qeventloop-runner.sh
 dbusconf.path    = /etc/dbus-1/system.d/
 dbusconf.files   = test-dbus-qeventloop.conf
-INSTALLS         = testsxml testrunner dbusconf
+INSTALLS         = testsxml ci-testing dbusconf
