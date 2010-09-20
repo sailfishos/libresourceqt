@@ -85,8 +85,16 @@ public:
      * \param alwaysReply Set this to true to always get a reply from the
      * Resource Manager. This optional parameter defaults to false.
      */
-    ResourceSet(const QString &applicationClass, QObject *parent = NULL,
-                bool alwaysReply = false, bool autoRelease = false);
+    ResourceSet(const QString &applicationClass, QObject *parent,
+                bool alwaysReply, bool autoRelease);
+    /**
+     * Alternative backwards-compatible constructor.
+     * \param applicationClass This parameter defines the application class.
+     * The application class is used to determine the priority order of the
+     * application.
+     * \param parent The optional parent of of this class.
+     */
+    ResourceSet(const QString &applicationClass, QObject *parent = NULL);
     /**
      * The destructor
      */

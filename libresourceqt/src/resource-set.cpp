@@ -15,6 +15,11 @@ ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent,
     memset(resourceSet, 0, sizeof(QPointer<Resource *>)*NumberOfTypes);
 }
 
+ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
+{
+    ResourceSet(applicationClass, parent, false, false);
+}
+
 ResourceSet::~ResourceSet()
 {
     qDebug("ResourceSet::%s(%d)", __FUNCTION__, identifier);
