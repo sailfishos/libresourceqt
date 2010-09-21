@@ -16,8 +16,13 @@ ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent,
 }
 
 ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
+        : QObject(parent), resourceClass(applicationClass), resourceEngine(NULL),
+        audioResource(NULL), autoRelease(false),
+        alwaysReply(false), initialized(false), pendingAcquire(false),
+        pendingUpdate(false), pendingAudioProperties(false)
 {
-    ResourceSet(applicationClass, parent, false, false);
+    identifier = resourceSetId++;
+    memset(resourceSet, 0, sizeof(QPointer<Resource *>)*NumberOfTypes);
 }
 
 ResourceSet::~ResourceSet()

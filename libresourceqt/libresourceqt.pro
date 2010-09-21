@@ -38,4 +38,4 @@ pc.files       = libresourceqt1.pc
 pc.path        = $${INSTALLBASE}/lib/pkgconfig
 
 INSTALLS       = target headers pc
-
+	
