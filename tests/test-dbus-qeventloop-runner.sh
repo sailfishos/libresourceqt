@@ -1,3 +1,4 @@
+#!/bin/sh
 ##############################################################################
 #  This file is part of libresourceqt                                        #
 #                                                                            #
@@ -18,8 +19,6 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  #
 #  USA.                                                                      #
 ##############################################################################
-
-#!/bin/sh
 
 # Source and export D-Bus session info 
 . /tmp/session_bus_address.user 
