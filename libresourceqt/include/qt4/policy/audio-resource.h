@@ -87,6 +87,15 @@ private:
     QString streamName;
     QString streamValue;
 signals:
+    /**
+     * This signal is emitted when any of the properties of the AudioResource
+     * are changed. This signal is connected to in the ResourceSet to
+     * track the changes to the AudioResource object.
+     * \param group The new audio group
+     * \param pit The new PID of the audio renderer
+     * \param name The new Stream tag name
+     * \param value the new stream tag value
+     */
     void audioPropertiesChanged(const QString &group, quint32 pid,
                                 const QString &name, const QString &value);
 };
