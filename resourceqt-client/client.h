@@ -66,7 +66,7 @@ private slots:
 private:
     QTextStream standardInput;
     QSocketNotifier stdInNotifier;
-    int mainTimerID;
+    bool pendingAddAudio;
     QString applicationClass;
     ResourcePolicy::ResourceSet *resourceSet;
     QTextStream output;

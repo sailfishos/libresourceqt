@@ -51,10 +51,9 @@ CommandListArgs::~CommandListArgs()
 }
 
 Client::Client()
-        : QObject(), standardInput(stdin, QIODevice::ReadOnly), stdInNotifier(0, QSocketNotifier::Read), applicationClass(),
+        : QObject(), standardInput(stdin, QIODevice::ReadOnly), stdInNotifier(0, QSocketNotifier::Read), pendingAddAudio(false), applicationClass(),
         resourceSet(NULL), output(stdout)
 {
-    mainTimerID   = startTimer(0);
     commandList["help"] = CommandListArgs("", "print this help message");
     commandList["quit"] = CommandListArgs("", "exit application");
     commandList["free"] = CommandListArgs("", "destroy and free the resources");
@@ -71,8 +70,6 @@ Client::Client()
 
 Client::~Client()
 {
-    killTimer(mainTimerID);
-
     delete resourceSet;
 }
 
@@ -263,6 +260,13 @@ void Client::resourceReleasedHandler()
 
 void Client::resourcesBecameAvailableHandler(const QList<ResourcePolicy::ResourceType> &availableResources)
 {
+    if (pendingAddAudio) {
+        pendingAddAudio = false;
+        long int ms = stop_timer();
+        if (ms > 0) {
+            outputln << "Operation took " << ms << "ms" << endl;
+        }
+    }
     outputln << "advice:" << availableResources << endl;
     showPrompt();
 }
@@ -445,6 +449,8 @@ void Client::readLine(int)
             else {
                 audioResource->setProcessID(pid);
                 audioResource->setStreamTag(tagName, tagValue);
+                pendingAddAudio = true;
+                start_timer();
                 resourceSet->addResourceObject(audioResource);
             }
         }
