@@ -18,8 +18,6 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
 USA.
 *************************************************************************/
-
-#include <math.h>
 #include "time-stat.h"
 
 static struct timespec start_time;
@@ -39,17 +37,28 @@ long int stop_timer(void)
 {
     struct timespec end_time;
     int r;
-    double milliseconds = 0.0;
+    long int milliseconds = 0L;
 
     r = clock_gettime(CLOCK_REALTIME, &end_time);
 
     if (r == 0) {
-        milliseconds = 1000.0 * (end_time.tv_sec - start_time.tv_sec) +
-                       (end_time.tv_nsec - start_time.tv_nsec) / 1000000.0;
+    	struct timespec temp;
+	    if (end_time.tv_nsec < start_time.tv_nsec) {
+		    temp.tv_sec  = end_time.tv_sec - start_time.tv_sec - 1;
+		    temp.tv_nsec = 1000000000 + end_time.tv_nsec - start_time.tv_nsec;
+    	} else {
+    		temp.tv_sec  = end_time.tv_sec  - start_time.tv_sec;
+    		temp.tv_nsec = end_time.tv_nsec - start_time.tv_nsec;
+    	}
+
+        milliseconds = 1000 * temp.tv_sec + temp.tv_nsec / 1000;
+        if (temp.tv_nsec % 1000 > 500) {
+            ++milliseconds;
+        }
     }
     start_time.tv_sec = 0;
     start_time.tv_nsec = 0;
 
-    return lround(milliseconds);
+    return milliseconds;
 }
 
