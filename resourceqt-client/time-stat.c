@@ -51,8 +51,8 @@ long int stop_timer(void)
     		temp.tv_nsec = end_time.tv_nsec - start_time.tv_nsec;
     	}
 
-        milliseconds = 1000 * temp.tv_sec + temp.tv_nsec / 1000;
-        if (temp.tv_nsec % 1000 > 500) {
+        milliseconds = (1000 * temp.tv_sec) + (temp.tv_nsec / 1000000);
+        if (temp.tv_nsec % 1000000 > 500000) {
             ++milliseconds;
         }
     }
