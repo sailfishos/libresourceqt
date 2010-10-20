@@ -50,6 +50,10 @@ CONFIG  += qt link_pkgconfig dll
 QT = core
 PKGCONFIG += dbus-1 libresource0
 
+dox.commands   = doxygen Doxyfile
+QMAKE_EXTRA_TARGETS += dox
+PRE_TARGETDEPS += dox
+
 # Install directives
 headers.files  = $${PUBLIC_HEADERS}
 INSTALLBASE    = /usr
@@ -58,5 +62,12 @@ headers.path   = $${INSTALLBASE}/include/resource/qt4/policy
 pc.files       = libresourceqt1.pc
 pc.path        = $${INSTALLBASE}/lib/pkgconfig
 
-INSTALLS       = target headers pc
-	
+man.files      = docs/man
+man.path       = $${INSTALLBASE}/share
+htmldoc.files   = docs/html
+htmldoc.path   = $${INSTALLBASE}/share/doc/libresourceqt
+xmldoc.files    = docs/xml
+xmldoc.path    = $${INSTALLBASE}/share/doc/libresourceqt
+
+INSTALLS       = target headers pc man htmldoc xmldoc
+
