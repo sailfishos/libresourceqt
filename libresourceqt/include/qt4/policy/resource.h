@@ -88,8 +88,22 @@ protected:
     Resource();
     Resource(const Resource &other);
 
+    /**
+     * \internal
+     * This holds the type of the resource.
+     */
     ResourceType resourceType;
+    /**
+     * \internal
+     * This is true when this resource is optional.
+     * \sa isOptional
+     * \sa setOptional
+     */
     bool optional;
+    /**
+     * \internal
+     * This is just a unique identifier for the resource.
+     */
     quint32 identifier;
 private:
     void setGranted();

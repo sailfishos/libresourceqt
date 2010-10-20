@@ -98,13 +98,14 @@ class ResourceSet: public QObject
     Q_DISABLE_COPY(ResourceSet)
 public:
     /**
-     * The constructor.
+     * Alternative constructor with additional parameters for setting
+     * alwaysReply and autoRelease.
      * \param applicationClass This parameter defines the application class.
      * The application class is used to determine the priority order of the
      * application.
-     * \param parent The optional parent of of this class.
-     * \param alwaysReply Set this to true to always get a reply from the
-     * Resource Manager. This optional parameter defaults to false.
+     * \param parent The parent of this class.
+     * \param alwaysReply see setAlwaysReply()
+     * \param autoRelease see setAutoRelease()
      */
     ResourceSet(const QString &applicationClass, QObject *parent,
                 bool alwaysReply, bool autoRelease);
@@ -148,8 +149,7 @@ public:
     /**
      * This method returns a list of all resource in the set.
      * \return a QList of all resources in the set.
-     */
-    QList<Resource *> resources() const;
+     */    QList<Resource *> resources() const;
     /**
      * This method returns a const pointer to a resource of a specific type.
      * \param type The type of resource we are interested in.
