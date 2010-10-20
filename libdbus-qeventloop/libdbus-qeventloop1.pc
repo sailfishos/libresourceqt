@@ -5,7 +5,7 @@ includedir=${prefix}/include
 
 Name: libdbus-qeventloop1
 Description: D-Bus - QEventloop binding
-Version: 1.6
+Version: 1.24
 Libs: -L${libdir} -ldbus-qeventloop
 Cflags: -I${includedir}
 Requires: dbus-1
