@@ -60,6 +60,7 @@ bool CommandLineParser::parseArguments()
                 ++ci;
             case 'm':
             case 's':
+            case 'i':
             case 't':
                 break;
             case 'f':
