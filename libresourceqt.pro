@@ -27,5 +27,9 @@ SUBDIRS = libdbus-qeventloop  \
           libmediaoverridesqt \
           resourceqt-client   \
           mediaoverrider      \
-          tests
+          tests               \
+          demo/player
+
+dist.commands   = ./makedist.sh
+QMAKE_EXTRA_TARGETS += dist
 
