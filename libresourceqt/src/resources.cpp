@@ -29,7 +29,7 @@ AudioRecorderResource::AudioRecorderResource()
 }
 
 AudioRecorderResource::AudioRecorderResource(const AudioRecorderResource &other)
-        :   Resource(other), group(other.group), pid(other.pid), stream(other.stream)
+        :   Resource(other)
 {
 }
 

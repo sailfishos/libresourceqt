@@ -51,9 +51,9 @@ enum ResourceType {
 class ResourceSet;
 
 /**
-* This class is the super class for all resources. It represents a generic
-* \ref Resource. The type specific resource classes should be used.
-*/
+ * This class is the super class for all resources. It represents a generic
+ * \ref Resource. The type specific resource classes should be used.
+ */
 class Resource
 {
     friend class ResourceSet;

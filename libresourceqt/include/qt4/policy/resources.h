@@ -28,127 +28,313 @@ USA.
 namespace ResourcePolicy
 {
 
+/**
+ * The AudioRecorderResource class represents the audio recorder device.
+ */
 class AudioRecorderResource: public Resource
 {
 public:
+	/**
+     * The constructor.
+     */
     AudioRecorderResource();
+	/**
+     * The copy constructor.
+     * \param other The resource to copy from
+     */
     AudioRecorderResource(const AudioRecorderResource &other);
+	/**
+     * The destructor.
+     */
     virtual ~AudioRecorderResource();
 
+	/**
+     * \return the resource type
+     */
     virtual ResourceType type() const;
-private:
-    QString group;
-    quint32 pid;
-    QString stream;
 };
 
+/**
+ * The BacklightResource is used by applications wanting to control the
+ * backlight
+ */
 class BacklightResource: public Resource
 {
 public:
+	/**
+     * The constructor.
+     */
     BacklightResource();
+	/**
+     * The copy constructor.
+     * \param other The resource to copy from
+     */
     BacklightResource(const BacklightResource &other);
+	/**
+     * The destructor.
+     */
     virtual ~BacklightResource();
 
+	/**
+     * \return the resource type
+     */
     virtual ResourceType type() const;
 };
 
+/**
+ * Resource to be used when the application wants to fiddle with the leds.
+ */
 class LedsResource: public Resource
 {
 public:
+	/**
+     * The constructor.
+     */
     LedsResource();
+	/**
+     * The copy constructor.
+     * \param other The resource to copy from
+     */
     LedsResource(const LedsResource &other);
+	/**
+     * The destructor.
+     */
     virtual ~LedsResource();
 
+	/**
+     * \return the resource type
+     */
     virtual ResourceType type() const;
 };
 
+/**
+ * Resource to be used when the application wants to use the vibra.
+ */
 class VibraResource: public Resource
 {
 public:
+	/**
+     * The constructor.
+     */
     VibraResource();
+	/**
+     * The copy constructor.
+     * \param other The resource to copy from
+     */
     VibraResource(const VibraResource &other);
+	/**
+     * The destructor.
+     */
     virtual ~VibraResource();
 
+	/**
+     * \return the resource type
+     */
     virtual ResourceType type() const;
 };
 
+/**
+ * Resource to be used when the application wants to record video.
+ */
 class VideoRecorderResource: public Resource
 {
 public:
+	/**
+     * The constructor.
+     */
     VideoRecorderResource();
+	/**
+     * The copy constructor.
+     * \param other The resource to copy from
+     */
     VideoRecorderResource(const VideoRecorderResource &other);
+	/**
+     * The destructor.
+     */
     virtual ~VideoRecorderResource();
 
+	/**
+     * \return the resource type
+     */
     virtual ResourceType type() const;
 };
 
+/**
+ * Resource to be used when the application wants to render video with the
+ * DSP decoder to render the viewfinder.
+ */
 class VideoResource: public Resource
 {
 public:
+	/**
+     * The constructor.
+     */
     VideoResource();
+	/**
+     * The copy constructor.
+     * \param other The resource to copy from
+     */
     VideoResource(const VideoResource &other);
+	/**
+     * The destructor.
+     */
     virtual ~VideoResource();
 
+	/**
+     * \return the resource type
+     */
     virtual ResourceType type() const;
 };
 
+/**
+ * Resource to be used when the application wants to control the system button.
+ */
 class SystemButtonResource: public Resource
 {
 public:
+	/**
+     * The constructor.
+     */
     SystemButtonResource();
+	/**
+     * The copy constructor.
+     * \param other The resource to copy from
+     */
     SystemButtonResource(const SystemButtonResource &other);
+	/**
+     * The destructor.
+     */
     virtual ~SystemButtonResource();
 
+	/**
+     * \return the resource type
+     */
     virtual ResourceType type() const;
 };
 
 class LockButtonResource: public Resource
 {
 public:
+	/**
+     * The constructor.
+     */
     LockButtonResource();
+	/**
+     * The copy constructor.
+     * \param other The resource to copy from
+     */
     LockButtonResource(const LockButtonResource &other);
+	/**
+     * The destructor.
+     */
     virtual ~LockButtonResource();
 
+	/**
+     * \return the resource type
+     */
     virtual ResourceType type() const;
 };
 
+/**
+ * Resource to be used when the application wants to control
+ * the volume/scale button.
+ */
 class ScaleButtonResource: public Resource
 {
 public:
+	/**
+     * The constructor.
+     */
     ScaleButtonResource();
+	/**
+     * The copy constructor.
+     * \param other The resource to copy from
+     */
     ScaleButtonResource(const ScaleButtonResource &other);
+	/**
+     * The destructor.
+     */
     virtual ~ScaleButtonResource();
 
+	/**
+     * \return the resource type
+     */
     virtual ResourceType type() const;
 };
 
+/**
+ * Resource to be used when the application wants to take still pictures.
+ */
 class SnapButtonResource: public Resource
 {
 public:
+	/**
+     * The constructor.
+     */
     SnapButtonResource();
+	/**
+     * The copy constructor.
+     * \param other The resource to copy from
+     */
     SnapButtonResource(const SnapButtonResource &other);
+	/**
+     * The destructor.
+     */
     virtual ~SnapButtonResource();
 
+	/**
+     * \return the resource type
+     */
     virtual ResourceType type() const;
 };
 
 class LensCoverResource: public Resource
 {
 public:
+	/**
+     * The constructor.
+     */
     LensCoverResource();
+	/**
+     * The copy constructor.
+     * \param other The resource to copy from
+     */
     LensCoverResource(const LensCoverResource &other);
+	/**
+     * The destructor.
+     */
     virtual ~LensCoverResource();
 
+	/**
+     * \return the resource type
+     */
     virtual ResourceType type() const;
 };
 
+/**
+ * Resource to be used when the application wants to control the
+ * headset buttons.
+ */
 class HeadsetButtonsResource: public Resource
 {
 public:
+	/**
+     * The constructor.
+     */
     HeadsetButtonsResource();
+	/**
+     * The copy constructor.
+     * \param other The resource to copy from
+     */
     HeadsetButtonsResource(const HeadsetButtonsResource &other);
+	/**
+     * The destructor.
+     */
     virtual ~HeadsetButtonsResource();
 
+	/**
+     * \return the resource type
+     */
     virtual ResourceType type() const;
 };
 

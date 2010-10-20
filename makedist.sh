@@ -1,6 +1,6 @@
 #!/bin/sh
 
-version="1.23"
+version="1.24"
 name="libresourceqt-$version"
 
 echo "packaging $name"
