@@ -155,7 +155,7 @@ const char * resourceTypeToString(ResourceType type)
     case VideoPlaybackType:
         return "VideoPlayback";
     case VideoRecorderType:
-        return "VideoRegording";
+        return "VideoRecording";
     case VibraType:
         return "Vibra";
     case LedsType:
