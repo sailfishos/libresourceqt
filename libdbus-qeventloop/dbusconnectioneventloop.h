@@ -124,7 +124,7 @@ private:
      */
     Connections	connections;
 
-private slots:
+private Q_SLOTS:
     void readSocket(int fd);
     void writeSocket(int fd);
     void dispatch();
