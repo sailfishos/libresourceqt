@@ -31,5 +31,9 @@ SUBDIRS = libdbus-qeventloop  \
           demo/player
 
 dist.commands   = ./makedist.sh
-QMAKE_EXTRA_TARGETS += dist
+FORCE.commands = $(CHK_DIR_EXISTS) libresourceqt/docs/man || mkdir -p libresourceqt/docs/man ;\
+                 $(CHK_DIR_EXISTS) libresourceqt/docs/xml || mkdir -p libresourceqt/docs/xml ;\
+                 $(CHK_DIR_EXISTS) libresourceqt/docs/html || mkdir -p libresourceqt/docs/html
+
+QMAKE_EXTRA_TARGETS += dist FORCE
 
