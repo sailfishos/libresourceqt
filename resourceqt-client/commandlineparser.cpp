@@ -22,6 +22,8 @@ USA.
 #include <QDebug>
 #include "commandlineparser.h"
 
+extern bool verbose;
+
 QHash<QString, ResourcePolicy::ResourceType> CommandLineParser::resourceValues;
 
 CommandLineParser::CommandLineParser():
@@ -76,6 +78,9 @@ bool CommandLineParser::parseArguments()
                 break;
             case 'u':
                 allowUnkownResourceClass = true;
+                break;
+            case 'v':
+                verbose = true;
                 break;
             case 'h':
             default:
