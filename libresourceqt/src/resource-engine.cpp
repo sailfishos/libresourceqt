@@ -230,12 +230,7 @@ void ResourceEngine::receivedAdvice(resmsg_notify_t *message)
 {
     uint32_t allResources = allResourcesToBitmask(resourceSet);
     qDebug("ResourceEngine(%d) - %s: have: %02x got %02x", identifier, __FUNCTION__, allResources, message->resrc);
-    if(message->resrc < allResources) {
-        emit resourcesLost(allResources-message->resrc);
-    }
-    else {
-        emit resourcesBecameAvailable(message->resrc);
-    }
+	    emit resourcesBecameAvailable(message->resrc);
 }
 
 bool ResourceEngine::connectToManager()
