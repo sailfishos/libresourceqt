@@ -5,7 +5,7 @@ includedir=${prefix}/include/resource/qt4
 
 Name: libmediaoverridesqt1
 Description: Maemo overrides Qt API
-Version: 1.25
+Version: 1.26
 Libs: -L${libdir}
 Cflags: -I${includedir}
 Requires: QtDbus
