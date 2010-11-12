@@ -18,6 +18,44 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
 USA.
 *************************************************************************/
+/**
+ * @file resources.h
+ * @brief Declaration of The different resource classes: 
+ * ResourcePolicy::AudioRecorderResource
+ * ResourcePolicy::BacklightResource
+ * ResourcePolicy::LedsResource
+ * ResourcePolicy::VibraResource
+ * ResourcePolicy::VideoRecorderResource
+ * ResourcePolicy::VideoResource
+ * ResourcePolicy::LockButtonResource
+ * ResourcePolicy::ScaleButtonResource
+ * ResourcePolicy::SystemButtonResource
+ * ResourcePolicy::LensCoverResource
+ * ResourcePolicy::HeadsetButtonsResource
+ *
+ * @copyright Copyright (C) 2010 Nokia Corporation.
+ * @author Wolf Bergenheim
+ * \par License
+ * @license LGPL
+ * This file is part of libresourceqt
+ * \par
+ * Copyright (C) 2010 Nokia Corporation.
+ * \par
+ * This library is free software; you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation
+ * version 2.1 of the License.
+ * \par
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ * \par
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
+ * USA.
+ */
 
 #ifndef RESOURCES_H
 #define RESOURCES_H
@@ -212,6 +250,9 @@ public:
     virtual ResourceType type() const;
 };
 
+/**
+ * Resource to be used when the application wants to control the lock button.
+ */
 class LockButtonResource: public Resource
 {
 public:
