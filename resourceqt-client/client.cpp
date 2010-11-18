@@ -53,7 +53,7 @@ CommandListArgs::~CommandListArgs()
 
 Client::Client()
         : QObject(), standardInput(stdin, QIODevice::ReadOnly), stdInNotifier(0, QSocketNotifier::Read), pendingAddAudio(false), applicationClass(),
-        resourceSet(NULL), output(stdout), prefix("")
+        resourceSet(NULL), output(stdout), prefix(""), showTimings(false)
 {
     commandList["help"] = CommandListArgs("", "print this help message");
     commandList["quit"] = CommandListArgs("", "exit application");
@@ -93,6 +93,7 @@ bool Client::initialize(const CommandLineParser &parser)
     if (parser.shouldAutoRelease()) {
         OUTPUT << "client: AutoRelease" << endl;
     }
+    showTimings = parser.showTimings();
 
     resourceSet = new ResourceSet(parser.resourceApplicationClass(), this,
                                   parser.shouldAlwaysReply(),
@@ -205,10 +206,7 @@ void Client::showResources(const QList<Resource*> &resList)
 
 void Client::resourceAcquiredHandler(const QList<ResourceType>&)
 {
-    long int ms = stop_timer();
-    if (ms > 0) {
-        outputln << "Operation took " << ms << "ms" << endl;
-    }
+    stopTimer();
 
     QList<Resource*> list = resourceSet->resources();
     if (!list.count()) {
@@ -228,10 +226,7 @@ void Client::resourceAcquiredHandler(const QList<ResourceType>&)
 
 void Client::resourceDeniedHandler()
 {
-    long int ms = stop_timer();
-    if (ms > 0) {
-        outputln << "Operation took " << ms << "ms" << endl;
-    }
+    stopTimer();
     QList<Resource*> allResources = resourceSet->resources();
     OUTPUT << "denied:" << allResources << endl;
     showPrompt();
@@ -239,10 +234,7 @@ void Client::resourceDeniedHandler()
 
 void Client::resourceLostHandler()
 {
-    long int ms = stop_timer();
-    if (ms > 0) {
-        outputln << "Operation took " << ms << "ms" << endl;
-    }
+    stopTimer();
 
     QList<Resource*> allResources = resourceSet->resources();
     outputln << "lost:" << allResources << endl;
@@ -251,10 +243,7 @@ void Client::resourceLostHandler()
 
 void Client::resourceReleasedHandler()
 {
-    long int ms = stop_timer();
-    if (ms > 0) {
-        outputln << "Operation took " << ms << "ms" << endl;
-    }
+    stopTimer();
 
     QList<Resource*> allResources = resourceSet->resources();
     outputln << "released:"<< allResources << endl;
@@ -265,10 +254,7 @@ void Client::resourcesBecameAvailableHandler(const QList<ResourcePolicy::Resourc
 {
     if (pendingAddAudio) {
         pendingAddAudio = false;
-        long int ms = stop_timer();
-        if (ms > 0) {
-            outputln << "Operation took " << ms << "ms" << endl;
-        }
+        stopTimer();
     }
     outputln << "advice:" << availableResources << endl;
     showPrompt();
@@ -321,16 +307,16 @@ void Client::readLine(int)
         }
     }
     else if (command == "acquire") {
-        start_timer();
+        startTimer();
         if (!resourceSet || !resourceSet->acquire()) {
-            stop_timer();
+            stopTimer();
             qCritical("%s failed!", qPrintable(command));
         }
     }
     else if (command == "release") {
-        start_timer();
+        startTimer();
         if (!resourceSet || !resourceSet->release()) {
-            stop_timer();
+            stopTimer();
             qCritical("%s failed!", qPrintable(command));
         }
     }
@@ -453,7 +439,7 @@ void Client::readLine(int)
                 audioResource->setProcessID(pid);
                 audioResource->setStreamTag(tagName, tagValue);
                 pendingAddAudio = true;
-                start_timer();
+                startTimer();
                 resourceSet->addResourceObject(audioResource);
             }
         }
@@ -491,3 +477,19 @@ QTextStream & operator<< (QTextStream &output,
     return output;
 }
 
+void Client::startTimer()
+{
+    if (showTimings) {
+        start_timer();
+    }
+}
+
+void Client::stopTimer()
+{
+    if (showTimings) {
+        long int ms = stop_timer();
+        if (ms > 0) {
+            outputln << "Operation took " << ms << " ms" << endl;
+        }
+    }
+}

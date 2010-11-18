@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
     if (!parser.parseArguments()) {
         return 1;
     }
+    verbose = parser.shouldBeVerbose();
 
     if (!client.initialize(parser)) {
         qFatal("Initialization failed");
