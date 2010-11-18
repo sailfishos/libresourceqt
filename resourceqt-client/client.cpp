@@ -133,9 +133,10 @@ bool Client::initialize(const CommandLineParser &parser)
                  this, SLOT(doExit()))) {
         return false;
     }
-    output << "accepting input" << endl;
-    showPrompt();
 
+    resourceSet->initAndConnect();
+    output << "connecting...accepting input" << endl;
+    showPrompt();
     return true;
 }
 

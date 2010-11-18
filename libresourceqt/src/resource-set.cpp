@@ -228,21 +228,34 @@ Resource * ResourceSet::resource(ResourceType type) const
     return resourceSet[type];
 }
 
-bool ResourceSet::acquire()
+bool ResourceSet::initAndConnect()
 {
-    if (!initialized) {
+    if ( !initialized )
+    {
         qDebug("ResourceSet::%s().... initializing...", __FUNCTION__);
-        pendingAcquire = true;
         return initialize();
     }
 
-    if (!resourceEngine->isConnectedToManager()) {
+    if ( !resourceEngine->isConnectedToManager() )
+    {
         qDebug("ResourceSet::%s().... connecting...", __FUNCTION__);
-        pendingAcquire = true;
-        resourceEngine->connectToManager();
-        return true;
+        return resourceEngine->connectToManager();
     }
-    else {
+    else
+        qDebug("ResourceSet::%s(): already connected", __FUNCTION__);
+
+    return true;
+}
+
+bool ResourceSet::acquire()
+{
+    if ( !initialized || !resourceEngine->isConnectedToManager() )
+    {
+        pendingAcquire = true;
+        return initAndConnect();
+    }
+    else
+    {
         qDebug("ResourceSet::%s().... acquiring", __FUNCTION__);
         return resourceEngine->acquireResources();
     }

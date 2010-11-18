@@ -209,6 +209,11 @@ public:
     QString applicationClass();
 
     /**
+      * Initialize and connect the ResourceEngine of this ResourceSet.
+      */
+    bool initAndConnect();
+
+    /**
      * Try to acquire the \ref ResourceSet. The resourcesGranted() or
      * resourcesDenied() signal will be emited depending on whether the
      * requested resources could be acquired or not.
