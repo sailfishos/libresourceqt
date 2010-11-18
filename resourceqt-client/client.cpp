@@ -29,7 +29,8 @@ USA.
 
 #include "client.h"
 
-#define outputln output << "\n"
+#define OUTPUT output << prefix
+#define outputln output << "\n" << prefix
 
 using namespace ResourcePolicy;
 
@@ -52,7 +53,7 @@ CommandListArgs::~CommandListArgs()
 
 Client::Client()
         : QObject(), standardInput(stdin, QIODevice::ReadOnly), stdInNotifier(0, QSocketNotifier::Read), pendingAddAudio(false), applicationClass(),
-        resourceSet(NULL), output(stdout)
+        resourceSet(NULL), output(stdout), prefix("")
 {
     commandList["help"] = CommandListArgs("", "print this help message");
     commandList["quit"] = CommandListArgs("", "exit application");
@@ -75,7 +76,7 @@ Client::~Client()
 
 void Client::showPrompt()
 {
-    output << "resource-Qt> " << flush;
+    OUTPUT << "resource-Qt> " << flush;
 }
 
 bool Client::initialize(const CommandLineParser &parser)
@@ -83,12 +84,14 @@ bool Client::initialize(const CommandLineParser &parser)
     QSet<ResourcePolicy::ResourceType> allResources;
     QSet<ResourcePolicy::ResourceType> optionalResources;
 
+    prefix = parser.getPrefix();
+
     if (parser.shouldAlwaysReply()) {
-        output << "client: AlwaysReply" << endl;
+        OUTPUT << "client: AlwaysReply" << endl;
     }
 
     if (parser.shouldAutoRelease()) {
-        output << "client: AutoRelease" << endl;
+        OUTPUT << "client: AutoRelease" << endl;
     }
 
     resourceSet = new ResourceSet(parser.resourceApplicationClass(), this,
@@ -133,7 +136,7 @@ bool Client::initialize(const CommandLineParser &parser)
                  this, SLOT(doExit()))) {
         return false;
     }
-    output << "accepting input" << endl;
+    OUTPUT << "accepting input" << endl;
     showPrompt();
 
     return true;
@@ -218,7 +221,7 @@ void Client::resourceAcquiredHandler(const QList<ResourceType>&)
                 grantedResources << resource->type();
             }
         }
-        output << "granted:" << grantedResources << endl;
+        OUTPUT << "granted:" << grantedResources << endl;
     }
     showPrompt();
 }
@@ -230,7 +233,7 @@ void Client::resourceDeniedHandler()
         outputln << "Operation took " << ms << "ms" << endl;
     }
     QList<Resource*> allResources = resourceSet->resources();
-    output << "denied:" << allResources << endl;
+    OUTPUT << "denied:" << allResources << endl;
     showPrompt();
 }
 
@@ -291,11 +294,11 @@ void Client::readLine(int)
         return;
     }
     else if (command == "help") {
-        output << "Available commands:\n";
+        OUTPUT << "Available commands:\n";
         QMap<QString, CommandListArgs>::const_iterator i =
             commandList.constBegin();
         while (i != commandList.constEnd()) {
-            output << qSetFieldWidth(10) << right << i.key()
+            OUTPUT << qSetFieldWidth(10) << right << i.key()
             << qSetFieldWidth(1) << " "
             << qSetFieldWidth(55) << left << i.value().args
             << qSetFieldWidth(0) << i.value().help << endl;
@@ -309,7 +312,7 @@ void Client::readLine(int)
         else {
             QList<Resource*> list = resourceSet->resources();
             if (!list.count()) {
-                output << "Resource set is empty, use add command to add some."
+                OUTPUT << "Resource set is empty, use add command to add some."
                 << endl;
             }
             else {
@@ -335,10 +338,10 @@ void Client::readLine(int)
         QString resourceList, flag;
         input >> resourceList >> flag;
         if (!resourceSet) {
-            qCritical("%s failed!", qPrintable(command));
+            qCritical("%s%s failed!", qPrintable(prefix), qPrintable(command));
         }
         else if (resourceList.isEmpty() || resourceList.isNull()) {
-            output << "List of desired resources is missing. Use help.";
+            OUTPUT << "List of desired resources is missing. Use help.";
         }
         else {
             bool optional = false;
@@ -361,10 +364,10 @@ void Client::readLine(int)
         QString resourceList, flag;
         input >> resourceList >> flag;
         if (!resourceSet) {
-            qCritical("%s failed!", qPrintable(command));
+            qCritical("%s%s failed!", qPrintable(prefix), qPrintable(command));
         }
         else if (resourceList.isEmpty() || resourceList.isNull()) {
-            output << "List of desired resources is missing. Use help.";
+            OUTPUT << "List of desired resources is missing. Use help.";
         }
         else {
             QSet<ResourcePolicy::ResourceType> resToRemove;
@@ -383,7 +386,7 @@ void Client::readLine(int)
     }
     else if (command == "update") {
         if (!resourceSet || !resourceSet->update()) {
-            qCritical("%s failed!", qPrintable(command));
+            qCritical("%s%s failed!", qPrintable(prefix), qPrintable(command));
         }
     }
     else if (command == "audio") {
@@ -392,14 +395,14 @@ void Client::readLine(int)
         input >> what;
 
         if (what.isEmpty() || what.isNull()) {
-            output << "Not enough parameters! See help" << endl;
+            OUTPUT << "Not enough parameters! See help" << endl;
         }
         else {
             Resource *resource = resourceSet->resource(AudioPlaybackType);
             AudioResource *audioResource = static_cast<AudioResource*>(resource);
             qDebug("resource = %p audioResource = %p", resource, audioResource);
             if (audioResource == NULL) {
-                output << "No AudioResource available in set!" << endl;
+                OUTPUT << "No AudioResource available in set!" << endl;
             }
             else {
                 if (what == "group") {
@@ -413,14 +416,14 @@ void Client::readLine(int)
                         audioResource->setProcessID(pid);
                     }
                     else {
-                        output << "Bad pid parameter!" << endl;
+                        OUTPUT << "Bad pid parameter!" << endl;
                     }
                 }
                 else if (what == "tag") {
                     input >> tagName >> tagValue;
                     if (tagName.isEmpty() || tagName.isNull() ||
                             tagValue.isEmpty() || tagValue.isNull()) {
-                        output << "tag requires 2 parameters name and value. See help"
+                        OUTPUT << "tag requires 2 parameters name and value. See help"
                         << endl;
                     }
                     else {
@@ -428,7 +431,7 @@ void Client::readLine(int)
                     }
                 }
                 else {
-                    output << "Unknown audio command!";
+                    OUTPUT << "Unknown audio command!";
                 }
             }
         }
@@ -439,12 +442,12 @@ void Client::readLine(int)
         input >> group >> pid >> tagName >> tagValue;
 
         if (group.isEmpty() || (pid == 0) || tagName.isEmpty() || tagValue.isEmpty()) {
-            output << "Invalid parameters! See help!" << endl;
+            OUTPUT << "Invalid parameters! See help!" << endl;
         }
         else {
             AudioResource *audioResource = new AudioResource(group);
             if (audioResource == NULL) {
-                output << "Failed to create an AudioResource object!" << endl;
+                OUTPUT << "Failed to create an AudioResource object!" << endl;
             }
             else {
                 audioResource->setProcessID(pid);
@@ -460,7 +463,7 @@ void Client::readLine(int)
         resourceSet = new ResourceSet(applicationClass);
     }
     else {
-        output << "unknown command '" << command << "'" << endl;
+        OUTPUT << "unknown command '" << command << "'" << endl;
     }
 
     showPrompt();

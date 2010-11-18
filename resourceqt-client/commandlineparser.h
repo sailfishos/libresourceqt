@@ -46,6 +46,7 @@ public:
     bool shouldAutoRelease() const;
     bool shouldAlwaysReply() const;
     bool shouldBeVerbose() const;
+    QString getPrefix() const;
 
 private:
     QSet<ResourcePolicy::ResourceType> allResources;
@@ -57,8 +58,10 @@ private:
     bool verbose;
     bool allowUnkownResourceClass;
     QTextStream output;
+    QString prefix;
 
     bool parseClassString(const QString &str);
+    void parsePrefix(const QString &str);
     bool parseModeValues(const QString &modeListStr);
 
     void usage();

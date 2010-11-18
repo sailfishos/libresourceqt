@@ -28,7 +28,7 @@ QHash<QString, ResourcePolicy::ResourceType> CommandLineParser::resourceValues;
 
 CommandLineParser::CommandLineParser():
         allResources(), optResources(), autoRelease(false), alwaysReply(false),
-        verbose(false), allowUnkownResourceClass(false), output(stdout)
+        verbose(false), allowUnkownResourceClass(false), output(stdout), prefix("")
 {
     resourceValues["AudioPlayback"] = ResourcePolicy::AudioPlaybackType;
     resourceValues["VideoPlayback"] = ResourcePolicy::VideoPlaybackType;
@@ -81,6 +81,9 @@ bool CommandLineParser::parseArguments()
                 break;
             case 'v':
                 verbose = true;
+                break;
+            case 'p':
+                parsePrefix(*(++ci));
                 break;
             case 'h':
             default:
@@ -137,6 +140,16 @@ bool CommandLineParser::parseClassString(const QString &str)
 
     applicationClass = str;
     return true;
+}
+
+void CommandLineParser::parsePrefix(const QString &str)
+{
+    prefix = str + ": ";
+}
+
+QString CommandLineParser::getPrefix() const
+{
+    return prefix;
 }
 
 bool CommandLineParser::parseResourceList(const QString &resourceListStr,

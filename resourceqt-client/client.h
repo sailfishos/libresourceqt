@@ -70,6 +70,7 @@ private:
     QString applicationClass;
     ResourcePolicy::ResourceSet *resourceSet;
     QTextStream output;
+    QString prefix;
 
     static QMap<QString, CommandListArgs> commandList;
 
