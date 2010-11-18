@@ -47,6 +47,7 @@ public:
     bool shouldAlwaysReply() const;
     bool shouldBeVerbose() const;
     QString getPrefix() const;
+    bool showTimings() const;
 
 private:
     QSet<ResourcePolicy::ResourceType> allResources;
@@ -59,6 +60,7 @@ private:
     bool allowUnkownResourceClass;
     QTextStream output;
     QString prefix;
+    bool timings;
 
     bool parseClassString(const QString &str);
     void parsePrefix(const QString &str);

@@ -28,7 +28,8 @@ QHash<QString, ResourcePolicy::ResourceType> CommandLineParser::resourceValues;
 
 CommandLineParser::CommandLineParser():
         allResources(), optResources(), autoRelease(false), alwaysReply(false),
-        verbose(false), allowUnkownResourceClass(false), output(stdout), prefix("")
+        verbose(false), allowUnkownResourceClass(false), output(stdout), prefix(""),
+        timings(false)
 {
     resourceValues["AudioPlayback"] = ResourcePolicy::AudioPlaybackType;
     resourceValues["VideoPlayback"] = ResourcePolicy::VideoPlaybackType;
@@ -63,6 +64,8 @@ bool CommandLineParser::parseArguments()
             case 'm':
             case 's':
             case 'i':
+                timings = true;
+                break;
             case 't':
                 break;
             case 'f':
@@ -195,11 +198,14 @@ bool CommandLineParser::parseModeValues(const QString &modeListStr)
 
 void CommandLineParser::usage()
 {
-    output << "usage: resourceqt-client [-h] [-m mode-values]" <<
-    "[-o optional-resources] [-s shared-resources -m shared-mask] " <<
+    output << "usage: resourceqt-client [-h] [-f mode-values]" <<
+    "[-o optional-resources] [-i] [-v] [-p prefix] " <<
     "class all-resources" << endl;
     output << "\toptions:" << endl;
     output << "\t  h\tprint this help message and exit" << endl;
+    output << "\t i\tshow timings of requests" << endl;
+    output << "\t v\tshow debug of libresourceqt" << endl;
+    output << "\t p\tPrefix all output with the given prefix" << endl;
     output << "\t  f\tmode values. See 'modes' below for the "
     "\n\t\tsyntax of <mode-values>" << endl;
     output << "\t  o\toptional resources. See 'resources' below for the "
@@ -260,3 +266,7 @@ bool CommandLineParser::shouldBeVerbose() const
     return verbose;
 }
 
+bool CommandLineParser::showTimings() const
+{
+    return timings;
+}
