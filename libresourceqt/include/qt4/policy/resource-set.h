@@ -298,6 +298,11 @@ signals:
      */
     void errorCallback(quint32, const char*);
 
+    /**
+      * This signals that we have connected to the Resource Manager.
+      */
+    void connectedToManager();
+
 private:
 
     bool initialize();

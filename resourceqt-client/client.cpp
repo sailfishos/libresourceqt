@@ -129,11 +129,15 @@ bool Client::initialize(const CommandLineParser &parser)
     if (!connect(&stdInNotifier, SIGNAL(activated(int)), this, SLOT(readLine(int)))) {
         return false;
     }
+    if (!connect(resourceSet , SIGNAL(connectedToManager()), this, SLOT(stopConnectTimerHandler()))) {
+        return false;
+    }
     if (!connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()),
                  this, SLOT(doExit()))) {
         return false;
     }
 
+    start_timer();
     resourceSet->initAndConnect();
     output << "connecting...accepting input" << endl;
     showPrompt();
@@ -145,6 +149,7 @@ void Client::doExit()
     if (resourceSet != NULL)
         resourceSet->release();
 }
+
 
 const char * resourceTypeToString(ResourceType type)
 {
@@ -199,6 +204,15 @@ void Client::showResources(const QList<Resource*> &resList)
             output << " (granted)";
         output << endl;
     }
+}
+
+void Client::stopConnectTimerHandler()
+{
+    long int ms = stop_timer();
+    if (ms > 0) {
+        outputln << "Register took " << ms << "ms" << endl;
+    }
+
 }
 
 void Client::resourceAcquiredHandler(const QList<ResourceType>&)

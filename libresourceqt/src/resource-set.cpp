@@ -322,6 +322,7 @@ void ResourceSet::connectedHandler()
     qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
     if (resourceEngine->isConnectedToManager()) {
         qDebug("ResourceSet::%s() Connected to manager!", __FUNCTION__);
+        emit connectedToManager();
 
         if (pendingAudioProperties) {
             registerAudioProperties();
