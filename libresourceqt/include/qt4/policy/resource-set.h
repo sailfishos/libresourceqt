@@ -104,6 +104,10 @@ USA.
  * So it is important that you connect to it.
  *
  * To modify the properties of the resources you can use the ResourcePolicy::ResourceSet::resource() method.
+ *
+ * \section see_devel_doc See Also
+ * For a more detailed guide see the
+ * <a href="https://projects.maemo.org/mediawiki/index.php/Maemo_Developer_Guide/Developing_Harmattan_applications/Application_policy_guidelines">Application policy guidelines</a>.
  */
 
 /**
