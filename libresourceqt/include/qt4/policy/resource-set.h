@@ -210,6 +210,8 @@ public:
 
     /**
       * Initialize and connect the ResourceEngine of this ResourceSet.
+      * Use this method after adding resources to the ResourceSet initially.
+      *  \return true if the method succeeds without encountering errors.
       */
     bool initAndConnect();
 

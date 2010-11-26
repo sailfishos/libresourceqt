@@ -59,9 +59,8 @@ Client::Client()
     commandList["free"] = CommandListArgs("", "destroy and free the resources");
     commandList["acquire"] = CommandListArgs("", "acquire required resources");
     commandList["release"] = CommandListArgs("", "release resources");
-    commandList["update"] = CommandListArgs("", "update modified resource set after add or remove command");
-    commandList["add"] = CommandListArgs("reslist [-o]", "add resource list, if -o provided, set as optional");
-    commandList["remove"] = CommandListArgs("reslist [-o]", "remove resource list, if -o provided, removed only optional flag");
+    commandList["update"] = CommandListArgs("update all[:opt] where 'all' and 'opt' are comma separated resources",
+                                               "update the resource set by specifying the new set");
     commandList["audio"] = CommandListArgs("pid <pid> | group <audio group> | tag <name> <value>", "set audio properties");
     commandList["addaudio"] = CommandListArgs("<audio group> <pid> <tag name> <tag value>", "Add an audio resource and set the properties");
     commandList["show"] = CommandListArgs("", "show resources");
@@ -148,6 +147,80 @@ void Client::doExit()
 {
     if (resourceSet != NULL)
         resourceSet->release();
+}
+
+
+void Client::modifyResources(QString resString)
+{
+    //resString example: [mand_resources:opt_resources] res1,res2,res3:res1,res3
+   if ( resString.isEmpty() || resString.isNull())
+   {
+       qDebug("Client::modifyResources(): no resources in string.");
+       return;
+   }
+   QStringList newAllAndOpt = resString.split(":");
+
+   if (newAllAndOpt.size()==1)
+       qDebug("There are only manditory resources.");
+
+   //Every optional res. is also in allSet
+   QSet<ResourcePolicy::ResourceType> newAllSet;
+   QSet<ResourcePolicy::ResourceType> newOptSet;
+
+   if ( !CommandLineParser::parseResourceList(newAllAndOpt.at(0), newAllSet) )
+       return;
+
+   if (newAllAndOpt.size()>1)
+   {
+       if ( !CommandLineParser::parseResourceList(newAllAndOpt.at(1), newOptSet) )
+           return;
+       //If the user forgot to add resource to all when specifying optional -> add to all.
+       foreach(ResourceType newOptRes, newOptSet)
+       {
+           if ( !newAllSet.contains(newOptRes) )
+           {
+               qDebug("Client::modifyResources(): optional resources should be added to all as well.");
+               newAllSet.insert(newOptRes);
+           }
+       }
+   }
+
+   QSet<ResourceType>::iterator newResIt = newAllSet.begin();
+   QList<Resource*>             resList  = resourceSet->resources();
+
+   //Check if new resources are in current resource set.
+   while (newResIt != newAllSet.end())
+   {
+        ResourceType newRes = *newResIt;
+
+        if ( resourceSet->contains(newRes) )
+        {
+            if ( resourceSet->resource(newRes)->isOptional() && !newOptSet.contains(newRes) ) {
+                //New manditory is in set, but is not optional in the new set.
+                resourceSet->resource(newRes)->setOptional(false);
+            }
+            else if ( !resourceSet->resource(newRes)->isOptional() && newOptSet.contains(newRes) )
+            {
+                //New manditory is in set, but is optional.
+                resourceSet->resource(newRes)->setOptional(true);
+            }
+        }
+        else
+        {   //Add new resource.
+            resourceSet->addResource(newRes);
+
+            if ( newOptSet.contains(newRes) )
+                resourceSet->resource(newRes)->setOptional(true);
+
+        }
+        ++newResIt;
+    }
+
+    //Check if there are current resources not in the new set (i.e. removed).
+    foreach(Resource* resource, resList)
+        if ( !newAllSet.contains(resource->type()) )
+            resourceSet->deleteResource(resource->type());
+
 }
 
 
@@ -346,60 +419,29 @@ void Client::readLine(int)
             qCritical("%s failed!", qPrintable(command));
         }
     }
-    else if (command == "add") {
-        QString resourceList, flag;
-        input >> resourceList >> flag;
-        if (!resourceSet) {
-            qCritical("%s failed!", qPrintable(command));
-        }
-        else if (resourceList.isEmpty() || resourceList.isNull()) {
-            output << "List of desired resources is missing. Use help.";
-        }
-        else {
-            bool optional = false;
-            QSet<ResourcePolicy::ResourceType> resToAdd;
-            CommandLineParser::parseResourceList(resourceList, resToAdd);
-            if (flag == "-o") {
-                optional = true;
-            }
-            foreach(ResourcePolicy::ResourceType resource, resToAdd) {
-                if (!resourceSet->contains(resource)) {
-                    resourceSet->addResource(resource);
-                }
-                if (optional) {
-                    resourceSet->resource(resource)->setOptional();
-                }
-            }
-        }
-    }
-    else if (command == "remove") {
-        QString resourceList, flag;
-        input >> resourceList >> flag;
-        if (!resourceSet) {
-            qCritical("%s failed!", qPrintable(command));
-        }
-        else if (resourceList.isEmpty() || resourceList.isNull()) {
-            output << "List of desired resources is missing. Use help.";
-        }
-        else {
-            QSet<ResourcePolicy::ResourceType> resToRemove;
-            CommandLineParser::parseResourceList(resourceList, resToRemove);
-            if (flag == "-o") {
-                foreach(ResourcePolicy::ResourceType resource, resToRemove) {
-                    resourceSet->resource(resource)->setOptional(false);
-                }
-            }
-            else {
-                foreach(ResourcePolicy::ResourceType resource, resToRemove) {
-                    resourceSet->deleteResource(resource);
-                }
-            }
-        }
-    }
+
     else if (command == "update") {
-        if (!resourceSet || !resourceSet->update()) {
+
+        QString resourceList;
+        input >> resourceList;
+
+        if (!resourceSet)
             qCritical("%s failed!", qPrintable(command));
+
+        if (resourceList.isEmpty() || resourceList.isNull())
+        {
+             qCritical("%s failed! List of desired resources is missing. Use help.",
+                       qPrintable(command));
         }
+        else
+        {
+            start_timer();
+            modifyResources(resourceList);
+
+            if (!resourceSet->update())
+                qCritical("%s failed!", qPrintable(command));
+        }
+
     }
     else if (command == "audio") {
         QString what, group, tagName, tagValue;

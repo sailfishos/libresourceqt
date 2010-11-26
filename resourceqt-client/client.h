@@ -80,6 +80,7 @@ private:
     void showPrompt();
     void showResources(const QList<ResourcePolicy::ResourceType> &resList);
     void showResources(const QList<ResourcePolicy::Resource*> &resList);
+    void modifyResources(QString resString);
 };
 
 QTextStream & operator<< (QTextStream &output,
