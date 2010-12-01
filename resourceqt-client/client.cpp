@@ -138,7 +138,7 @@ bool Client::initialize(const CommandLineParser &parser)
 
     start_timer();
     resourceSet->initAndConnect();
-    output << "connecting...accepting input" << endl;
+    output << "accepting input" << endl;
     showPrompt();
     return true;
 }
@@ -150,72 +150,64 @@ void Client::doExit()
 }
 
 
-void Client::modifyResources(QString resString)
+void Client::modifyResources(const QString &resString)
 {
     //resString example: [mand_resources:opt_resources] res1,res2,res3:res1,res3
-   if ( resString.isEmpty() || resString.isNull())
-   {
+   if ( resString.isEmpty() || resString.isNull()){
        qDebug("Client::modifyResources(): no resources in string.");
        return;
    }
    QStringList newAllAndOpt = resString.split(":");
 
    if (newAllAndOpt.size()==1)
-       qDebug("There are only manditory resources.");
+       qDebug("There are only mandatory resources.");
 
    //Every optional res. is also in allSet
    QSet<ResourcePolicy::ResourceType> newAllSet;
    QSet<ResourcePolicy::ResourceType> newOptSet;
 
-   if ( !CommandLineParser::parseResourceList(newAllAndOpt.at(0), newAllSet) )
+   if ( !CommandLineParser::parseResourceList(newAllAndOpt.at(0), newAllSet) ) {
+       qDebug("Client::modifyResources(): could not parse all resources.");
        return;
+   }
 
-   if (newAllAndOpt.size()>1)
-   {
-       if ( !CommandLineParser::parseResourceList(newAllAndOpt.at(1), newOptSet) )
+   if (newAllAndOpt.size()>1) {
+       if ( !CommandLineParser::parseResourceList(newAllAndOpt.at(1), newOptSet) ){
+           qDebug("Client::modifyResources(): could not parse optional resources.");
            return;
+       }
+       bool optNotInAll = false;
        //If the user forgot to add resource to all when specifying optional -> add to all.
-       foreach(ResourceType newOptRes, newOptSet)
-       {
-           if ( !newAllSet.contains(newOptRes) )
-           {
-               qDebug("Client::modifyResources(): optional resources should be added to all as well.");
+       foreach(ResourceType newOptRes, newOptSet){
+           if ( !newAllSet.contains(newOptRes) ){
+               optNotInAll = true;
                newAllSet.insert(newOptRes);
            }
        }
+       if (optNotInAll)
+           qDebug("Client::modifyResources(): optional resources should be added to all as well.");
    }
 
-   QSet<ResourceType>::iterator newResIt = newAllSet.begin();
-   QList<Resource*>             resList  = resourceSet->resources();
-
    //Check if new resources are in current resource set.
-   while (newResIt != newAllSet.end())
-   {
-        ResourceType newRes = *newResIt;
-
-        if ( resourceSet->contains(newRes) )
-        {
+   foreach ( ResourceType newRes, newAllSet) {
+        if ( resourceSet->contains(newRes) ){
             if ( resourceSet->resource(newRes)->isOptional() && !newOptSet.contains(newRes) ) {
-                //New manditory is in set, but is not optional in the new set.
+                //New mandatory is in set, but is not optional in the new set.
                 resourceSet->resource(newRes)->setOptional(false);
             }
-            else if ( !resourceSet->resource(newRes)->isOptional() && newOptSet.contains(newRes) )
-            {
-                //New manditory is in set, but is optional.
+            else if ( !resourceSet->resource(newRes)->isOptional() && newOptSet.contains(newRes) ){
+                //New mandatory is in set, but is optional.
                 resourceSet->resource(newRes)->setOptional(true);
             }
         }
-        else
-        {   //Add new resource.
+        else {   //Add new resource.
             resourceSet->addResource(newRes);
 
             if ( newOptSet.contains(newRes) )
                 resourceSet->resource(newRes)->setOptional(true);
-
         }
-        ++newResIt;
     }
-
+    QList<Resource*> resList  = resourceSet->resources();
     //Check if there are current resources not in the new set (i.e. removed).
     foreach(Resource* resource, resList)
         if ( !newAllSet.contains(resource->type()) )

@@ -230,14 +230,12 @@ Resource * ResourceSet::resource(ResourceType type) const
 
 bool ResourceSet::initAndConnect()
 {
-    if ( !initialized )
-    {
+    if ( !initialized ) {
         qDebug("ResourceSet::%s().... initializing...", __FUNCTION__);
         return initialize();
     }
 
-    if ( !resourceEngine->isConnectedToManager() )
-    {
+    if ( !resourceEngine->isConnectedToManager() ) {
         qDebug("ResourceSet::%s().... connecting...", __FUNCTION__);
         return resourceEngine->connectToManager();
     }
