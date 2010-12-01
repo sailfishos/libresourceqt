@@ -284,6 +284,12 @@ signals:
      */
     void resourcesReleased();
     /**
+      * This signal is emited when the manager releases our acquired resources,
+      * so that we have to acquire them again when the user wishes to interact
+      * with us.
+      */
+    void resourcesReleasedByManager();
+    /**
      * This signal is emitted when some other program with a higher priority
      * supersedes us, and as a result we loose (some of) our resources.
      * It is very important to connect to this signal as it is signaling when

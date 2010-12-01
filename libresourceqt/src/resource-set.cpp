@@ -80,6 +80,8 @@ bool ResourceSet::initialize()
                      this, SLOT(handleResourcesBecameAvailable(quint32)));
     QObject::connect(resourceEngine, SIGNAL(errorCallback(quint32, const char*)),
                      this, SIGNAL(errorCallback(quint32, const char*)));
+    QObject::connect(resourceEngine, SIGNAL(resourcesReleasedByManager()),
+                     this, SIGNAL(resourcesReleasedByManager()));
 
     qDebug("initializing resource engine...");
     if (!resourceEngine->initialize()) {

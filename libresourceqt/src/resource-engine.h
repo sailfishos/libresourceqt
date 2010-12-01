@@ -65,6 +65,7 @@ public:
     void disconnected();
     void receivedGrant(resmsg_notify_t *notifyMessage);
     void receivedAdvice(resmsg_notify_t *notifyMessage);
+    void receivedRelease(resmsg_notify_t *notifyMessage);
 
     void handleStatusMessage(quint32 requestNo);
     void handleError(quint32 requestNo, qint32 code, const char *message);
@@ -81,6 +82,7 @@ signals:
     void connectedToManager();
     void disconnectedFromManager();
     void errorCallback(quint32 code, const char* );
+    void resourcesReleasedByManager();
 
 private:
     bool connected;

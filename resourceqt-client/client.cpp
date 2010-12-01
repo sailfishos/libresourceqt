@@ -130,6 +130,10 @@ bool Client::initialize(const CommandLineParser &parser)
                  this, SLOT(resourcesBecameAvailableHandler(const QList<ResourcePolicy::ResourceType> &)))) {
         return false;
     }
+    if (!connect(resourceSet, SIGNAL(resourcesReleasedByManager()),
+                 this, SLOT(resourceReleasedByManagerHandler()))) {
+        return false;
+    }
     if (!connect(&stdInNotifier, SIGNAL(activated(int)), this, SLOT(readLine(int)))) {
         return false;
     }
@@ -247,6 +251,15 @@ void Client::resourceReleasedHandler()
 
     QList<Resource*> allResources = resourceSet->resources();
     outputln << "released:"<< allResources << endl;
+    showPrompt();
+}
+
+void Client::resourceReleasedByManagerHandler()
+{
+    stopTimer();
+
+    QList<Resource*> allResources = resourceSet->resources();
+    outputln << "mgr-released:"<< allResources << endl;
     showPrompt();
 }
 

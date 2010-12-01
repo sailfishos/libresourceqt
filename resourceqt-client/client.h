@@ -59,6 +59,7 @@ private slots:
     void resourceDeniedHandler();
     void resourceLostHandler();
     void resourceReleasedHandler();
+    void resourceReleasedByManagerHandler();
     void resourcesBecameAvailableHandler(const QList<ResourcePolicy::ResourceType> &availableResources);
     void readLine(int);
     void doExit();

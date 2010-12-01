@@ -39,6 +39,7 @@ static void statusCallbackHandler(resset_t *rset, resmsg_t *msg);
 static void handleUnregisterMessage(resmsg_t *, resset_t *, void *data);
 static void handleGrantMessage(resmsg_t *msg, resset_t *rs, void *data);
 static void handleAdviceMessage(resmsg_t *msg, resset_t *rs, void *data);
+static void handleReleaseMessage(resmsg_t *message, resset_t *rs, void *data);
 
 ResourceEngine::ResourceEngine(ResourceSet *resourceSet)
         : QObject(), connected(false), resourceSet(resourceSet),
@@ -111,6 +112,7 @@ bool ResourceEngine::initialize()
         resproto_set_handler(ResourceEngine::libresourceConnection, RESMSG_UNREGISTER, handleUnregisterMessage);
         resproto_set_handler(ResourceEngine::libresourceConnection, RESMSG_GRANT, handleGrantMessage);
         resproto_set_handler(ResourceEngine::libresourceConnection, RESMSG_ADVICE, handleAdviceMessage);
+        resproto_set_handler(ResourceEngine::libresourceConnection, RESMSG_RELEASE, handleReleaseMessage);
         engineMap.insert(ResourceEngine::libresourceConnection, this);
     }
     else {
@@ -186,12 +188,12 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
             emit resourcesLost(allResourcesToBitmask(resourceSet));
         }
         else if (originaloriginalMessageType == RESMSG_ACQUIRE) {
-                qDebug("ResourceEngine(%d) - request DENIED!", identifier);
-                emit resourcesDenied();
+            qDebug("ResourceEngine(%d) - request DENIED!", identifier);
+            emit resourcesDenied();
         }
         else if (originaloriginalMessageType == RESMSG_RELEASE) {
-                qDebug("ResourceEngine(%d) - confirmation to release", identifier);
-                emit resourcesReleased();
+            qDebug("ResourceEngine(%d) - confirmation to release", identifier);
+            emit resourcesReleased();
         }
         else {
             qDebug("ResourceEngine(%d) - Ignoring the receivedGrant", identifier);
@@ -203,6 +205,34 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
         emit resourcesGranted(notifyMessage->resrc);
     }
     messageMap.remove(notifyMessage->reqno);
+}
+
+static void handleReleaseMessage(resmsg_t *message, resset_t *rs, void *)
+{
+    qDebug("**************** %s() - locking....", __FUNCTION__);
+    QMutexLocker locker(&mutex);
+    if (NULL == rs->userdata) {
+        qDebug("IGNORING release, no context");
+        return;
+    }
+    ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(rs->userdata);
+    qDebug("recv: release: type=%d, id=%d, reqno=%d, resc=0x%04x engine->id() = %d",
+           message->notify.type, message->notify.id, message->notify.reqno,
+           message->notify.resrc, engine->id());
+    if(engine->id() != message->any.id) {
+        qDebug("Received an advice message, but it is not for us. Ignoring (%d != %d)",
+               engine->id(), message->any.id);
+        return;
+    }
+
+    engine->receivedRelease(&(message->notify));
+}
+
+void ResourceEngine::receivedRelease(resmsg_notify_t *message)
+{
+    uint32_t allResources = allResourcesToBitmask(resourceSet);
+    qDebug("ResourceEngine(%d) - %s: have: %02x got %02x", identifier, __FUNCTION__, allResources, message->resrc);
+    emit resourcesReleasedByManager();
 }
 
 static void handleAdviceMessage(resmsg_t *message, resset_t *libresourceSet, void *)
