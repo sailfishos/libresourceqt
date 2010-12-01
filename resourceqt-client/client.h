@@ -71,6 +71,8 @@ private:
     QString applicationClass;
     ResourcePolicy::ResourceSet *resourceSet;
     QTextStream output;
+    QString prefix;
+    bool showTimings;
 
     static QMap<QString, CommandListArgs> commandList;
 
@@ -81,6 +83,8 @@ private:
     void showResources(const QList<ResourcePolicy::ResourceType> &resList);
     void showResources(const QList<ResourcePolicy::Resource*> &resList);
     void modifyResources(const QString &resString);
+    inline void startTimer();
+    inline void stopTimer();
 };
 
 QTextStream & operator<< (QTextStream &output,

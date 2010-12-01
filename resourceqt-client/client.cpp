@@ -29,7 +29,8 @@ USA.
 
 #include "client.h"
 
-#define outputln output << "\n"
+#define OUTPUT output << prefix
+#define outputln output << "\n" << prefix
 
 using namespace ResourcePolicy;
 
@@ -52,14 +53,14 @@ CommandListArgs::~CommandListArgs()
 
 Client::Client()
         : QObject(), standardInput(stdin, QIODevice::ReadOnly), stdInNotifier(0, QSocketNotifier::Read), pendingAddAudio(false), applicationClass(),
-        resourceSet(NULL), output(stdout)
+        resourceSet(NULL), output(stdout), prefix(""), showTimings(false)
 {
     commandList["help"] = CommandListArgs("", "print this help message");
     commandList["quit"] = CommandListArgs("", "exit application");
     commandList["free"] = CommandListArgs("", "destroy and free the resources");
     commandList["acquire"] = CommandListArgs("", "acquire required resources");
     commandList["release"] = CommandListArgs("", "release resources");
-    commandList["update"] = CommandListArgs("update all[:opt] where 'all' and 'opt' are comma separated resources",
+    commandList["update"] = CommandListArgs("update <all>[:opt] where 'all' and 'opt' are comma separated resources",
                                                "update the resource set by specifying the new set");
     commandList["audio"] = CommandListArgs("pid <pid> | group <audio group> | tag <name> <value>", "set audio properties");
     commandList["addaudio"] = CommandListArgs("<audio group> <pid> <tag name> <tag value>", "Add an audio resource and set the properties");
@@ -74,7 +75,7 @@ Client::~Client()
 
 void Client::showPrompt()
 {
-    output << "resource-Qt> " << flush;
+    OUTPUT << "resource-Qt> " << flush;
 }
 
 bool Client::initialize(const CommandLineParser &parser)
@@ -82,13 +83,16 @@ bool Client::initialize(const CommandLineParser &parser)
     QSet<ResourcePolicy::ResourceType> allResources;
     QSet<ResourcePolicy::ResourceType> optionalResources;
 
+    prefix = parser.getPrefix();
+
     if (parser.shouldAlwaysReply()) {
-        output << "client: AlwaysReply" << endl;
+        OUTPUT << "client: AlwaysReply" << endl;
     }
 
     if (parser.shouldAutoRelease()) {
-        output << "client: AutoRelease" << endl;
+        OUTPUT << "client: AutoRelease" << endl;
     }
+    showTimings = parser.showTimings();
 
     resourceSet = new ResourceSet(parser.resourceApplicationClass(), this,
                                   parser.shouldAlwaysReply(),
@@ -136,9 +140,9 @@ bool Client::initialize(const CommandLineParser &parser)
         return false;
     }
 
-    start_timer();
+    startTimer();
     resourceSet->initAndConnect();
-    output << "accepting input" << endl;
+    OUTPUT << "accepting input" << endl;
     showPrompt();
     return true;
 }
@@ -273,19 +277,12 @@ void Client::showResources(const QList<Resource*> &resList)
 
 void Client::stopConnectTimerHandler()
 {
-    long int ms = stop_timer();
-    if (ms > 0) {
-        outputln << "Register took " << ms << "ms" << endl;
-    }
-
+    stopTimer();
 }
 
 void Client::resourceAcquiredHandler(const QList<ResourceType>&)
 {
-    long int ms = stop_timer();
-    if (ms > 0) {
-        outputln << "Operation took " << ms << "ms" << endl;
-    }
+    stopTimer();
 
     QList<Resource*> list = resourceSet->resources();
     if (!list.count()) {
@@ -298,28 +295,22 @@ void Client::resourceAcquiredHandler(const QList<ResourceType>&)
                 grantedResources << resource->type();
             }
         }
-        output << "granted:" << grantedResources << endl;
+        OUTPUT << "granted:" << grantedResources << endl;
     }
     showPrompt();
 }
 
 void Client::resourceDeniedHandler()
 {
-    long int ms = stop_timer();
-    if (ms > 0) {
-        outputln << "Operation took " << ms << "ms" << endl;
-    }
+    stopTimer();
     QList<Resource*> allResources = resourceSet->resources();
-    output << "denied:" << allResources << endl;
+    OUTPUT << "denied:" << allResources << endl;
     showPrompt();
 }
 
 void Client::resourceLostHandler()
 {
-    long int ms = stop_timer();
-    if (ms > 0) {
-        outputln << "Operation took " << ms << "ms" << endl;
-    }
+    stopTimer();
 
     QList<Resource*> allResources = resourceSet->resources();
     outputln << "lost:" << allResources << endl;
@@ -328,10 +319,7 @@ void Client::resourceLostHandler()
 
 void Client::resourceReleasedHandler()
 {
-    long int ms = stop_timer();
-    if (ms > 0) {
-        outputln << "Operation took " << ms << "ms" << endl;
-    }
+    stopTimer();
 
     QList<Resource*> allResources = resourceSet->resources();
     outputln << "released:"<< allResources << endl;
@@ -342,10 +330,7 @@ void Client::resourcesBecameAvailableHandler(const QList<ResourcePolicy::Resourc
 {
     if (pendingAddAudio) {
         pendingAddAudio = false;
-        long int ms = stop_timer();
-        if (ms > 0) {
-            outputln << "Operation took " << ms << "ms" << endl;
-        }
+        stopTimer();
     }
     outputln << "advice:" << availableResources << endl;
     showPrompt();
@@ -371,11 +356,11 @@ void Client::readLine(int)
         return;
     }
     else if (command == "help") {
-        output << "Available commands:\n";
+        OUTPUT << "Available commands:\n";
         QMap<QString, CommandListArgs>::const_iterator i =
             commandList.constBegin();
         while (i != commandList.constEnd()) {
-            output << qSetFieldWidth(10) << right << i.key()
+            OUTPUT << qSetFieldWidth(10) << right << i.key()
             << qSetFieldWidth(1) << " "
             << qSetFieldWidth(55) << left << i.value().args
             << qSetFieldWidth(0) << i.value().help << endl;
@@ -389,7 +374,7 @@ void Client::readLine(int)
         else {
             QList<Resource*> list = resourceSet->resources();
             if (!list.count()) {
-                output << "Resource set is empty, use add command to add some."
+                OUTPUT << "Resource set is empty, use add command to add some."
                 << endl;
             }
             else {
@@ -398,20 +383,19 @@ void Client::readLine(int)
         }
     }
     else if (command == "acquire") {
-        start_timer();
+        startTimer();
         if (!resourceSet || !resourceSet->acquire()) {
-            stop_timer();
+            stopTimer();
             qCritical("%s failed!", qPrintable(command));
         }
     }
     else if (command == "release") {
-        start_timer();
+        startTimer();
         if (!resourceSet || !resourceSet->release()) {
-            stop_timer();
+            stopTimer();
             qCritical("%s failed!", qPrintable(command));
         }
     }
-
     else if (command == "update") {
 
         QString resourceList;
@@ -420,14 +404,12 @@ void Client::readLine(int)
         if (!resourceSet)
             qCritical("%s failed!", qPrintable(command));
 
-        if (resourceList.isEmpty() || resourceList.isNull())
-        {
+        if (resourceList.isEmpty() || resourceList.isNull()) {
              qCritical("%s failed! List of desired resources is missing. Use help.",
                        qPrintable(command));
         }
-        else
-        {
-            start_timer();
+        else {
+            startTimer();
             modifyResources(resourceList);
 
             if (!resourceSet->update())
@@ -441,14 +423,14 @@ void Client::readLine(int)
         input >> what;
 
         if (what.isEmpty() || what.isNull()) {
-            output << "Not enough parameters! See help" << endl;
+            OUTPUT << "Not enough parameters! See help" << endl;
         }
         else {
             Resource *resource = resourceSet->resource(AudioPlaybackType);
             AudioResource *audioResource = static_cast<AudioResource*>(resource);
             qDebug("resource = %p audioResource = %p", resource, audioResource);
             if (audioResource == NULL) {
-                output << "No AudioResource available in set!" << endl;
+                OUTPUT << "No AudioResource available in set!" << endl;
             }
             else {
                 if (what == "group") {
@@ -462,14 +444,14 @@ void Client::readLine(int)
                         audioResource->setProcessID(pid);
                     }
                     else {
-                        output << "Bad pid parameter!" << endl;
+                        OUTPUT << "Bad pid parameter!" << endl;
                     }
                 }
                 else if (what == "tag") {
                     input >> tagName >> tagValue;
                     if (tagName.isEmpty() || tagName.isNull() ||
                             tagValue.isEmpty() || tagValue.isNull()) {
-                        output << "tag requires 2 parameters name and value. See help"
+                        OUTPUT << "tag requires 2 parameters name and value. See help"
                         << endl;
                     }
                     else {
@@ -477,7 +459,7 @@ void Client::readLine(int)
                     }
                 }
                 else {
-                    output << "Unknown audio command!";
+                    OUTPUT << "Unknown audio command!";
                 }
             }
         }
@@ -488,18 +470,18 @@ void Client::readLine(int)
         input >> group >> pid >> tagName >> tagValue;
 
         if (group.isEmpty() || (pid == 0) || tagName.isEmpty() || tagValue.isEmpty()) {
-            output << "Invalid parameters! See help!" << endl;
+            OUTPUT << "Invalid parameters! See help!" << endl;
         }
         else {
             AudioResource *audioResource = new AudioResource(group);
             if (audioResource == NULL) {
-                output << "Failed to create an AudioResource object!" << endl;
+                OUTPUT << "Failed to create an AudioResource object!" << endl;
             }
             else {
                 audioResource->setProcessID(pid);
                 audioResource->setStreamTag(tagName, tagValue);
                 pendingAddAudio = true;
-                start_timer();
+                startTimer();
                 resourceSet->addResourceObject(audioResource);
             }
         }
@@ -509,7 +491,7 @@ void Client::readLine(int)
         resourceSet = new ResourceSet(applicationClass);
     }
     else {
-        output << "unknown command '" << command << "'" << endl;
+        OUTPUT << "unknown command '" << command << "'" << endl;
     }
 
     showPrompt();
@@ -537,3 +519,19 @@ QTextStream & operator<< (QTextStream &output,
     return output;
 }
 
+void Client::startTimer()
+{
+    if (showTimings) {
+        start_timer();
+    }
+}
+
+void Client::stopTimer()
+{
+    if (showTimings) {
+        long int ms = stop_timer();
+        if (ms > 0) {
+            outputln << "Operation took " << ms << " ms" << endl;
+        }
+    }
+}
