@@ -63,6 +63,7 @@ private slots:
     void resourcesBecameAvailableHandler(const QList<ResourcePolicy::ResourceType> &availableResources);
     void readLine(int);
     void doExit();
+    void stopConnectTimerHandler();
 
 private:
     QTextStream standardInput;
@@ -82,6 +83,7 @@ private:
     void showPrompt();
     void showResources(const QList<ResourcePolicy::ResourceType> &resList);
     void showResources(const QList<ResourcePolicy::Resource*> &resList);
+    void modifyResources(const QString &resString);
     inline void startTimer();
     inline void stopTimer();
 };

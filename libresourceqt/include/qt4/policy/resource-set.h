@@ -213,6 +213,13 @@ public:
     QString applicationClass();
 
     /**
+      * Initialize and connect the ResourceEngine of this ResourceSet.
+      * Use this method after adding resources to the ResourceSet initially.
+      *  \return true if the method succeeds without encountering errors.
+      */
+    bool initAndConnect();
+
+    /**
      * Try to acquire the \ref ResourceSet. The resourcesGranted() or
      * resourcesDenied() signal will be emited depending on whether the
      * requested resources could be acquired or not.
@@ -302,6 +309,11 @@ signals:
      * particularly security errors.
      */
     void errorCallback(quint32, const char*);
+
+    /**
+      * This signals that we have connected to the Resource Manager.
+      */
+    void connectedToManager();
 
 private:
 
