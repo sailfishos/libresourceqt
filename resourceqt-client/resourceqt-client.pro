@@ -33,13 +33,14 @@ CONFIG      -= app_bundle
 INCLUDEPATH += $${LIBRESOURCEINC}
 QMAKE_CXXFLAGS += -Wall
 QMAKE_CFLAGS += -std=c99 -D_POSIX_C_SOURCE=199309L
-LIBS += -L$${LIBRESOURCEQT}/build -lresourceqt -L$${LIBDBUSQEVENTLOOP}/build -ldbus-qeventloop -lrt
+QMAKE_LFLAGS = -L$${LIBRESOURCEQT}/build -lresourceqt -L$${LIBDBUSQEVENTLOOP}/build -ldbus-qeventloop -lrt
 
 # Input 
 HEADERS     = client.h commandlineparser.h time-stat.h
 SOURCES    += resourceqt-client.cpp commandlineparser.cpp client.cpp time-stat.c
 
 QMAKE_DISTCLEAN += -r .moc .obj
+#QMAKE_LFLAGS += -rpath-link=$${LIBRESOURCEQT}/build
 
 # Install options
 target.path = /usr/bin/
