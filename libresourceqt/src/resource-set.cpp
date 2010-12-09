@@ -81,7 +81,7 @@ bool ResourceSet::initialize()
     QObject::connect(resourceEngine, SIGNAL(errorCallback(quint32, const char*)),
                      this, SIGNAL(errorCallback(quint32, const char*)));
     QObject::connect(resourceEngine, SIGNAL(resourcesReleasedByManager()),
-                     this, SIGNAL(resourcesReleasedByManager()));
+                     this, SLOT(handleReleasedByManager()));
 
     qDebug("initializing resource engine...");
     if (!resourceEngine->initialize()) {
@@ -236,7 +236,6 @@ bool ResourceSet::initAndConnect()
         qDebug("ResourceSet::%s().... initializing...", __FUNCTION__);
         return initialize();
     }
-
     if ( !resourceEngine->isConnectedToManager() ) {
         qDebug("ResourceSet::%s().... connecting...", __FUNCTION__);
         return resourceEngine->connectToManager();
@@ -469,3 +468,8 @@ void ResourceSet::handleAudioPropertiesChanged(const QString &, quint32,
     registerAudioProperties();
 }
 
+void ResourceSet::handleReleasedByManager()
+{
+    resourceEngine->releaseResources(); 
+    emit resourcesReleasedByManager();
+}

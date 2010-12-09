@@ -339,6 +339,7 @@ private slots:
     void handleGranted(quint32);
     void handleDeny();
     void handleReleased();
+    void handleReleasedByManager();
     void handleResourcesLost(quint32);
     void handleResourcesBecameAvailable(quint32);
 
