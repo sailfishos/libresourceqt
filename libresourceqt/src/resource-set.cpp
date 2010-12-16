@@ -18,7 +18,6 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
 USA.
 *************************************************************************/
-
 #include <policy/resource-set.h>
 #include "resource-engine.h"
 using namespace ResourcePolicy;
@@ -30,7 +29,7 @@ ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent,
         : QObject(parent), resourceClass(applicationClass), resourceEngine(NULL),
         audioResource(NULL), autoRelease(initialAutoRelease),
         alwaysReply(initialAlwaysReply), initialized(false), pendingAcquire(false),
-        pendingUpdate(false), pendingAudioProperties(false)
+        pendingUpdate(false), pendingAudioProperties(false), inAcquireMode(false)
 {
     identifier = resourceSetId++;
     memset(resourceSet, 0, sizeof(QPointer<Resource *>)*NumberOfTypes);
@@ -40,7 +39,7 @@ ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
         : QObject(parent), resourceClass(applicationClass), resourceEngine(NULL),
         audioResource(NULL), autoRelease(false),
         alwaysReply(false), initialized(false), pendingAcquire(false),
-        pendingUpdate(false), pendingAudioProperties(false)
+        pendingUpdate(false), pendingAudioProperties(false), inAcquireMode(false)
 {
     identifier = resourceSetId++;
     memset(resourceSet, 0, sizeof(QPointer<Resource *>)*NumberOfTypes);
@@ -82,6 +81,8 @@ bool ResourceSet::initialize()
                      this, SIGNAL(errorCallback(quint32, const char*)));
     QObject::connect(resourceEngine, SIGNAL(resourcesReleasedByManager()),
                      this, SLOT(handleReleasedByManager()));
+    QObject::connect(resourceEngine, SIGNAL(updateOK()),
+                     this, SLOT(handleUpdateOK()));
 
     qDebug("initializing resource engine...");
     if (!resourceEngine->initialize()) {
@@ -99,14 +100,14 @@ bool ResourceSet::initialize()
 
 void ResourceSet::addResourceObject(Resource *resource)
 {
-    qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
+    qDebug("**************** ResourceSet::%s(%d).... %d", __FUNCTION__,this->id(), __LINE__);
     if(resource == NULL)
         return;
-    qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
+    qDebug("**************** ResourceSet::%s(%d).... %d", __FUNCTION__,this->id(), __LINE__);
     delete resourceSet[resource->type()];
     resourceSet[resource->type()] = resource;
     if ((resource->type() == AudioPlaybackType)) {
-        qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
+        qDebug("**************** ResourceSet::%s(%d).... %d", __FUNCTION__,this->id(), __LINE__);
         audioResource = static_cast<AudioResource *>(resource);
         QObject::connect(audioResource,
                           SIGNAL(audioPropertiesChanged(const QString &, quint32,
@@ -124,6 +125,12 @@ void ResourceSet::addResourceObject(Resource *resource)
             pendingAudioProperties = true;
         }
     }
+    if (resourceEngine &&
+       (resourceEngine->isConnectedToManager() || resourceEngine->isConnectingToManager()) )
+    {
+        pendingUpdate = true;
+    }
+
 }
 
 bool ResourceSet::addResource(ResourceType type)
@@ -246,8 +253,10 @@ bool ResourceSet::initAndConnect()
     return true;
 }
 
+
 bool ResourceSet::acquire()
 {
+
     if ( !initialized || !resourceEngine->isConnectedToManager() )
     {
         pendingAcquire = true;
@@ -255,8 +264,16 @@ bool ResourceSet::acquire()
     }
     else
     {
-        qDebug("ResourceSet::%s().... acquiring", __FUNCTION__);
-        return resourceEngine->acquireResources();
+        if (pendingUpdate)
+        { //Connected and there are res.added.
+            if (!resourceEngine->updateResources())
+                return false;
+        }
+        if ( !inAcquireMode )
+        {
+            qDebug("ResourceSet::%s().... acquiring", __FUNCTION__);
+            return resourceEngine->acquireResources();
+        }
     }
 }
 
@@ -331,7 +348,7 @@ void ResourceSet::connectedHandler()
             pendingUpdate = false;
         }
         if (pendingAcquire) {
-            resourceEngine->acquireResources();
+            acquire();
             pendingAcquire = false;
         }
     }
@@ -413,6 +430,7 @@ void ResourceSet::handleGranted(quint32 bitmaskOfGrantedResources)
             resourceSet[i]->unsetGranted();
         }
     }
+    inAcquireMode = true;
     emit resourcesGranted(optionalResources);
 }
 
@@ -424,6 +442,7 @@ void ResourceSet::handleReleased()
         }
     }
     qDebug("ResourceSet(%d) - resourcesReleased!", identifier);
+    inAcquireMode = false;
     emit resourcesReleased();
 }
 
@@ -472,4 +491,9 @@ void ResourceSet::handleReleasedByManager()
 {
     resourceEngine->releaseResources(); 
     emit resourcesReleasedByManager();
+}
+
+void ResourceSet::handleUpdateOK()
+{
+    pendingUpdate = false;
 }

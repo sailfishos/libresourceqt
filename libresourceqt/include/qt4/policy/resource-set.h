@@ -331,8 +331,8 @@ private:
     bool pendingUpdate;
     bool pendingAudioProperties;
     bool haveAudioProperties;
-
     void registerAudioProperties();
+    bool inAcquireMode;
 
 private slots:
     void connectedHandler();
@@ -342,6 +342,7 @@ private slots:
     void handleReleasedByManager();
     void handleResourcesLost(quint32);
     void handleResourcesBecameAvailable(quint32);
+    void handleUpdateOK();
 
     void handleAudioPropertiesChanged(const QString &group, quint32 pid,
                                       const QString &name, const QString &value);

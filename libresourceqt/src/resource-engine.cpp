@@ -458,6 +458,7 @@ void ResourceEngine::handleStatusMessage(quint32 requestNo)
     }
     else if(originalMessageType == RESMSG_UPDATE) {
         qDebug("ResourceEngine(%d) - Update status", identifier);
+        emit updateOK(); //We only come here if status ok.
     }
     else if(originalMessageType == RESMSG_ACQUIRE) {
         qDebug("ResourceEngine(%d) - Acquire status", identifier);
