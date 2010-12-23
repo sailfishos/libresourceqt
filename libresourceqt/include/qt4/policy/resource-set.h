@@ -298,7 +298,7 @@ signals:
     void resourcesReleasedByManager();
     /**
      * This signal is emitted when some other program with a higher priority
-     * supersedes us, and as a result we loose (some of) our resources.
+     * supersedes us, and as a result we loose all our resources.
      * It is very important to connect to this signal as it is signaling when
      * the acquired resources shouldn't be used anymore.
      */

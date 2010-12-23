@@ -182,7 +182,8 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
         resmsg_type_t originaloriginalMessageType = messageMap.take(notifyMessage->reqno);
         qDebug("ResourceEngine(%d) - lost resources, originaloriginalMessageType=%u", 
                identifier, originaloriginalMessageType);
-        if (unkownRequest) {
+        if (unkownRequest ||
+            originaloriginalMessageType == RESMSG_UPDATE) {
             //we don't know this req number => it must be a server override.
             qDebug("ResourceEngine(%d) - emiting signal resourcesLost()", identifier);
             emit resourcesLost(allResourcesToBitmask(resourceSet));
