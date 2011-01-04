@@ -204,6 +204,11 @@ bool ResourceSet::contains(ResourceType type) const
         return false;
 }
 
+bool ResourceSet::isConnectedToManager() const
+{
+    return resourceEngine->isConnectedToManager();
+}
+
 bool ResourceSet::contains(const QList<ResourceType> &types) const
 {
     bool containsAll = true;

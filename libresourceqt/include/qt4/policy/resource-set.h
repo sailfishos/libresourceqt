@@ -187,12 +187,19 @@ public:
      * \return a pointer to the Resource if it is defined NULL otherwise.
      */
     Resource * resource(ResourceType type) const;
+
     /**
      * Checks if the \ref ResourceSet contains the given \ref Resource
      * \param type The Resource to look for
      * \return true if the \ref Resource is defined in this \ref ResourceSet
      */
     bool contains(ResourceType type) const;
+
+    /**
+      * Checks if the \ref ResourceEngine of this set is connected to the manager.
+      * @return true if \ref resourceEngine is connected to the manager.
+      */
+    bool isConnectedToManager() const;
 
     /**
      * Checks if the \ref ResourceSet contains all given resources.
