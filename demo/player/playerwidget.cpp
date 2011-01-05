@@ -46,12 +46,19 @@ using namespace ResourcePolicy;
   * \see PlayerWidget::resourceLostHandler
   * \see PlayerWidget::resourceReleasedHandler
   */
-PlayerWidget::PlayerWidget(QGraphicsItem *parent)
-  : MVideoWidget(parent) {
+PlayerWidget::PlayerWidget(Streamer *streamer)
+  : QObject() {
+
+  this->streamer = streamer;
+  this->streamer->start();
+
+  connect(this->streamer, SIGNAL(eos()), this, SLOT(eos()));
+  connect(this->streamer, SIGNAL(error(const QString)), this, SLOT(error(const QString)));
 
   qDebug("PlayerWidget::PlayerWidget");
   resourceSet = new ResourceSet("player", this);
-  resourceSet->setAlwaysReply();
+//  resourceSet->setAlwaysReply();
+//  resourceSet->setAutoRelease();
 
   audioResource = new ResourcePolicy::AudioResource("player");
   audioResource->setProcessID(QCoreApplication::applicationPid());
@@ -65,6 +72,20 @@ PlayerWidget::PlayerWidget(QGraphicsItem *parent)
 
   // playback timer
   startTimer(100);
+}
+
+void PlayerWidget::error(const QString message)
+{
+    qCritical() << QString("Streamer error: %1").arg(message);
+
+    pause();
+}
+
+void PlayerWidget::eos(void)
+{
+    qDebug() << QString("end of stream");
+
+    pause();
 }
 
 /**
@@ -121,7 +142,7 @@ void PlayerWidget::play() {
   *
   */
 void PlayerWidget::beginPlayback() {
-  MVideoWidget::play();
+  streamer->play();
   emit playing();
 }
 
@@ -135,7 +156,7 @@ void PlayerWidget::beginPlayback() {
   * \see MVideoWidget::pause().
   */
 void PlayerWidget::pause(bool releaseResources) {
-  MVideoWidget::pause();
+  streamer->stop();
   if (releaseResources && policyAware())  release();
   emit paused();
 }
@@ -176,7 +197,7 @@ void PlayerWidget::resourceReleasedHandler() {
   */
 void PlayerWidget::resourceLostHandler() {
   qDebug("PlayerWidget::resourceLostHandler()");
-  if (state() == MVideo::Playing) {
+  if (state() == Streamer::PlayingState) {
     pause(false);
   }
 }
@@ -193,13 +214,16 @@ void PlayerWidget::timerEvent(QTimerEvent */*event*/) {
   // MVideoWidget doesn't update position on audio files, so we'll keep our own count
   // /* position = videoWidget->position(); */
 
-  if (state() == MVideo::Playing) {
+  qDebug() << "PlayerWidget::timerEvent state=" << (int)state();
+
+  if (state() == Streamer::PlayingState) {
     d.pos += 100;
   }
 
-  if (state() == MVideo::Stopped) {
+  if (state() == Streamer::StoppedState && prevState != state()) {
     d.pos = 0;
     pause();
+    prevState = state();
   }
 
   emit playerPositionChanged();
@@ -221,7 +245,7 @@ void PlayerWidget::setPolicyAware(bool aware) {
   d.policyAware = aware;
 
   if (policyAware()) {
-    if (state() == MVideo::Playing)  acquire();
+    if (state() == Streamer::PlayingState)  acquire();
   } else {
     release();
   }
@@ -251,5 +275,19 @@ void PlayerWidget::setPosition(quint64 pos) {
   */
 void PlayerWidget::seek(quint64 pos) {
   setPosition(pos);
-  MVideoWidget::seek(pos);
+  streamer->setPosition(pos);
 }
+
+
+void PlayerWidget::open(const QString& filename) {
+  streamer->setLocation(filename);
+}
+
+Streamer::State PlayerWidget::state() {
+  return streamer->state();
+}
+
+quint64 PlayerWidget::length() {
+  return streamer->duration();
+}
+

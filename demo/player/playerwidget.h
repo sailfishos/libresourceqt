@@ -21,8 +21,9 @@ USA.
 
 #pragma once
 
-#include <MVideoWidget>
 #include <policy/resource-set.h>
+
+#include "streamer.h"
 
 /**
   * PlayerWidget subclasses MVideoWidget from libmeegotouch to add policy awareness to this
@@ -36,13 +37,14 @@ USA.
   *
   * \see MVideoWidget
   */
-class PlayerWidget : public MVideoWidget {
+class PlayerWidget : public QObject {
   Q_OBJECT
 
 public:
-  PlayerWidget(QGraphicsItem *parent = 0);
+  PlayerWidget(Streamer *streamer = 0);
 
   enum {VIDEO, AUDIO} filetype;
+  Streamer::State prevState;
 
   void play();
   void beginPlayback();
@@ -56,6 +58,15 @@ public:
   quint64 position();
   void setPosition(quint64);
   void seek(quint64);
+
+  Streamer     *streamer;
+
+  void open(const QString& filename);
+  Streamer::State state();
+  quint64 length();
+
+  void error(const QString message);
+  void eos(void);
 
 private:
 

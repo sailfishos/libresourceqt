@@ -45,10 +45,12 @@ void PlayerPage::createContent() {
   layoutPolicy = new MLinearLayoutPolicy(layout, Qt::Vertical);
 
   // video widget
-  playerWidget = new PlayerWidget(this);
-  playerWidget->setLooping(false);
+  Streamer *streamer = new Streamer(this);
+  playerWidget = new PlayerWidget(streamer);
+//  mediaPlayer->setVideoOutput(playerWidget);
+
   // height is hard-coded for a lack of a better option
-  playerWidget->setMaximumSize(1000, 300);
+//  playerWidget->setMaximumSize(1000, 300);
 
   connect(playerWidget, SIGNAL(playerPositionChanged()), this, SLOT(onPositionChanged()));
   connect(playerWidget, SIGNAL(playing()), this, SLOT(setPlayingIcon()));
@@ -73,12 +75,16 @@ void PlayerPage::createContent() {
   controlBarPolicy = new MLinearLayoutPolicy(controlBarLayout, Qt::Horizontal);
   makeControlBar(controlBarPolicy);
 
+  QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
+//  proxy->setWidget(playerWidget);
+
   layoutPolicy->addItem(lblTitle,    Qt::AlignVCenter);
-  layoutPolicy->addItem(playerWidget);
+  layoutPolicy->addItem(proxy);
   layoutPolicy->addItem(lblPosition, Qt::AlignVCenter);
   layoutPolicy->addStretch();
   layoutPolicy->addItem(controlBarLayout, Qt::AlignBottom);
 }
+
 
 /**
   * A helper function to create icon buttons.
@@ -115,10 +121,10 @@ void PlayerPage::makeControlBar(MLinearLayoutPolicy *controlBarPolicy) {
   setEnabled(seekbar, false);
 
   btnLoadAudio = makeButton("icon-m-content-audio");
-  btnLoadVideo = makeButton("icon-m-common-video");
+//  btnLoadVideo = makeButton("icon-m-common-video");
 
   connect(btnLoadAudio, SIGNAL(clicked()), this, SLOT(openAudioFile()));
-  connect(btnLoadVideo, SIGNAL(clicked()), this, SLOT(openVideoFile()));
+//  connect(btnLoadVideo, SIGNAL(clicked()), this, SLOT(openVideoFile()));
   connect(btnPlay, SIGNAL(clicked()), this, SLOT(playOrPause()));
 
   connect(seekbar, SIGNAL(sliderPressed()),  this, SLOT(sliderPressed()));
@@ -166,7 +172,7 @@ void PlayerPage::openAudioFile() {
   playerWidget->filetype = PlayerWidget::AUDIO;
   openFile("/home/user/MyDocs/.sounds/");
 
-  playerWidget->setVisible(false);
+//  playerWidget->setVisible(false);
 }
 
 /**
@@ -179,7 +185,7 @@ void PlayerPage::openVideoFile() {
   playerWidget->filetype = PlayerWidget::VIDEO;
   openFile("/home/user/MyDocs/.videos/");
 
-  playerWidget->setVisible(true);
+//  playerWidget->setVisible(true);
 }
 
 /**
@@ -211,7 +217,7 @@ void PlayerPage::openFile(QString dir) {
   * Starts or pauses the playback.
   */
 void PlayerPage::playOrPause() {
-  if (playerWidget->state() != MVideo::Playing) {
+  if (playerWidget->state() != Streamer::PlayingState) {
     setPlayingIcon();
     playerWidget->play();
   } else {

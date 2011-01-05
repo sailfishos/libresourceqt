@@ -25,7 +25,6 @@ USA.
 #include <QFileDialog>
 
 #include <MApplicationPage>
-#include <MVideoWidget>
 #include <MLayout>
 #include <MLinearLayoutPolicy>
 #include <MButton>
@@ -37,7 +36,10 @@ USA.
 #include <MSeekBar>
 #include <MSceneManager>
 
+#include <QGraphicsProxyWidget>
+
 #include "playerwidget.h"
+#include "streamer.h"
 
 /**
   * \mainpage Policy-aware Player
