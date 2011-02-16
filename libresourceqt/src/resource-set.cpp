@@ -115,7 +115,10 @@ void ResourceSet::addResourceObject(Resource *resource)
                           this,
                           SLOT(handleAudioPropertiesChanged(const QString &, quint32,
                                                              const QString &, const QString &)));
-        if(audioResource->streamTagIsSet() && (audioResource->processID() > 0))
+        if (!audioResource->audioGroupIsSet())
+            audioResource->setAudioGroup(resourceClass);
+
+        if (audioResource->streamTagIsSet() && (audioResource->processID() > 0))
         {
             qDebug("registering audio properties");
             registerAudioProperties();
@@ -124,6 +127,7 @@ void ResourceSet::addResourceObject(Resource *resource)
             qDebug("ResourceSet::%s().... %d registering audio proprerties later", __FUNCTION__, __LINE__);
             pendingAudioProperties = true;
         }
+
     }
     if (resourceEngine &&
        (resourceEngine->isConnectedToManager() || resourceEngine->isConnectingToManager()) )
