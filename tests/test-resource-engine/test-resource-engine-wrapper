@@ -21,9 +21,14 @@
 ##############################################################################
 
 # Source and export D-Bus session info
-. /tmp/dbus-info
-export DBUS_SESSION_BUS_ADDRESS
-export DBUS_SESSION_BUS_PID
-export DBUS_SESSION_BUS_WINDOWID
+
+if test -e /tmp/session_bus_address.user; then
+    . /tmp/session_bus_address.user
+else
+    . /tmp/dbus-info || . /tmp/dbus-info-address
+    export DBUS_SESSION_BUS_ADDRESS
+    export DBUS_SESSION_BUS_PID
+    export DBUS_SESSION_BUS_WINDOWID
+fi
 
 /usr/lib/libresourceqt-tests/test-resource-engine "$@"
