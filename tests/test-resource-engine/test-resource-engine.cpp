@@ -57,7 +57,7 @@ TestResourceEngine::TestResourceEngine()
     audioRecorder->setOptional();
     videoRecorder->setOptional();
 
-    resourceSet = new ResourceSet("player", this);
+    resourceSet = new ResourceSet(APP_CLASS, this);
     theID = resourceSet->id();
     resourceSet->addResourceObject(audioPlayback);
     resourceSet->addResourceObject(videoPlayback);
@@ -267,7 +267,7 @@ void TestResourceEngine::testRegisterAudioProperties()
     requestShouldFail = false;
 
     if(audioGroup.isEmpty() || audioGroup.isNull()) {
-        expectedGroup = NULL;
+        expectedGroup = APP_CLASS;
     }
     else {
         QByteArray ba = audioGroup.toLatin1();
@@ -386,7 +386,7 @@ static void verify_resconn_connect(resconn_t *connection, resmsg_t *message,
                                          | RESMSG_VIDEO_RECORDING));
     QVERIFY(message->record.rset.share == 0);
     QVERIFY(message->record.rset.mask == 0);
-    QCOMPARE(message->record.klass, "player");
+    QCOMPARE(message->record.klass, APP_CLASS);
     QVERIFY(message->record.mode == 0);
     QVERIFY(callbackFunction != NULL);
 }

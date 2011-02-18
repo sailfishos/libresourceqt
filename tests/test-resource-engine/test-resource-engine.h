@@ -31,6 +31,8 @@ class TestResourceEngine;
 
 #include "resource-engine.h"
 
+#define APP_CLASS "player"
+
 Q_DECLARE_METATYPE(ResourcePolicy::ResourceType)
 
 class TestResourceEngine: public QObject
