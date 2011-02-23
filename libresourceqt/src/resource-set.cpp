@@ -474,7 +474,7 @@ void ResourceSet::handleResourcesLost(quint32 lostResourcesBitmask)
             qDebug("Resource %04x is now lost", bitmask);
         }
     }
-    emit lostResources();
+    if (inAcquireMode) emit lostResources();
 }
 
 void ResourceSet::handleResourcesBecameAvailable(quint32 availableResources)
