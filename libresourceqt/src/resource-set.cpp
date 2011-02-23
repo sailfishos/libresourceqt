@@ -291,7 +291,7 @@ bool ResourceSet::release()
     if (!initialized || !resourceEngine->isConnectedToManager()) {
         return true;
     }
-
+    inAcquireMode = false;
     qDebug("ResourceSet::%s().... releasing...", __FUNCTION__);
     return resourceEngine->releaseResources();
 }
@@ -451,7 +451,7 @@ void ResourceSet::handleReleased()
         }
     }
     qDebug("ResourceSet(%d) - resourcesReleased!", identifier);
-    inAcquireMode = false;
+    //inAcquireMode = false;
     emit resourcesReleased();
 }
 
