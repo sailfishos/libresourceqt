@@ -278,11 +278,10 @@ bool ResourceSet::acquire()
             if (!resourceEngine->updateResources())
                 return false;
         }
-        if ( !inAcquireMode )
-        {
-            qDebug("ResourceSet::%s().... acquiring", __FUNCTION__);
-            return resourceEngine->acquireResources();
-        }
+
+        qDebug("ResourceSet::%s().... acquiring", __FUNCTION__);
+        return resourceEngine->acquireResources();
+
     }
 }
 
@@ -497,8 +496,9 @@ void ResourceSet::handleAudioPropertiesChanged(const QString &, quint32,
 }
 
 void ResourceSet::handleReleasedByManager()
-{
+{       
     resourceEngine->releaseResources(); 
+    inAcquireMode = false;
     emit resourcesReleasedByManager();
 }
 
