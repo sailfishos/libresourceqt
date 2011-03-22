@@ -3,6 +3,10 @@
   <suite name="libresourceqt-tests" domain="Multimedia Middleware">
     <set name="libresourceqt-tests" feature="Resource policy">
 
+      <case name="test-init-and-connect" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
+        <step expected_result="0">/usr/lib/libresourceqt-tests/test-init-and-connect</step>
+      </case>
+
       <case name="test-resource" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
         <step expected_result="0">/usr/lib/libresourceqt-tests/test-resource</step>
       </case>
