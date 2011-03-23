@@ -23,6 +23,7 @@ USA.
 
 #include "test-resource.h"
 #include <QSet>
+#include <QtDebug>
 
 using namespace ResourcePolicy;
 

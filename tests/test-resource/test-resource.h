@@ -25,6 +25,7 @@ USA.
 #define TEST_RESOURCE_H
 
 #include <QtTest/QTest>
+#include <QObject>
 #include <QMetaType>
 #include <policy/resources.h>
 #include <policy/audio-resource.h>

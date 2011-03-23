@@ -27,6 +27,7 @@ USA.
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
 #include <QtDBus/QtDBus>
+#include <QtCore/QtDebug>
 
 #include "pong.h"
 

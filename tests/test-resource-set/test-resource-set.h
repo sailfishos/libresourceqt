@@ -19,11 +19,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
 USA.
 *************************************************************************/
 
-
-
 #ifndef TEST_RESOURCE_SET_H
 #define TEST_RESOURCE_SET_H
 
+#include <QObject>
+#include <QList>
 #include <QtTest/QTest>
 #include <policy/resource-set.h>
 

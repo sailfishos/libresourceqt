@@ -25,6 +25,7 @@ USA.
 #define _PONG_H_
 
 #include <QtCore/QObject>
+#include <QtCore/QString>
 
 class Pong: public QObject
 {

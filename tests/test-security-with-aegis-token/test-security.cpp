@@ -22,6 +22,8 @@ USA.
 
 
 #include "qt4/policy/resource-set.h"
+#include <QObject>
+#include <QList>
 #include <cstdio>
 #include <cstdlib>
 #include <QCoreApplication>

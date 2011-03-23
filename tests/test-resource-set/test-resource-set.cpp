@@ -183,13 +183,12 @@ void TestResourceSet::testConnectToSignals()
         this, SLOT(handleLostResources()));
 
     QVERIFY(signalConnectionSucceeded);
-
 }
 
 void TestResourceSet::handleResourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)
 {
-
 }
+
 void TestResourceSet::handleResourcesGranted(const QList<ResourcePolicy::ResourceType> &)
 {
 }

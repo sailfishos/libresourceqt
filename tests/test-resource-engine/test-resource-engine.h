@@ -26,6 +26,7 @@ USA.
 
 #include <QtTest/QTest>
 #include <QMetaType>
+#include <QObject>
 
 class TestResourceEngine;
 

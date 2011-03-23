@@ -19,9 +19,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
 USA.
 *************************************************************************/
 
-
-
 #include "test-resource-engine.h"
+#include <QString>
+#include <QByteArray>
+#include <QList>
+#include <QtDebug>
 #include <dbus/dbus.h>
 #include <string.h>
 
