@@ -59,6 +59,7 @@ public slots:
     void handleAcquire(quint32 bitmaskOfResources);
 
 private slots:
+    void initTestCase();
     void init();
     void cleanup();
 

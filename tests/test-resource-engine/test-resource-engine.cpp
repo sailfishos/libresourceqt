@@ -47,9 +47,23 @@ static void verify_resproto_send_message(resset_t *resourceSet, resmsg_t *messag
         resproto_status_t  callbackFunction);
 
 TestResourceEngine::TestResourceEngine()
+    : resourceEngine(NULL)
+    , audioPlayback(NULL)
+    , videoPlayback(NULL)
+    , audioRecorder(NULL)
+    , videoRecorder(NULL)
+    , libresourceInitialized(false)
+    , acquireOrDenyWasCalled(false)
+    , resourceSet(NULL)
 {
-    resourceEngine = NULL;
-    acquireOrDenyWasCalled = false;
+}
+
+TestResourceEngine::~TestResourceEngine()
+{
+}
+
+void TestResourceEngine::initTestCase()
+{
     audioPlayback = new AudioResource;
     videoPlayback = new VideoResource;
     audioRecorder = new AudioRecorderResource;
@@ -65,10 +79,6 @@ TestResourceEngine::TestResourceEngine()
     resourceSet->addResourceObject(videoPlayback);
     resourceSet->addResourceObject(audioRecorder);
     resourceSet->addResourceObject(videoRecorder);
-}
-
-TestResourceEngine::~TestResourceEngine()
-{
 }
 
 void TestResourceEngine::init()
