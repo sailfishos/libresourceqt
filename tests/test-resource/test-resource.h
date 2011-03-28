@@ -63,6 +63,8 @@ private slots:
     void init();
     void cleanup();
 
+    void testDefaults();
+
     void testType();
 
     void testOptional_data();

@@ -97,6 +97,19 @@ const char * TestResource::stringFromType(ResourceType type)
 }
 
 TestResource::TestResource()
+    : audioResource(NULL)
+    , audioRecorderResource(NULL)
+    , videoResource(NULL)
+    , videoRecorderResource(NULL)
+    , vibraResource(NULL)
+    , ledsResource(NULL)
+    , backlightResource(NULL)
+    , systemButtonResource(NULL)
+    , lockButtonResource(NULL)
+    , scaleButtonResource(NULL)
+    , snapButtonResource(NULL)
+    , lensCoverResource(NULL)
+    , headsetButtonsResource(NULL)
 {
 }
 
@@ -136,6 +149,17 @@ void TestResource::cleanup()
     delete snapButtonResource;
     delete lensCoverResource;
     delete headsetButtonsResource;
+}
+
+void TestResource::testDefaults()
+{
+    for (quint32 type = AudioPlaybackType; type < NumberOfTypes; type++) {
+        ResourceType expected = (ResourceType)type;
+        Resource *resource = resourceFromType(expected);
+
+        QVERIFY(!resource->isGranted());
+        QVERIFY(!resource->isOptional());
+    }
 }
 
 void TestResource::testType()
