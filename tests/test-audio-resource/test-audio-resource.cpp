@@ -32,13 +32,71 @@ TestAudioResource::~TestAudioResource()
 {
 }
 
-void TestAudioResource::init()
+void TestAudioResource::testConstruct1()
 {
-    audioResource = new AudioResource;
+    AudioResource *audioResource = new AudioResource;
+    QVERIFY(audioResource);
+    QCOMPARE(audioResource->audioGroupIsSet(), false);
+    QCOMPARE(audioResource->audioGroup(), QString(""));
+    QCOMPARE(audioResource->processID(), (quint32) 0);
+    QCOMPARE(audioResource->streamTagIsSet(), false);
+    QCOMPARE(audioResource->streamTagName(), QString(""));
+    QCOMPARE(audioResource->streamTagValue(), QString(""));
+    delete audioResource;
 }
 
-void TestAudioResource::cleanup()
+void TestAudioResource::testConstruct2()
 {
+    AudioResource *audioResource = new AudioResource("testing");
+    QVERIFY(audioResource);
+    QCOMPARE(audioResource->audioGroupIsSet(), true);
+    QCOMPARE(audioResource->audioGroup(), QString("testing"));
+    QCOMPARE(audioResource->processID(), (quint32) 0);
+    QCOMPARE(audioResource->streamTagIsSet(), false);
+    QCOMPARE(audioResource->streamTagName(), QString(""));
+    QCOMPARE(audioResource->streamTagValue(), QString(""));
+    delete audioResource;
+}
+
+void TestAudioResource::testSetAudioGroup()
+{
+    AudioResource *audioResource = new AudioResource();
+    QVERIFY(audioResource);
+    audioResource->setAudioGroup("foobar");
+    QCOMPARE(audioResource->audioGroupIsSet(), true);
+    QCOMPARE(audioResource->audioGroup(), QString("foobar"));
+    QCOMPARE(audioResource->processID(), (quint32) 0);
+    QCOMPARE(audioResource->streamTagIsSet(), false);
+    QCOMPARE(audioResource->streamTagName(), QString(""));
+    QCOMPARE(audioResource->streamTagValue(), QString(""));
+    delete audioResource;
+}
+
+void TestAudioResource::testSetProcessId()
+{
+    AudioResource *audioResource = new AudioResource();
+    QVERIFY(audioResource);
+    audioResource->setProcessID(2345);
+    QCOMPARE(audioResource->audioGroupIsSet(), false);
+    QCOMPARE(audioResource->audioGroup(), QString(""));
+    QCOMPARE(audioResource->processID(), (quint32) 2345);
+    QCOMPARE(audioResource->streamTagIsSet(), false);
+    QCOMPARE(audioResource->streamTagName(), QString(""));
+    QCOMPARE(audioResource->streamTagValue(), QString(""));
+    delete audioResource;
+}
+
+void TestAudioResource::testSetStreamTag()
+{
+    AudioResource *audioResource = new AudioResource;
+    QVERIFY(audioResource);
+    audioResource->setStreamTag("tagname", "tagvalue");
+    QCOMPARE(audioResource->audioGroupIsSet(), false);
+    QCOMPARE(audioResource->audioGroup(), QString(""));
+    QCOMPARE(audioResource->processID(), (quint32) 0);
+    QCOMPARE(audioResource->streamTagIsSet(), true);
+    QCOMPARE(audioResource->streamTagName(), QString("tagname"));
+    QCOMPARE(audioResource->streamTagValue(), QString("tagvalue"));
     delete audioResource;
 }
 

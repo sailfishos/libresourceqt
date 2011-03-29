@@ -40,8 +40,11 @@ public:
 
 private slots:
 
-    void init();
-    void cleanup();
+    void testConstruct1();
+    void testConstruct2();
+    void testSetAudioGroup();
+    void testSetProcessId();
+    void testSetStreamTag();
 };
 
 #endif // TESTAUDIORESOURCE_H
