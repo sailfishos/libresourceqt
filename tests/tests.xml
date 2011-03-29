@@ -11,6 +11,10 @@
         <step expected_result="0">/usr/lib/libresourceqt-tests/test-resource</step>
       </case>
 
+      <case name="test-audio-resource" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
+        <step expected_result="0">/usr/lib/libresourceqt-tests/test-audio-resource</step>
+      </case>
+
       <case name="test-resource-set" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
         <step expected_result="0">/usr/lib/libresourceqt-tests/test-resource-set</step>
       </case>
