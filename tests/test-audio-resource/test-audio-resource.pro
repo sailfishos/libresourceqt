@@ -19,24 +19,33 @@
 #  USA.                                                                      #
 ##############################################################################
 
-CONFIG  += ordered 
-TEMPLATE = subdirs
+include(../../common.pri)
+TEMPLATE = app
+TARGET = test-audio-resource
+DESTDIR = build
+DEPENDPATH += $${POLICY} $${LIBRESOURCEQT}/src .
+INCLUDEPATH += $${LIBRESOURCEQT}/src $${LIBRESOURCEINC}
 
-SUBDIRS = test-dbus-qeventloop	\
-          test-dbus-pong		\
-          test-audio-resource   \
-          test-resource			\
-          test-resource-set     \
-          test-resource-engine  \
-          test-security-with-aegis-token \
-          test-security-without-aegis-token \
-          test-init-and-connect
+# Input
+HEADERS +=  $${POLICY}/resource.h \
+            $${POLICY}/resources.h \
+            $${POLICY}/audio-resource.h \
+            test-audio-resource.h
 
-# Install options
-testsxml.path    = /usr/share/libresourceqt-tests/
-testsxml.files   = tests.xml
-testrunner.path  = /usr/lib/libresourceqt-tests/
-testrunner.files = test-dbus-qeventloop-runner.sh
-dbusconf.path    = /etc/dbus-1/system.d/
-dbusconf.files   = test-dbus-qeventloop.conf
-INSTALLS         = testsxml testrunner dbusconf
+SOURCES +=  $${LIBRESOURCEQT}/src/resource.cpp \
+            $${LIBRESOURCEQT}/src/resources.cpp \
+            $${LIBRESOURCEQT}/src/audio-resource.cpp \
+            test-audio-resource.cpp
+
+OBJECTS_DIR = build
+MOC_DIR = build
+
+QMAKE_CXXFLAGS += -Wall
+
+CONFIG  += qt qtestlib debug warn_on
+QT -= gui
+
+# Install directives
+INSTALLBASE    = /usr
+target.path    = $${INSTALLBASE}/lib/libresourceqt-tests/
+INSTALLS       = target
