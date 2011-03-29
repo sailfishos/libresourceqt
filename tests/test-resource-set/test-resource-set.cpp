@@ -62,6 +62,19 @@ Resource * TestResourceSet::resourceFromType(ResourceType type)
 using namespace ResourcePolicy;
 
 TestResourceSet::TestResourceSet()
+    : audioResource(NULL)
+    , audioRecorderResource(NULL)
+    , videoResource(NULL)
+    , videoRecorderResource(NULL)
+    , vibraResource(NULL)
+    , ledsResource(NULL)
+    , backlightResource(NULL)
+    , systemButtonResource(NULL)
+    , lockButtonResource(NULL)
+    , scaleButtonResource(NULL)
+    , snapButtonResource(NULL)
+    , lensCoverResource(NULL)
+    , headsetButtonsResource(NULL)
 {
 }
 
@@ -69,116 +82,113 @@ TestResourceSet::~TestResourceSet()
 {
 }
 
-void TestResourceSet::init()
-{
-    resourceSet = new ResourceSet("player");
-}
-
-void TestResourceSet::cleanup()
-{
-    delete resourceSet;
-}
-
 void TestResourceSet::testIdentifier()
 {
+    ResourceSet resourceSet("player");
     ResourceSet otherSet("game");
 
-    bool identifiersAreUnique = (resourceSet->id() != otherSet.id());
+    bool identifiersAreUnique = (resourceSet.id() != otherSet.id());
     QVERIFY(identifiersAreUnique);
 }
 
 void TestResourceSet::testAddResource()
 {
+    ResourceSet resourceSet("player");
     for (int i = 0;i < NumberOfTypes;i++) {
         ResourceType type = (ResourceType)i;
-        resourceSet->addResource(type);
-        bool setContainsGivenResource = resourceSet->contains(type);
+        resourceSet.addResource(type);
+        bool setContainsGivenResource = resourceSet.contains(type);
         QVERIFY(setContainsGivenResource);
     }
 }
 
 void TestResourceSet::testAddResourceObject()
 {
+    ResourceSet resourceSet("player");
     for (int i = 0;i < NumberOfTypes;i++) {
         ResourceType type = (ResourceType)i;
         Resource *resource = resourceFromType(type);
-        resourceSet->addResourceObject(resource);
-        bool setContainsGivenResource = resourceSet->contains(type);
+        resourceSet.addResourceObject(resource);
+        bool setContainsGivenResource = resourceSet.contains(type);
         QVERIFY(setContainsGivenResource);
     }
 }
 
 void TestResourceSet::testDelResource()
 {
+    ResourceSet resourceSet("player");
     for (int i = 0;i < NumberOfTypes;i++) {
         ResourceType type = (ResourceType)i;
-        resourceSet->addResource(type);
-        bool setContainsGivenResource = resourceSet->contains(type);
+        resourceSet.addResource(type);
+        bool setContainsGivenResource = resourceSet.contains(type);
         QVERIFY(setContainsGivenResource);
     }
 
     for (int i = 0;i < NumberOfTypes;i++) {
         ResourceType type = (ResourceType)i;
-        resourceSet->deleteResource(type);
-        bool setNoLongerContainType = !resourceSet->contains(type);
+        resourceSet.deleteResource(type);
+        bool setNoLongerContainType = !resourceSet.contains(type);
         QVERIFY(setNoLongerContainType);
         for (int j = 0; j < NumberOfTypes; j++) {
-            if(j == i) continue;
+            if (j == i)
+                continue;
             ResourceType otherType = (ResourceType)j;
-            bool setStillContainsOtherTypes = resourceSet->contains(otherType);
+            bool setStillContainsOtherTypes = resourceSet.contains(otherType);
             QVERIFY(setStillContainsOtherTypes);
         }
-        resourceSet->addResource(type);
+        resourceSet.addResource(type);
     }
 }
 
 void TestResourceSet::testContainsSet()
 {
+    ResourceSet resourceSet("player");
     QList<ResourceType> types, subset;
 
     for (int i = 0;i < NumberOfTypes;i++) {
         ResourceType type = (ResourceType)i;
-        resourceSet->addResource(type);
+        resourceSet.addResource(type);
         types.append(type);
     }
 
     subset << AudioPlaybackType << VideoPlaybackType
-    << AudioRecorderType << VideoRecorderType << LensCoverType;
+           << AudioRecorderType << VideoRecorderType << LensCoverType;
 
-    bool containsAll = resourceSet->contains(types);
-    bool containsSubset = resourceSet->contains(subset);
+    bool containsAll = resourceSet.contains(types);
+    bool containsSubset = resourceSet.contains(subset);
     QVERIFY(containsAll);
     QVERIFY(containsSubset);
 }
 
 void TestResourceSet::testConnectToSignals()
 {
+    ResourceSet resourceSet("player");
     bool signalConnectionSucceeded=false;
-    signalConnectionSucceeded = QObject::connect(resourceSet,
+    signalConnectionSucceeded = QObject::connect(&resourceSet,
         SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)),
         this, SLOT(handleResourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
 
     QVERIFY(signalConnectionSucceeded);
 
-    signalConnectionSucceeded = QObject::connect(resourceSet,
+    signalConnectionSucceeded = QObject::connect(&resourceSet,
         SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)),
         this, SLOT(handleResourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
 
     QVERIFY(signalConnectionSucceeded);
 
-    signalConnectionSucceeded = QObject::connect(resourceSet,
+    signalConnectionSucceeded = QObject::connect(&resourceSet,
         SIGNAL(resourcesDenied()),
         this, SLOT(handleResourcesDenied()));
 
     QVERIFY(signalConnectionSucceeded);
 
-    signalConnectionSucceeded = QObject::connect(resourceSet,
+    signalConnectionSucceeded = QObject::connect(&resourceSet,
         SIGNAL(resourcesReleased()),
         this, SLOT(handleResourcesReleased()));
 
     QVERIFY(signalConnectionSucceeded);
 
-    signalConnectionSucceeded = QObject::connect(resourceSet,
+    signalConnectionSucceeded = QObject::connect(&resourceSet,
         SIGNAL(lostResources()),
         this, SLOT(handleLostResources()));
 
@@ -206,4 +216,3 @@ void TestResourceSet::handleLostResources()
 }
 
 QTEST_MAIN(TestResourceSet)
-

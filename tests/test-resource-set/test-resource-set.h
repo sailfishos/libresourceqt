@@ -31,7 +31,6 @@ class TestResourceSet: public QObject
 {
     Q_OBJECT
 private:
-    ResourcePolicy::ResourceSet *resourceSet;
 
     ResourcePolicy::AudioResource *audioResource;
     ResourcePolicy::AudioRecorderResource *audioRecorderResource;
@@ -61,9 +60,6 @@ public slots:
     void handleLostResources();
 
 private slots:
-
-    void init();
-    void cleanup();
 
     void testIdentifier();
 
