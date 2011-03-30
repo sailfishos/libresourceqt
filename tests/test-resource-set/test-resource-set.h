@@ -61,6 +61,9 @@ public slots:
 
 private slots:
 
+    void testConstructor1();
+    void testConstructor2();
+
     void testIdentifier();
 
     void testAddResource();
