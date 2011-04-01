@@ -26,6 +26,9 @@ DESTDIR = build
 DEPENDPATH += $${POLICY} $${BASE}/src .
 INCLUDEPATH += $${LIBRESOURCEQT}/src $${LIBRESOURCEINC} $${LIBDBUSQEVENTLOOP}
 
+# Silence qDebug
+DEFINES += QT_NO_DEBUG_OUTPUT
+
 # Input
 HEADERS +=  $${POLICY}/resources.h \
             $${POLICY}/resource-set.h \
