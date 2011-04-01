@@ -19,8 +19,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
 USA.
 *************************************************************************/
 
-
-
+#include <QSignalSpy>
+#include <QList>
 #include "test-resource-set.h"
 
 using namespace ResourcePolicy;
@@ -213,6 +213,52 @@ void TestResourceSet::handleResourcesReleased()
 
 void TestResourceSet::handleLostResources()
 {
+}
+
+void TestResourceSet::testConnectEngine()
+{
+    ResourceSet resourceSet("player");
+    bool connectOk = resourceSet.initAndConnect();
+    QVERIFY(connectOk);
+}
+
+void TestResourceSet::testConnectEngine2()
+{
+    ResourceSet resourceSet("player");
+    bool addOk = resourceSet.addResource(AudioPlaybackType);
+    QVERIFY(addOk);
+    bool connectOk = resourceSet.initAndConnect();
+    QVERIFY(connectOk);
+}
+
+void TestResourceSet::testAcquire()
+{
+    ResourceSet resourceSet("player");
+
+    // Test that signals gets emitted
+    QSignalSpy stateSpy(&resourceSet,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpy.isValid());
+    QSignalSpy stateSpy2(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpy2.isValid());
+
+    bool addOk = resourceSet.addResource(AudioPlaybackType);
+    QVERIFY(addOk);
+    bool connectOk = resourceSet.initAndConnect();
+    QVERIFY(connectOk);
+    bool acquireOk = resourceSet.acquire();
+    QVERIFY(acquireOk);
+    QTest::qWait(500);
+
+    // Check the signal parameters
+    QCOMPARE(stateSpy.count(), 1);
+
+    bool releaseOk = resourceSet.release();
+    QVERIFY(releaseOk);
+    QTest::qWait(500);
+
+    // Check the signal parameters
+    QCOMPARE(stateSpy2.count(), 1);
 }
 
 QTEST_MAIN(TestResourceSet)

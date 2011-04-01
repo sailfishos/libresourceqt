@@ -70,6 +70,11 @@ private slots:
     void testContainsSet();
 
     void testConnectToSignals();
+
+    void testConnectEngine();
+    void testConnectEngine2();
+
+    void testAcquire();
 };
 
 #endif
