@@ -21,6 +21,7 @@ USA.
 
 #include <QSignalSpy>
 #include <QList>
+#include <QEventLoop>
 #include "test-resource-set.h"
 
 using namespace ResourcePolicy;
@@ -248,14 +249,21 @@ void TestResourceSet::testAcquire()
     QVERIFY(connectOk);
     bool acquireOk = resourceSet.acquire();
     QVERIFY(acquireOk);
-    QTest::qWait(500);
+
+    QEventLoop loop;
+    loop.connect(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)),
+                 SLOT(quit()));
+    loop.exec();
 
     // Check the signal parameters
     QCOMPARE(stateSpy.count(), 1);
 
     bool releaseOk = resourceSet.release();
     QVERIFY(releaseOk);
-    QTest::qWait(500);
+
+    QEventLoop loop2;
+    loop2.connect(&resourceSet, SIGNAL(resourcesReleased()), SLOT(quit()));
+    loop2.exec();
 
     // Check the signal parameters
     QCOMPARE(stateSpy2.count(), 1);
