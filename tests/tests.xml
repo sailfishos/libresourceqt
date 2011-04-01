@@ -30,6 +30,10 @@
         <step expected_result="1">/usr/lib/libresourceqt-tests/test-security-without-aegis-token</step>
       </case>
 
+      <case name="benchmark-resource-set" type="Benchmark" level="Component" subfeature="libresource Qt API" description="Benchmark tests for libresourceqt" timeout="15">
+        <step expected_result="0">/usr/lib/libresourceqt-tests/benchmark-resource-set</step>
+      </case>
+
       <environments>
         <scratchbox>false</scratchbox>
         <hardware>true</hardware>
