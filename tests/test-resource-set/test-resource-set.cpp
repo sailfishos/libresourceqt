@@ -22,6 +22,7 @@ USA.
 #include <QSignalSpy>
 #include <QList>
 #include <QEventLoop>
+#include <QTimer>
 #include "test-resource-set.h"
 
 using namespace ResourcePolicy;
@@ -232,6 +233,14 @@ void TestResourceSet::testConnectEngine2()
     QVERIFY(connectOk);
 }
 
+void TestResourceSet::waitForSignal(const QObject *sender, const char *signal, quint32 timeout)
+{
+    QEventLoop loop;
+    QTimer::singleShot(timeout, &loop, SLOT(quit()));
+    loop.connect(sender, signal, SLOT(quit()));
+    loop.exec();
+}
+
 void TestResourceSet::testAcquire()
 {
     ResourceSet resourceSet("player");
@@ -249,21 +258,14 @@ void TestResourceSet::testAcquire()
     QVERIFY(connectOk);
     bool acquireOk = resourceSet.acquire();
     QVERIFY(acquireOk);
-
-    QEventLoop loop;
-    loop.connect(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)),
-                 SLOT(quit()));
-    loop.exec();
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
 
     // Check the signal parameters
     QCOMPARE(stateSpy.count(), 1);
 
     bool releaseOk = resourceSet.release();
     QVERIFY(releaseOk);
-
-    QEventLoop loop2;
-    loop2.connect(&resourceSet, SIGNAL(resourcesReleased()), SLOT(quit()));
-    loop2.exec();
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
 
     // Check the signal parameters
     QCOMPARE(stateSpy2.count(), 1);

@@ -47,6 +47,9 @@ private:
     ResourcePolicy::Resource *headsetButtonsResource;
 
     ResourcePolicy::Resource * resourceFromType(ResourcePolicy::ResourceType type);
+
+    void waitForSignal(const QObject *sender, const char *signal, quint32 timeout = 500);
+
 public:
     TestResourceSet();
     ~TestResourceSet();
