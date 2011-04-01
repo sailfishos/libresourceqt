@@ -23,12 +23,14 @@
         <step expected_result="0">/usr/lib/libresourceqt-tests/test-resource-engine-wrapper</step>
       </case>
 
+<!--
       <case name="test-security-with-token" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
         <step expected_result="0">/usr/lib/libresourceqt-tests/test-security-with-aegis-token</step>
       </case>
       <case name="test-security-without-token" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
         <step expected_result="1">/usr/lib/libresourceqt-tests/test-security-without-aegis-token</step>
       </case>
+-->
 
       <environments>
         <scratchbox>false</scratchbox>
