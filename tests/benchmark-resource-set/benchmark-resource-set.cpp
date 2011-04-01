@@ -128,4 +128,32 @@ void BenchmarkResourceSet::benchmarkReleaseSend()
     waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
 }
 
+void BenchmarkResourceSet::benchmarkAcquire()
+{
+    ResourceSet resourceSet("player");
+    resourceSet.addResource(AudioPlaybackType);
+    resourceSet.initAndConnect();
+    QBENCHMARK {
+        resourceSet.acquire();
+        waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    }
+
+    resourceSet.release();
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+}
+
+void BenchmarkResourceSet::benchmarkRelease()
+{
+    ResourceSet resourceSet("player");
+    resourceSet.addResource(AudioPlaybackType);
+    resourceSet.initAndConnect();
+    resourceSet.acquire();
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+
+    QBENCHMARK {
+        resourceSet.release();
+        waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+    }
+}
+
 QTEST_MAIN(BenchmarkResourceSet)

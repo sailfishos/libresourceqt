@@ -60,6 +60,8 @@ private slots:
 
     void benchmarkAcquireSend();
     void benchmarkReleaseSend();
+    void benchmarkAcquire();
+    void benchmarkRelease();
 };
 
 #endif
