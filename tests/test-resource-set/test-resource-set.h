@@ -64,9 +64,6 @@ public slots:
 
 private slots:
 
-    void testConstructor1();
-    void testConstructor2();
-
     void testIdentifier();
 
     void testAddResource();
@@ -85,6 +82,10 @@ private:
 
     // This test crashes!
     void testContainsSet();
+
+    // These crash because of the same reason than above test
+    void testConstructor1();
+    void testConstructor2();
 
 };
 
