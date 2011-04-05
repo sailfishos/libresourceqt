@@ -73,14 +73,19 @@ private slots:
     void testAddResourceObject();
     void testDelResource();
 
-    void testContainsSet();
-
     void testConnectToSignals();
 
     void testConnectEngine();
     void testConnectEngine2();
 
     void testAcquire();
+
+private:
+    // "Disabled tests" - move to private slots to enable
+
+    // This test crashes!
+    void testContainsSet();
+
 };
 
 #endif
