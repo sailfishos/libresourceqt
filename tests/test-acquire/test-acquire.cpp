@@ -147,4 +147,61 @@ void TestAcquire::testAcquire()
     QCOMPARE(stateSpyReleased2.count(), 1);
 }
 
+void TestAcquire::testAcquire2()
+{
+    ResourceSet resourceSet("player");
+    ResourceSet resourceSet2("player");
+
+    // Test that signals gets emitted
+    QSignalSpy stateSpyGranted(&resourceSet,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted.isValid());
+    QSignalSpy stateSpyLost(&resourceSet, SIGNAL(lostResources()));
+    QVERIFY(stateSpyLost.isValid());
+    QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased.isValid());
+    QSignalSpy stateSpyGranted2(&resourceSet2,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted2.isValid());
+    QSignalSpy stateSpyReleased2(&resourceSet2, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased2.isValid());
+
+    bool addOk = resourceSet.addResource(AudioPlaybackType);
+    QVERIFY(addOk);
+    bool connectOk = resourceSet.initAndConnect();
+    QVERIFY(connectOk);
+    bool addOk2 = resourceSet2.addResource(AudioPlaybackType);
+    QVERIFY(addOk2);
+    bool connectOk2 = resourceSet2.initAndConnect();
+    QVERIFY(connectOk2);
+
+    bool acquireOk = resourceSet.acquire();
+    QVERIFY(acquireOk);
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    // Check the signal parameters
+    QCOMPARE(stateSpyGranted.count(), 1);
+
+    bool acquireOk2 = resourceSet2.acquire();
+    QVERIFY(acquireOk2);
+    waitForSignal(&resourceSet2, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    // Check the signal parameters
+    QCOMPARE(stateSpyGranted2.count(), 1);
+    waitForSignal(&resourceSet, SIGNAL(lostResources()));
+    QCOMPARE(stateSpyLost.count(), 1);
+
+    bool releaseOk2 = resourceSet2.release();
+    QVERIFY(releaseOk2);
+    waitForSignal(&resourceSet2, SIGNAL(resourcesReleased()));
+    // Check the signal parameters
+    QCOMPARE(stateSpyReleased2.count(), 1);
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted.count(),2);
+
+    bool releaseOk = resourceSet.release();
+    QVERIFY(releaseOk);
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+    // Check the signal parameters
+    QCOMPARE(stateSpyReleased.count(), 1);
+}
+
 QTEST_MAIN(TestAcquire)
