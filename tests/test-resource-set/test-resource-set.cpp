@@ -84,6 +84,48 @@ TestResourceSet::~TestResourceSet()
 {
 }
 
+void TestResourceSet::testConstructor1()
+{
+    ResourceSet resourceSet("player");
+    QVERIFY(resourceSet.isConnectedToManager() == false);
+    QCOMPARE(resourceSet.id(), (quint32) 1);
+    QCOMPARE(resourceSet.applicationClass(), QString("player"));
+    QVERIFY(resourceSet.willAutoRelease() == false);
+    QVERIFY(resourceSet.alwaysGetReply() == false);
+
+    // Test it has no any resources
+    QList<Resource*> resources = resourceSet.resources();
+    QVERIFY(resources.isEmpty());
+    for (int i = 0;i < NumberOfTypes;i++) {
+        ResourceType type = (ResourceType)i;
+        Resource *res = resourceSet.resource(type);
+        QVERIFY(res == NULL);
+        bool contains = resourceSet.contains(type);
+        QVERIFY(contains == false);
+    }
+}
+
+void TestResourceSet::testConstructor2()
+{
+    ResourceSet resourceSet("player", this, true, true);
+    QVERIFY(resourceSet.isConnectedToManager() == false);
+    QCOMPARE(resourceSet.id(), (quint32) 1);
+    QCOMPARE(resourceSet.applicationClass(), QString("player"));
+    QVERIFY(resourceSet.willAutoRelease() == true);
+    QVERIFY(resourceSet.alwaysGetReply() == true);
+
+    // Test it has no any resources
+    QList<Resource*> resources = resourceSet.resources();
+    QVERIFY(resources.isEmpty());
+    for (int i = 0;i < NumberOfTypes;i++) {
+        ResourceType type = (ResourceType)i;
+        Resource *res = resourceSet.resource(type);
+        QVERIFY(res == NULL);
+        bool contains = resourceSet.contains(type);
+        QVERIFY(contains == false);
+    }
+}
+
 void TestResourceSet::testIdentifier()
 {
     ResourceSet resourceSet("player");
