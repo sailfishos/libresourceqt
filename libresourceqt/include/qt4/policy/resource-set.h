@@ -107,7 +107,7 @@ USA.
  *
  * \section see_devel_doc See Also
  * For a more detailed guide see the
- * <a href="https://projects.maemo.org/mediawiki/index.php/Maemo_Developer_Guide/Developing_Harmattan_applications/Application_policy_guidelines">Application policy guidelines</a>.
+ * <a href="http://wiki.meego.com/images/Meego-policy-framework-developer-guide.pdf">MeeGo Policy Framework Developer Guide (PDF)</a>.
  */
 
 /**
