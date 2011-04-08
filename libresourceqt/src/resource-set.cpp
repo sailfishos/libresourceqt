@@ -210,6 +210,10 @@ bool ResourceSet::contains(ResourceType type) const
 
 bool ResourceSet::isConnectedToManager() const
 {
+    if (resourceEngine == NULL) {
+        // not initialized
+        return false;
+    }
     return resourceEngine->isConnectedToManager();
 }
 
