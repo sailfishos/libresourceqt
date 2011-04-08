@@ -57,6 +57,8 @@ public:
 private slots:
 
     void testAcquire();
+    void testAcquiringAndDenyingResource();
+    void testAcquiringAndDenyingResource2();
 
 private:
     // Disabled tests - move to under 'private slots:' to enable again
