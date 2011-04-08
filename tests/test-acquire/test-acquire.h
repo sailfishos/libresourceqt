@@ -57,7 +57,7 @@ public:
 private slots:
 
     void testAcquire();
-    void testAcquire2();
+    void testAcquiringAndLosingResource();
 };
 
 #endif
