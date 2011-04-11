@@ -24,12 +24,15 @@ using namespace ResourcePolicy;
 
 static quint32 resourceSetId=1;
 
+
+
 ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent,
                          bool initialAlwaysReply, bool initialAutoRelease)
         : QObject(parent), resourceClass(applicationClass), resourceEngine(NULL),
         audioResource(NULL), autoRelease(initialAutoRelease),
         alwaysReply(initialAlwaysReply), initialized(false), pendingAcquire(false),
-        pendingUpdate(false), pendingAudioProperties(false), inAcquireMode(false)
+        pendingUpdate(false), pendingAudioProperties(false), pendingVideoProperties(false),
+        inAcquireMode(false), reqMutex(QMutex::Recursive), ignoreQ(false)
 {
     identifier = resourceSetId++;
     memset(resourceSet, 0, sizeof(QPointer<Resource *>)*NumberOfTypes);
@@ -39,7 +42,8 @@ ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
         : QObject(parent), resourceClass(applicationClass), resourceEngine(NULL),
         audioResource(NULL), autoRelease(false),
         alwaysReply(false), initialized(false), pendingAcquire(false),
-        pendingUpdate(false), pendingAudioProperties(false), inAcquireMode(false)
+        pendingUpdate(false), pendingAudioProperties(false), pendingVideoProperties(false),
+        inAcquireMode(false), reqMutex(QMutex::Recursive), ignoreQ(false)
 {
     identifier = resourceSetId++;
     memset(resourceSet, 0, sizeof(QPointer<Resource *>)*NumberOfTypes);
@@ -81,8 +85,8 @@ bool ResourceSet::initialize()
                      this, SIGNAL(errorCallback(quint32, const char*)));
     QObject::connect(resourceEngine, SIGNAL(resourcesReleasedByManager()),
                      this, SLOT(handleReleasedByManager()));
-    QObject::connect(resourceEngine, SIGNAL(updateOK()),
-                     this, SLOT(handleUpdateOK()));
+    QObject::connect(resourceEngine, SIGNAL(updateOK(bool)),
+                     this, SLOT(handleUpdateOK(bool)));
 
     qDebug("initializing resource engine...");
     if (!resourceEngine->initialize()) {
@@ -106,7 +110,9 @@ void ResourceSet::addResourceObject(Resource *resource)
     qDebug("**************** ResourceSet::%s(%d).... %d", __FUNCTION__,this->id(), __LINE__);
     delete resourceSet[resource->type()];
     resourceSet[resource->type()] = resource;
-    if ((resource->type() == AudioPlaybackType)) {
+
+    if ( resource->type() == AudioPlaybackType ) {
+
         qDebug("**************** ResourceSet::%s(%d).... %d", __FUNCTION__,this->id(), __LINE__);
         audioResource = static_cast<AudioResource *>(resource);
         QObject::connect(audioResource,
@@ -129,6 +135,23 @@ void ResourceSet::addResourceObject(Resource *resource)
         }
 
     }
+    else if ( resource->type() == VideoPlaybackType ) {
+
+        qDebug("**************** ResourceSet::%s(%d).... %d", __FUNCTION__,this->id(), __LINE__);
+        videoResource = static_cast<VideoResource *>(resource);
+
+        QObject::connect(videoResource,
+                          SIGNAL(videoPropertiesChanged(quint32)),
+                          this,
+                          SLOT(handleVideoPropertiesChanged(quint32)));
+        if (videoResource->processID() > 0)
+        {
+            qDebug("registering video properties");
+            registerVideoProperties();
+        }
+    }
+
+
     if (resourceEngine &&
        (resourceEngine->isConnectedToManager() || resourceEngine->isConnectingToManager()) )
     {
@@ -198,6 +221,13 @@ void ResourceSet::deleteResource(ResourceType type)
     }
     delete resourceSet[type];
     resourceSet[type] = NULL;
+
+    if (resourceEngine &&
+       (resourceEngine->isConnectedToManager() || resourceEngine->isConnectingToManager()) )
+    {
+        pendingUpdate = true;
+    }
+
 }
 
 bool ResourceSet::contains(ResourceType type) const
@@ -267,6 +297,83 @@ bool ResourceSet::initAndConnect()
 }
 
 
+bool ResourceSet::proceedIfImFirst( requestType theRequest )
+{    
+    if  (!ignoreQ)
+        requestQ.push_back( theRequest );
+    else
+    {
+        qDebug("ResourceSet::%s()...executing first request of %d.", __FUNCTION__, requestQ.size() );
+        return true;
+    }
+
+    //Execute if this is the first request or the next is run from slot.
+    if ( requestQ.size() == 1  )
+    {
+        if (!ignoreQ) { qDebug("ResourceSet::%s()...allowing only request directly.", __FUNCTION__); }
+        return true;
+    }
+
+    if ( requestQ.size() > 1 )
+    {
+        qDebug("ResourceSet::%s()...queuing request %d.", __FUNCTION__, requestQ.size());
+
+        switch (theRequest)
+        {
+        case Acquire:  qDebug("ResourceSet::%s()...queuing request:Acquire.", __FUNCTION__); break;
+        case Update:   qDebug("ResourceSet::%s()...queuing request:Update.", __FUNCTION__);  break;
+        case Release:  qDebug("ResourceSet::%s()...queuing request:Release.", __FUNCTION__); break;
+        }
+        return false;
+    }
+
+    Q_ASSERT_X(0, "proceedIfImFirst", "request queue can not be empty.");
+
+    return false;
+}
+
+
+void ResourceSet::executeNextRequest()
+{
+    qDebug("ResourceSet::%s().", __FUNCTION__);
+
+    if ( requestQ.isEmpty() )
+    {
+        qDebug("ResourceSet::%s()...the completed request is not present.",
+               __FUNCTION__);
+        return;
+    }
+
+    requestQ.removeFirst(); //Remove completed request.
+
+    if ( requestQ.isEmpty() )
+    {
+        qDebug("ResourceSet::%s()...last request acknowledged and removed.", __FUNCTION__);
+        return;
+    }
+
+    requestType nxtReq = requestQ.at(0);
+
+    //Ensure that proceedIfimFirst() lets through.
+    ignoreQ = true;
+    //Having recursive mutexes, because it is taken again in proceedIfImFirst.
+    qDebug("ResourceSet::%s()...executing first request of %d.", __FUNCTION__, requestQ.size() );
+
+    switch (nxtReq)
+    {
+    case Acquire: qDebug("ResourceSet::%s()...Acquire.", __FUNCTION__); this->acquire();  break;
+    case Update:  qDebug("ResourceSet::%s()...Update.",  __FUNCTION__); this->update();   break;
+    case Release: qDebug("ResourceSet::%s()...Release.", __FUNCTION__); this->release();  break;
+    }
+
+    ignoreQ = false;
+
+    //Q_ASSERT_X(0, "executeNextRequest", "should not happen since requestQ.isEmpty() was false.");
+
+}
+
+
+
 bool ResourceSet::acquire()
 {
 
@@ -277,11 +384,19 @@ bool ResourceSet::acquire()
     }
     else
     {
-        if (pendingUpdate)
+      /*  if (pendingUpdate)
         { //Connected and there are res.added.
-            if (!resourceEngine->updateResources())
-                return false;
-        }
+
+            if ( !proceedIfImFirst( Update, Acquire ) ) return true;
+
+            qDebug("ResourceSet::%s().... forcing update.", __FUNCTION__);
+
+            if (!resourceEngine->updateResources()) return false;
+
+            if ( inAcquireMode ) return true;
+        }*/
+
+        if ( !proceedIfImFirst( Acquire ) ) return true;
 
         qDebug("ResourceSet::%s().... acquiring", __FUNCTION__);
         return resourceEngine->acquireResources();
@@ -294,7 +409,10 @@ bool ResourceSet::release()
     if (!initialized || !resourceEngine->isConnectedToManager()) {
         return true;
     }
-    inAcquireMode = false;
+
+    if ( !proceedIfImFirst( Release ) ) return true;
+
+    //inAcquireMode = false;
     qDebug("ResourceSet::%s().... releasing...", __FUNCTION__);
     return resourceEngine->releaseResources();
 }
@@ -310,6 +428,9 @@ bool ResourceSet::update()
         resourceEngine->connectToManager();
         return true;
     }
+
+    if ( !proceedIfImFirst( Update ) ) return true;
+
     qDebug("ResourceSet::%s().... updating...", __FUNCTION__);
     return resourceEngine->updateResources();
 }
@@ -350,10 +471,13 @@ void ResourceSet::connectedHandler()
     qDebug("**************** ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
     if (resourceEngine->isConnectedToManager()) {
         qDebug("ResourceSet::%s() Connected to manager!", __FUNCTION__);
-        emit connectedToManager();
+        emit managerIsUp();
 
         if (pendingAudioProperties) {
             registerAudioProperties();
+        }
+        if (pendingVideoProperties) {
+            registerVideoProperties();
         }
         if (pendingUpdate) {
             resourceEngine->updateResources();
@@ -371,10 +495,17 @@ void ResourceSet::connectedHandler()
         for (int i = 0; i < NumberOfTypes; i++) {
             if (resourceSet[i] != NULL) {
                 if (resourceSet[i]->isGranted()) {
+
                     if (i == AudioPlaybackType) {
                         pendingAudioProperties = true;
                         qDebug("ResourceSet::%s() We have audio", __FUNCTION__);
                     }
+
+                    if (i == VideoPlaybackType) {
+                        pendingVideoProperties = true;
+                        qDebug("ResourceSet::%s() We have video", __FUNCTION__);
+                    }
+
                     qDebug("ResourceSet::%s() We have acquired resources. Re-acquire", __FUNCTION__);
                     pendingAcquire = true;
                     resourceSet[i]->unsetGranted();
@@ -420,30 +551,83 @@ void ResourceSet::registerAudioProperties()
     }
 }
 
+void ResourceSet::registerVideoProperties()
+{
+    if (!initialized) {
+        qDebug("%s(): initializing...", __FUNCTION__);
+        pendingVideoProperties = true;
+        initialize();
+        return;
+    }
+    else if (resourceEngine->isConnectedToManager()) {
+
+        qDebug("Registering new video settings:");
+        qDebug() << "\tPID: " << videoResource->processID();
+
+        if( videoResource->processID() < 2 ) {
+            qWarning() << "processID should be > 1 '" << "'";
+        }
+
+        bool r = resourceEngine->registerVideoProperties( videoResource->processID() );
+
+        qDebug("resourceEngine->registerVideoProperties returned %s", r?"true":"false");
+
+        pendingVideoProperties = false;
+    }
+    else { //if (!resourceEngine->isConnectedToManager() && !resourceEngine->isConnectingToManager()) {
+        qDebug("%s(): Connecting to Manager...", __FUNCTION__);
+
+        pendingVideoProperties = true;
+        resourceEngine->connectToManager();
+        return;
+    }
+}
+
 void ResourceSet::handleGranted(quint32 bitmaskOfGrantedResources)
 {
-    qDebug("in %s",__FUNCTION__);
+    qDebug(" ResourceSet::%s",__FUNCTION__);
     QList<ResourceType> optionalResources;
     qDebug("Acquired resources: 0x%04x", bitmaskOfGrantedResources);
+
+    bool haveSomeResource   = false;
+
     for(int i=0;i < NumberOfTypes; i++) {
+
         if(resourceSet[i] == NULL)
             continue;
+
         ResourceType type = (ResourceType)i;
-        quint32 bitmask = resourceTypeToLibresourceType(type);
+        quint32 bitmask   = resourceTypeToLibresourceType(type);
         qDebug("Checking if resource 0x%04x is in the set", bitmask);
+
         if ((bitmask & bitmaskOfGrantedResources) == bitmask) {
             if (resourceSet[i]->isOptional()) {
                 optionalResources << type;
             }
             resourceSet[i]->setGranted();
+            haveSomeResource = true;
             qDebug("Resource 0x%04x is now granted", i);
         }
-        else {
+        else
+        {
             resourceSet[i]->unsetGranted();
         }
     }
+
+    //When we come to this slot bitmaskOfGrantedResources contains resources.
+   /* if (inAcquireMode && haveSomeResource)
+    {
+        qDebug(" ResourceSet::%s - emitting updateOK(optionalResources) ",__FUNCTION__);
+        emit updateOK(optionalResources);
+    }
+    else
+    {
+        qDebug(" ResourceSet::%s - emitting resourcesGranted(optionalResources) ",__FUNCTION__);
+       */ emit resourcesGranted(optionalResources);
+    //}
     inAcquireMode = true;
-    emit resourcesGranted(optionalResources);
+
+    executeNextRequest();
 }
 
 void ResourceSet::handleReleased()
@@ -454,8 +638,13 @@ void ResourceSet::handleReleased()
         }
     }
     qDebug("ResourceSet(%d) - resourcesReleased!", identifier);
-    //inAcquireMode = false;
+    inAcquireMode = false;
+
+    executeNextRequest();
+
     emit resourcesReleased();
+
+
 }
 
 void ResourceSet::handleDeny()
@@ -465,6 +654,8 @@ void ResourceSet::handleDeny()
             resourceSet[i]->unsetGranted();
         }
     }
+
+    executeNextRequest();
     emit resourcesDenied();
 }
 
@@ -477,7 +668,11 @@ void ResourceSet::handleResourcesLost(quint32 lostResourcesBitmask)
             qDebug("Resource %04x is now lost", bitmask);
         }
     }
+
+    //All requests are invalid when we are pre-empted.
+   requestQ.clear();
     if (inAcquireMode) emit lostResources();
+
 }
 
 void ResourceSet::handleResourcesBecameAvailable(quint32 availableResources)
@@ -499,14 +694,47 @@ void ResourceSet::handleAudioPropertiesChanged(const QString &, quint32,
     registerAudioProperties();
 }
 
-void ResourceSet::handleReleasedByManager()
-{       
-    resourceEngine->releaseResources(); 
-    inAcquireMode = false;
-    emit resourcesReleasedByManager();
+void ResourceSet::handleVideoPropertiesChanged( quint32)
+{
+    registerVideoProperties();
 }
 
-void ResourceSet::handleUpdateOK()
+void ResourceSet::handleReleasedByManager()
 {
+    //All requests are invalid when we are pre-empted.
+   requestQ.clear();
+
+   resourceEngine->releaseResources();
+   inAcquireMode = false;
+   emit resourcesReleasedByManager();
+}
+
+void ResourceSet::handleUpdateOK(bool resend)
+{    
     pendingUpdate = false;
+
+    if ( resend ) {
+
+        qDebug("ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
+
+        QList<ResourceType> optionalResources;
+
+        for (int i=0; i < NumberOfTypes; i++) {
+
+            if(resourceSet[i] == NULL)
+                continue;
+
+            ResourceType type = (ResourceType)i;
+
+            if ( resourceSet[i]->isOptional() &&  resourceSet[i]->isGranted() )
+                optionalResources << type;
+        }
+
+        //Only way to reply if alwaysReply is off and the set doesn't change.
+        emit updateOK(optionalResources);
+    }
+
+    qDebug("ResourceSet::%s()...about to exe next request....", __FUNCTION__);
+    executeNextRequest();
+
 }

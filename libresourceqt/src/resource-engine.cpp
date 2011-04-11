@@ -175,38 +175,62 @@ static void handleGrantMessage(resmsg_t *message, resset_t *libresourceSet, void
 
 void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
 {
-    qDebug("ResourceEngine(%d) - receivedGrant: type=0x%04x, id=0x%04x, reqno=0x%04x, resc=0x%04x",
+    qDebug("ResourceEngine(%d) -- receivedGrant: type=0x%04x, id=0x%04x, reqno=0x%04x, resc=0x%04x",
            identifier, notifyMessage->type, notifyMessage->id, notifyMessage->reqno, notifyMessage->resrc);
+
     if (notifyMessage->resrc == 0) {
-        bool unkownRequest = !messageMap.contains(notifyMessage->reqno);
-        resmsg_type_t originaloriginalMessageType = messageMap.take(notifyMessage->reqno);
-        qDebug("ResourceEngine(%d) - lost resources, originaloriginalMessageType=%u", 
-               identifier, originaloriginalMessageType);
-        if (unkownRequest ||
-            originaloriginalMessageType == RESMSG_UPDATE) {
-            //we don't know this req number => it must be a server override.
-            qDebug("ResourceEngine(%d) - emiting signal resourcesLost()", identifier);
+
+        bool unkownRequest                = !messageMap.contains(notifyMessage->reqno);
+        resmsg_type_t originalMessageType =  messageMap.take(notifyMessage->reqno);
+
+        qDebug("ResourceEngine(%d) -- originalMessageType=%u", identifier, originalMessageType);
+
+        if (unkownRequest ) {
+            //we don't know this req number => it must be a server override
+            qDebug("ResourceEngine(%d) -- emiting signal resourcesLost()", identifier);
             emit resourcesLost(allResourcesToBitmask(resourceSet));
-        }
-        else if (originaloriginalMessageType == RESMSG_ACQUIRE) {
-            qDebug("ResourceEngine(%d) - request DENIED!", identifier);
+
+        }else if ( originalMessageType == RESMSG_UPDATE ) {
+            //An app can loose all resources with update() or if it had no resources,
+            //it can be ACKed saying that the update() was OK but you have no resources yet.
+            bool hadGrantsWhenSentUpdate = false;
+
+            if ( wasInAcquireMode.contains(notifyMessage->reqno) )
+               hadGrantsWhenSentUpdate = wasInAcquireMode.take(notifyMessage->reqno);
+
+            if (hadGrantsWhenSentUpdate) {
+                qDebug("ResourceEngine(%d) -- emitting signal resourcesLost() for update", identifier);
+                emit resourcesLost(allResourcesToBitmask(resourceSet));
+            }else
+            {
+                //If alwaysReply is on and we didn't have resources at update() then we come from here to updateOK()
+                qDebug("ResourceEngine(%d) -- emitting signal updateOK() via receivedGrant.", identifier);
+                emit updateOK(true);
+            }
+
+        }else if (originalMessageType == RESMSG_ACQUIRE) {
+            qDebug("ResourceEngine(%d) -- request DENIED!", identifier);
             emit resourcesDenied();
         }
-        else if (originaloriginalMessageType == RESMSG_RELEASE) {
-            qDebug("ResourceEngine(%d) - confirmation to release", identifier);
+        else if (originalMessageType == RESMSG_RELEASE) {
+            qDebug("ResourceEngine(%d) -- confirmation to release", identifier);
             emit resourcesReleased();
         }
         else {
-            qDebug("ResourceEngine(%d) - Ignoring the receivedGrant", identifier);
+            qDebug("ResourceEngine(%d) -- Ignoring the receivedGrant because original message unknown.", identifier);
         }
     }
     else {
-        qDebug("ResourceEngine(%d) - emiting signal resourcesGranted(%02x)",
-               identifier, notifyMessage->resrc);
+
+        //Alhough if the resourset was reduced or increased we should emit updateOK(), i.e. only resourcesGranted() if
+        //this is the first grant (non-update). Emit resourcesGranted() if this is a grant after resourceLost() preemption.
+        qDebug("ResourceEngine(%d) - emitting signal resourcesGranted(%02x).", identifier, notifyMessage->resrc);
         emit resourcesGranted(notifyMessage->resrc);
     }
+
     messageMap.remove(notifyMessage->reqno);
 }
+
 
 static void handleReleaseMessage(resmsg_t *message, resset_t *rs, void *)
 {
@@ -458,7 +482,22 @@ void ResourceEngine::handleStatusMessage(quint32 requestNo)
     }
     else if(originalMessageType == RESMSG_UPDATE) {
         qDebug("ResourceEngine(%d) - Update status", identifier);
-        emit updateOK(); //We only come here if status ok.
+        //We only come here if status ok.
+
+        bool hadGrantsWhenSentUpdate = false;
+
+        if ( wasInAcquireMode.contains(requestNo) )
+           hadGrantsWhenSentUpdate = wasInAcquireMode.take(requestNo);
+
+        //if ( !hadGrantsWhenSentUpdate  &&  !resourceSet->alwaysGetReply() ) {
+
+            //If alwaysReply is off and we didn't have resources at update() emit from here to
+            //updateOK() (i.e. ACK that the set we are interested in is changed). Or if alwayReply
+            // is off and our update does not change the granted set.
+            qDebug("ResourceEngine(%d) -- emitting signal updateOK() via handleStatusMessage.", identifier);
+            emit updateOK(false);
+        //}
+
     }
     else if(originalMessageType == RESMSG_ACQUIRE) {
         qDebug("ResourceEngine(%d) - Acquire status", identifier);
@@ -559,6 +598,10 @@ bool ResourceEngine::updateResources()
 
     messageMap.insert(requestId, RESMSG_UPDATE);
 
+    bool hasGranted = resourceSet->resources().size() ? true : false;
+
+    wasInAcquireMode.insert(requestId, hasGranted /*hasResourcesGranted()*/ );
+
     qDebug("ResourceEngine(%d) - update %u:%u", identifier, resourceSet->id(), requestId);
     int success = resproto_send_message(libresourceSet, &message, statusCallbackHandler);
 
@@ -607,6 +650,36 @@ bool ResourceEngine::registerAudioProperties(const QString &audioGroup, quint32 
     messageMap.insert(requestId, RESMSG_AUDIO);
 
     qDebug("ResourceEngine(%d) - audio %u:%u", identifier, resourceSet->id(), requestId);
+    int success = resproto_send_message(libresourceSet, &message, statusCallbackHandler);
+    qDebug("ResourceEngine(%d) - resproto_send_message returned %d", identifier, success);
+
+    if(!success)
+        return false;
+    else
+        return true;
+}
+
+bool ResourceEngine::registerVideoProperties(quint32 pid)
+{
+    qDebug("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+    QMutexLocker locker(&mutex);
+    resmsg_t message;
+    memset(&message, 0, sizeof(resmsg_t));
+
+    if (pid <= 0) {
+        qDebug("ResourceEngine(%d) - erroneous pid %u", identifier, pid);
+        return false;
+    }
+
+    message.video.pid   = pid;
+    message.video.type  = RESMSG_VIDEO;
+    message.video.id    = resourceSet->id();
+    message.video.reqno = ++requestId;
+    message.video.type  = RESMSG_VIDEO;
+
+    messageMap.insert(requestId, RESMSG_VIDEO);
+
+    qDebug("ResourceEngine(%d) - video %u:%u", identifier, resourceSet->id(), requestId);
     int success = resproto_send_message(libresourceSet, &message, statusCallbackHandler);
     qDebug("ResourceEngine(%d) - resproto_send_message returned %d", identifier, success);
 

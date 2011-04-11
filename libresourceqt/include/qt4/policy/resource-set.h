@@ -116,6 +116,9 @@ USA.
  */
 namespace ResourcePolicy
 {
+
+enum requestType { None=-1, Acquire=0, Update=1, Release=2, Register=3  } ;
+
 class ResourceEngine;
 /**
  * The resourceSet repesents a set of attributes. Each set can only contain
@@ -128,6 +131,8 @@ class ResourceSet: public QObject
     Q_OBJECT
     Q_DISABLE_COPY(ResourceSet)
 public:
+
+
     /**
      * Alternative constructor with additional parameters for setting
      * alwaysReply and autoRelease.
@@ -180,7 +185,9 @@ public:
     /**
      * This method returns a list of all resource in the set.
      * \return a QList of all resources in the set.
-     */    QList<Resource *> resources() const;
+     */
+    QList<Resource *> resources() const;
+
     /**
      * This method returns a const pointer to a resource of a specific type.
      * \param type The type of resource we are interested in.
@@ -262,8 +269,8 @@ public:
     bool willAutoRelease();
     /**
      * Sets that the resourcesGranted() signal is emited even if we already
-     * have the requested resources granted. By default this feature is off.
-     *
+     * have the requested resources granted. By default this feature is off,
+     * and note that in that case you will not receive the ref\ updateOK() signal.
      * This flag should be set once only before calling anything else
      * (excluding setAutoRelease()), and cannot be unset.
      */
@@ -274,6 +281,12 @@ public:
      */
     bool alwaysGetReply();
 
+    /**
+     * ref\ hasResourcesGranted() returns true if this set has granted resources.
+     */
+    //bool hasResourcesGranted() { return inAcquireMode; }
+
+
 signals:
     /**
      * This signal is emited when the Resource Policy Manager notifies that
@@ -282,12 +295,27 @@ signals:
      * available resources contains only available resource which we have in the set.
      */
     void resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &availableResources);
+
     /**
      * This signal is emitted as a response to the acquire() request.
+     * Thus, this signal informs of currently granted resources.
      * \param grantedOptionalResources The list of granted optional resources.
-     * All the mandatory resources have also been acquired.
+     * All the mandatory resources have also been acquired. Note that this signal is also
+     * received after an application with higher priority stopped using the resources
+     * that were preempted from you with the lostResources() signal.
      */
     void resourcesGranted(const QList<ResourcePolicy::ResourceType> &grantedOptionalResources);
+
+    /**
+     * This signal is emitted as a response to the update() request. Thus, if \ref update()
+     * is called after acquire() then this signal informs of currently granted resources.
+     * (which may be none if ref\ aquire() has not been called, or release() has been called).
+     * \param grantedOptionalResources The list of granted optional resources.
+     * All the mandatory resources have also been updated. Note that a reply to an update()
+     * request may also be resourcesLost() if the update request is denied.
+     */
+    void updateOK(const QList<ResourcePolicy::ResourceType> &grantedOptionalResources);
+
     /**
      * This signal is emitted as a response to the acquire() request, in the
      * case where one or more of the mandatory resources were not available.
@@ -318,9 +346,10 @@ signals:
     void errorCallback(quint32, const char*);
 
     /**
-      * This signals that we have connected to the Resource Manager.
+      * This signals that the manager has started and is available.
       */
-    void connectedToManager();
+    void managerIsUp();
+
 
 private:
 
@@ -331,15 +360,24 @@ private:
     Resource* resourceSet[NumberOfTypes];
     ResourceEngine *resourceEngine;
     AudioResource *audioResource;
+    VideoResource *videoResource;
     bool autoRelease;
     bool alwaysReply;
     bool initialized;
     bool pendingAcquire;
     bool pendingUpdate;
     bool pendingAudioProperties;
+    bool pendingVideoProperties;
     bool haveAudioProperties;
     void registerAudioProperties();
+    void registerVideoProperties();
     bool inAcquireMode;
+    bool proceedIfImFirst( requestType theRequest );
+    void executeNextRequest();
+
+    QList<requestType> requestQ;
+    QMutex reqMutex;
+    bool ignoreQ;
 
 private slots:
     void connectedHandler();
@@ -349,10 +387,12 @@ private slots:
     void handleReleasedByManager();
     void handleResourcesLost(quint32);
     void handleResourcesBecameAvailable(quint32);
-    void handleUpdateOK();
+    void handleUpdateOK(bool resend);
 
     void handleAudioPropertiesChanged(const QString &group, quint32 pid,
                                       const QString &name, const QString &value);
+
+    void handleVideoPropertiesChanged(quint32 pid);
 
 };
 }

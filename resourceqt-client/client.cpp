@@ -136,7 +136,7 @@ bool Client::initialize(const CommandLineParser &parser)
     if (!connect(&stdInNotifier, SIGNAL(activated(int)), this, SLOT(readLine(int)))) {
         return false;
     }
-    if (!connect(resourceSet , SIGNAL(connectedToManager()), this, SLOT(stopConnectTimerHandler()))) {
+    if (!connect(resourceSet , SIGNAL(managerIsUp()), this, SLOT(stopConnectTimerHandler()))) {
         return false;
     }
     if (!connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()),
@@ -496,6 +496,60 @@ void Client::readLine(int)
                 pendingAddAudio = true;
                 startTimer();
                 resourceSet->addResourceObject(audioResource);
+            }
+        }
+    }
+    else if (command == "video") {
+        QString what;
+        quint32 pid = 0;
+        input >> what;
+
+        if (what.isEmpty() || what.isNull()) {
+            OUTPUT << "Not enough parameters! See help" << endl;
+        }
+        else {
+            Resource *resource = resourceSet->resource(VideoPlaybackType);
+            VideoResource *videoResource = static_cast<VideoResource*>(resource);
+            qDebug("resource = %p videoResource = %p", resource, videoResource);
+
+            if (videoResource == NULL) {
+                OUTPUT << "No VideoResource available in set!" << endl;
+            }
+            else {
+                if (what == "pid") {
+                    input >> pid;
+                    if (pid != 0) {
+                        qDebug("Setting video PID to %u", pid);
+                        videoResource->setProcessID(pid);
+                    }
+                    else {
+                        OUTPUT << "Bad pid parameter!" << endl;
+                    }
+                }
+                else {
+                    OUTPUT << "Unknown video command!";
+                }
+            }
+        }
+    }
+    else if (command == "addvideo") {
+        quint32 pid = 0;
+        input >> pid ;
+
+        if (  pid == 0  ) {
+            OUTPUT << "Invalid process ID! See help!" << endl;
+        }
+        else {
+            VideoResource *videoResource = new VideoResource();
+
+            if (videoResource == NULL) {
+                OUTPUT << "Failed to create an VideoResource object!" << endl;
+            }
+            else {
+                videoResource->setProcessID(pid);
+                pendingAddAudio = true;
+                startTimer();
+                resourceSet->addResourceObject(videoResource);
             }
         }
     }

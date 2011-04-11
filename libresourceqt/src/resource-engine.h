@@ -60,6 +60,9 @@ public:
     bool registerAudioProperties(const QString &audioGroup, quint32 pid,
                                   const QString &name, const QString &value);
 
+    bool registerVideoProperties(quint32 pid);
+
+
     void handleConnectionIsUp(resconn_t *connection);
 
     void disconnected();
@@ -83,7 +86,7 @@ signals:
     void disconnectedFromManager();
     void errorCallback(quint32 code, const char* );
     void resourcesReleasedByManager();
-    void updateOK();
+    void updateOK(bool);
 
 private:
     bool connected;
@@ -92,6 +95,7 @@ private:
     resset_t *libresourceSet;
     quint32 requestId;
     QMap<quint32, resmsg_type_t> messageMap;
+    QMap<quint32, bool> wasInAcquireMode;
     quint32 connectionMode;
     static quint32 libresourceUsers;
     static resconn_t *libresourceConnection;

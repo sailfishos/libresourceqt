@@ -42,8 +42,8 @@ ResourceType AudioRecorderResource::type() const
     return AudioRecorderType;
 }
 
-VideoResource::VideoResource()
-        :   Resource()
+VideoResource::VideoResource(quint32 inPid)
+        :   Resource(), pid(inPid)
 {
 }
 
@@ -59,6 +59,13 @@ VideoResource::~VideoResource()
 ResourceType VideoResource::type() const
 {
     return VideoPlaybackType;
+}
+
+void VideoResource::setProcessID(quint32 newPID)
+{
+    pid = newPID;
+    qDebug("New video PID = %u", pid);
+    emit videoPropertiesChanged(pid);
 }
 
 VideoRecorderResource::VideoRecorderResource()

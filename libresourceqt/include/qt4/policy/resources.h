@@ -201,13 +201,16 @@ public:
  * Resource to be used when the application wants to render video with the
  * DSP decoder to render the viewfinder.
  */
-class VideoResource: public Resource
+class VideoResource: public QObject, public Resource
 {
+    Q_OBJECT
 public:
 	/**
      * The constructor.
      */
-    VideoResource();
+    VideoResource(quint32 pid);
+
+    VideoResource():pid(0){} ;
 	/**
      * The copy constructor.
      * \param other The resource to copy from
@@ -222,6 +225,19 @@ public:
      * \return the resource type
      */
     virtual ResourceType type() const;
+
+    quint32 processID() const { return pid; }
+
+    /**
+      * Set the process ID of the video resource.
+      */
+    void setProcessID(quint32 newPID);
+
+signals:
+    void videoPropertiesChanged(quint32 pid);
+private:
+    quint32 pid;
+
 };
 
 /**
