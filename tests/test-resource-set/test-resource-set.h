@@ -64,6 +64,10 @@ public slots:
 
 private slots:
 
+    void testConstructor1();
+    void testConstructor2();
+
+    void testContainsSet();
     void testIdentifier();
 
     void testAddResource();
@@ -76,17 +80,6 @@ private slots:
     void testConnectEngine2();
 
     void testAcquire();
-
-private:
-    // "Disabled tests" - move to private slots to enable
-
-    // This test crashes!
-    void testContainsSet();
-
-    // These crash because of the same reason than above test
-    void testConstructor1();
-    void testConstructor2();
-
 };
 
 #endif
