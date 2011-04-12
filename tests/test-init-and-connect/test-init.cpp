@@ -57,7 +57,7 @@ void TestInitAndConnect::testTheCase()
 void Case::initAndConnect()
 {
     resSetWithInit->initAndConnect();
-    QObject::connect(resSetWithInit, SIGNAL(connectedToManager()), &loop, SLOT(quit()));
+    QObject::connect(resSetWithInit, SIGNAL(managerIsUp()), &loop, SLOT(quit()));
     loop.exec();
     connectedWithInitHandler();
 }
