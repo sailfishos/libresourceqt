@@ -57,7 +57,7 @@ USA.
 #include <policy/audio-resource.h>
 
 /**
-* \mainpage Resource Policy Library
+* \mainpage The Resource Policy API Libresourceqt
 *
 * \section intro_section Introduction
 *
@@ -65,7 +65,7 @@ USA.
 * To use this library two classes are provided: \ref ResourcePolicy::Resource and
 * \ref ResourcePolicy::ResourceSet.
 *
-* The Resource Policy API (libresourceqt) provides:
+* The Libresourceqt API provides:
 *
 * <table border="1">
 * <caption>
@@ -79,10 +79,10 @@ USA.
 * </tr>
 * <tr>
 *   <td>ResourcePolicy::ResourceSet</td>
-*   <td>The ResourceSet which should be filled with resources and whose methods one uses to acquire those resources. </td>
+*   <td>The \ref ResourceSet is the main class whose instances should be filled with needed resources. Use the ResourceSet's methods to acquire those resources. </td>
 * <tr>
 *   <td>ResourcePolicy::Resource</td>
-*   <td>The ResourceSet is filled with R</td>
+*   <td>The ResourceSet is filled with instances of subclasses of the class \ref Resource, for example </td>
 * </tr>
 * </table>
 *
