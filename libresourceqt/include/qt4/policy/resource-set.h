@@ -65,7 +65,28 @@ USA.
 * To use this library two classes are provided: \ref ResourcePolicy::Resource and
 * \ref ResourcePolicy::ResourceSet.
 *
-* \section library_use_section Library Usage
+* The Resource Policy API (libresourceqt) provides:
+*
+* <table border="1">
+* <caption>
+*   <big><b>
+*     Classes in Libresourceqt API
+*   </b></big>
+* </caption>
+* <tr>
+*   <th>Name</th>
+*   <th>Content</th>
+* </tr>
+* <tr>
+*   <td>ResourcePolicy::ResourceSet</td>
+*   <td>The ResourceSet which should be filled with resources and whose methods one uses to acquire those resources. </td>
+* <tr>
+*   <td>ResourcePolicy::Resource</td>
+*   <td>The ResourceSet is filled with R</td>
+* </tr>
+* </table>
+*
+* \section library_use_section Getting started
 *
 * To use the Resource Policy Library, you first need to create the
 * \ref ResourcePolicy::ResourceSet like this:
@@ -103,7 +124,7 @@ USA.
 *
 * To modify the properties of the resources you can use the ResourcePolicy::ResourceSet::resource() method.
 *
-* \section see_devel_doc See Also
+* \section see_devel_doc Further information
 * For a more detailed guide see the
 * <a href="http://wiki.meego.com/images/Meego-policy-framework-developer-guide.pdf">MeeGo Policy Framework Developer Guide (PDF)</a>.
 */
@@ -288,7 +309,7 @@ public:
 	/**
 	* ref\ hasResourcesGranted() returns true if this set has granted resources.
 	*/
-	//bool hasResourcesGranted() { return inAcquireMode; }
+        bool hasResourcesGranted() { return inAcquireMode; }
 
 
 signals:
