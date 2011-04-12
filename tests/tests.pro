@@ -29,8 +29,6 @@ SUBDIRS = test-dbus-qeventloop              \
           test-resource                     \
           test-resource-set                 \
           test-resource-engine              \
-          test-security-with-aegis-token    \
-          test-security-without-aegis-token \
           test-init-and-connect             \
           benchmark-resource-set            \
           test-acquire                      \
