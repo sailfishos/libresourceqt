@@ -33,10 +33,6 @@
         <step expected_result="0">/usr/lib/libresourceqt-tests/test-update</step>
       </case>
 
-      <case name="benchmark-resource-set" type="Benchmark" level="Component" subfeature="libresource Qt API" description="Benchmark tests for libresourceqt" timeout="120">
-        <step expected_result="0">/usr/lib/libresourceqt-tests/benchmark-resource-set</step>
-      </case>
-
 <!--
       <case name="test-auto-release" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
         <step expected_result="0">/usr/lib/libresourceqt-tests/test-auto-release</step>
