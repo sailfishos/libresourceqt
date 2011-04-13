@@ -193,12 +193,12 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
         }else if ( originalMessageType == RESMSG_UPDATE ) {
             //An app can loose all resources with update() or if it had no resources,
             //it can be ACKed saying that the update() was OK but you have no resources yet.
-            bool hadGrantsWhenSentUpdate = false;
+            //bool hadGrantsWhenSentUpdate = false;
 
-            if ( wasInAcquireMode.contains(notifyMessage->reqno) )
-               hadGrantsWhenSentUpdate = wasInAcquireMode.take(notifyMessage->reqno);
+            //if ( wasInAcquireMode.contains(notifyMessage->reqno) )
+            //   hadGrantsWhenSentUpdate = wasInAcquireMode.take(notifyMessage->reqno);
 
-            if (hadGrantsWhenSentUpdate) {
+            if ( /*hadGrantsWhenSentUpdate*/ resourceSet->hasResourcesGranted() ) {
                 qDebug("ResourceEngine(%d) -- emitting signal resourcesLost() for update", identifier);
                 emit resourcesLost(allResourcesToBitmask(resourceSet));
             }else

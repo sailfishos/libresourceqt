@@ -57,7 +57,7 @@ USA.
 #include <policy/audio-resource.h>
 
 /**
-* \mainpage The Resource Policy API Libresourceqt
+* \mainpage The Resource Policy API: Libresourceqt
 *
 * \section intro_section Introduction
 *
@@ -86,7 +86,7 @@ USA.
 * </tr>
 * </table>
 *
-* \section library_use_section Getting started
+* \section library_started_section Getting started
 *
 * To use the Resource Policy Library, you first need to create the
 * \ref ResourcePolicy::ResourceSet like this:
@@ -124,7 +124,7 @@ USA.
 *
 * To modify the properties of the resources you can use the ResourcePolicy::ResourceSet::resource() method.
 *
-* \section see_devel_doc Further information
+* \section see_further_info Further information
 * For a more detailed guide see the
 * <a href="http://wiki.meego.com/images/Meego-policy-framework-developer-guide.pdf">MeeGo Policy Framework Developer Guide (PDF)</a>.
 */
@@ -140,7 +140,7 @@ enum requestType { None=-1, Acquire=0, Update=1, Release=2, Register=3  } ;
 
 class ResourceEngine;
 /**
-* The resourceSet repesents a set of attributes. Each set can only contain
+* Needed resources must be added to the ResourceSet. Each set can only contain
 * a single Resource of a given type. That is one AudioPlaybackResource, etc.
 *
 * Internally the set is stored as a QVector of \ref Resource objects.
@@ -181,16 +181,16 @@ public:
 	/**
 	* This method adds a resource to the set. A set contains only a single
 	* instance of a given resource. If the ResourceSet already contains a
-	* resource of the given type it will be overridden.
+        * resource of the given type it will be written over.
 	* \param resourceType The resource to add to the set. A copy of this object
-	* is stored in the Set.
+        * is stored in the ResourceSet.
 	*/
 	bool addResource(ResourceType resourceType);
 
 	/**
 	* This method adds a resource to the set. A set contains only a single
 	* instance of a given resource. If the ResourceSet already contains a
-	* resource of the given type it will be overridden.
+        * resource of the given type it will be written over.
 	* \param resource The resource to add to the set.
 	* The ResourcePolicy::ResourseSet takes ownership of the pointer. Do NOT free!
 	*/
@@ -267,7 +267,11 @@ public:
 
 	/**
 	* Commits changes to the \ref ResourcePolicy::ResourceSet. Remember to call update()
-	* after adding and/or removing resources.
+        * after adding and/or removing resources. Note that, if you have no resources aquired when
+        * calling update() then this method only informs the policy manager of which resources you are
+        * intersted in, and this request is acknowledged with a \ref updateOK() signal. If you do have
+        * resources granted then you will acknowledged with a \ref resourcesGranted() or \ref lostResources()
+        * signal.
 	*/
 	bool update();
 
@@ -314,27 +318,28 @@ public:
 
 signals:
 	/**
-	* This signal is emitted when the Resource Policy Manager notifies that
-	* the given resources have become available.
-	* \param availableResources A list of available resources. The list of
-	* available resources contains only available resource which we have in the set.
+        * This signal is emitted when the Resource Policy Manager notifies that the given
+        * non-granted resources \param availableResources have become available. These are resources
+        * are such that the user has shown interest in before. A list of available resources.
+        * The list of available resources contains only available resource which we have in the set.
 	*/
 	void resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &availableResources);
 
 	/**
-	* This signal is emitted as a response to the acquire() request.
-	* Thus, this signal informs of currently granted resources.
-	* \param grantedOptionalResources The list of granted optional resources.
-	* All the mandatory resources have also been acquired. Note that this signal is also
-	* received after an application with higher priority stopped using the resources
-	* that were preempted from you with the lostResources() signal.
+        * This signal is emitted as a response to the acquire() request. Thus, this signal informs
+        * of currently granted resources. \param grantedOptionalResources The list of granted optional
+        * resources. All the mandatory resources have also been acquired. Note that this signal
+        * is also received after an application with higher priority stopped using the resources
+        * that were preempted from you with the lostResources() signal. Another situation in which
+        * this signal is emitted is when the application has resources aquired and ref \ref update()
+        * is used to "acquire" a modified set.
 	*/
 	void resourcesGranted(const QList<ResourcePolicy::ResourceType> &grantedOptionalResources);
 
 	/**
-	* This signal is emitted as a response to the update() request. Thus, if \ref update()
-	* is called after acquire() then this signal informs of currently granted resources.
-	* (which may be none if ref\ aquire() has not been called, or release() has been called).
+        * This signal is emitted as a response to the update() request if the application did not have
+        * resources and also in the case when the application did have resources aquired, but the call
+        * to update() did not change the set of granted resources.
 	* \param grantedOptionalResources The list of granted optional resources.
 	* All the mandatory resources have also been updated. Note that a reply to an update()
 	* request may also be resourcesLost() if the update request is denied.
@@ -363,7 +368,8 @@ signals:
 	* This signal is emitted when some other program with a higher priority
 	* supersedes us, and as a result we loose all our resources.
 	* It is very important to connect to this signal as it is signaling when
-	* the acquired resources shouldn't be used anymore.
+        * the acquired resources shouldn't be used anymore. When resourcesGranted() is
+        * is emitted againg then the resources can be used again.
 	*/
 	void lostResources();
 
