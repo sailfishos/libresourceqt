@@ -86,7 +86,7 @@ signals:
     void disconnectedFromManager();
     void errorCallback(quint32 code, const char* );
     void resourcesReleasedByManager();
-    void updateOK();
+    void updateOK(bool);
 
 private:
     bool connected;

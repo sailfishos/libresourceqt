@@ -85,8 +85,8 @@ bool ResourceSet::initialize()
                      this, SIGNAL(errorCallback(quint32, const char*)));
     QObject::connect(resourceEngine, SIGNAL(resourcesReleasedByManager()),
                      this, SLOT(handleReleasedByManager()));
-    QObject::connect(resourceEngine, SIGNAL(updateOK()),
-                     this, SLOT(handleUpdateOK()));
+    QObject::connect(resourceEngine, SIGNAL(updateOK(bool)),
+                     this, SLOT(handleUpdateOK(bool)));
 
     qDebug("initializing resource engine...");
     if (!resourceEngine->initialize()) {
@@ -700,29 +700,27 @@ void ResourceSet::handleReleasedByManager()
    emit resourcesReleasedByManager();
 }
 
-void ResourceSet::handleUpdateOK()
+void ResourceSet::handleUpdateOK(bool resend)
 {    
     pendingUpdate = false;
     qDebug("ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
 
-   /* if ( resend ) {        
+    if ( resend ) {
 
-        QList<ResourceType> optionalResources;
+        /*QList<ResourceType> optionalResources;
 
         for (int i=0; i < NumberOfTypes; i++) {
-
             if(resourceSet[i] == NULL)
                 continue;
 
             ResourceType type = (ResourceType)i;
-
             if ( resourceSet[i]->isOptional() &&  resourceSet[i]->isGranted() )
                 optionalResources << type;
-        }
-*/
+        }*/
+
         //Only way to reply if alwaysReply is off and the set doesn't change.
         emit updateOK();
-  //  }
+    }
 
     qDebug("ResourceSet::%s()...about to exe next request....", __FUNCTION__);
     executeNextRequest();

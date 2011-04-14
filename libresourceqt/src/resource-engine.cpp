@@ -206,7 +206,10 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
                 if ( resourceSet->alwaysGetReply() ) {
                     //If alwaysReply is on and we didn't have resources at update() then we come from here to updateOK()
                     qDebug("ResourceEngine(%d) -- emitting signal updateOK() via receivedGrant.", identifier);
-                    emit updateOK();
+                    emit updateOK(true);
+                }
+                else {
+                    emit updateOK(false);
                 }
             }
 
@@ -497,7 +500,7 @@ void ResourceEngine::handleStatusMessage(quint32 requestNo)
             //updateOK() (i.e. ACK that the set we are interested in is changed). Or if alwayReply
             // is off and our update does not change the granted set.
             qDebug("ResourceEngine(%d) -- handleStatusMessage.", identifier);
-        //    emit updateOK(false);
+            emit updateOK(false);
         //}
 
     }

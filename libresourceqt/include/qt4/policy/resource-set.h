@@ -420,7 +420,7 @@ private slots:
 	void handleReleasedByManager();
 	void handleResourcesLost(quint32);
 	void handleResourcesBecameAvailable(quint32);
-        void handleUpdateOK();
+        void handleUpdateOK(bool resend);
 	void handleAudioPropertiesChanged(const QString &group, quint32 pid, const QString &name, const QString &value);
 	void handleVideoPropertiesChanged(quint32 pid);
 
