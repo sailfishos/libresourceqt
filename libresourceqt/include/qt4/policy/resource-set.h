@@ -23,7 +23,7 @@ USA.
 * \brief Declaration of ResourcePolicy::ResourceSet
 *
 * \copyright Copyright (C) 2010 Nokia Corporation.
-* \author Wolf Bergenheim
+* \author Wolf Bergenheim and Robert Löfman
 * \par License
 * @license LGPL
 * This file is part of libresourceqt
@@ -136,7 +136,7 @@ USA.
 namespace ResourcePolicy
 {
 
-enum requestType { None=-1, Acquire=0, Update=1, Release=2, Register=3  } ;
+enum requestType { Acquire=0, Update, Release } ;
 
 class ResourceEngine;
 /**
@@ -269,9 +269,9 @@ public:
 	* Commits changes to the \ref ResourcePolicy::ResourceSet. Remember to call update()
         * after adding and/or removing resources. Note that, if you have no resources aquired when
         * calling update() then this method only informs the policy manager of which resources you are
-        * intersted in, and this request is acknowledged with a \ref updateOK() signal. If you do have
-        * resources granted then you will acknowledged with a \ref resourcesGranted() or \ref lostResources()
-        * signal.
+        * intersted in, and this request is acknowledged with a \ref updateOK() signal (if alwasReply is on).
+        * If you do have resources granted then the application will be acknowledged with a \ref resourcesGranted()
+        * or \ref lostResources() signal.
 	*/
 	bool update();
 
@@ -296,10 +296,10 @@ public:
 	bool willAutoRelease();
 
 	/**
-	* Sets that the resourcesGranted() signal is emitted even if we already
-	* have the requested resources granted. By default this feature is off,
-	* and note that in that case you will not receive the ref\ updateOK() signal.
-	* This flag should be set once only before calling anything else
+        * Assures that the resourcesGranted() signal are emitted even if we already
+        * have the requested resources granted (i.e. the set does not change). By default
+        * this feature is off, and note that in that case you will not receive the
+        * ref\ updateOK() signal. This flag should be set once only before calling anything else
 	* (excluding setAutoRelease()), and cannot be unset.
 	*/
 	bool setAlwaysReply();
@@ -326,13 +326,12 @@ signals:
 	void resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &availableResources);
 
 	/**
-        * This signal is emitted as a response to the acquire() request. Thus, this signal informs
-        * of currently granted resources. \param grantedOptionalResources The list of granted optional
+        * This signal is emitted as a response to the acquire() request (also for the update() request
+        * when resources has already been granted). Thus, this signal informs  of currently
+        * granted resources. \param grantedOptionalResources The list of granted optional
         * resources. All the mandatory resources have also been acquired. Note that this signal
         * is also received after an application with higher priority stopped using the resources
-        * that were preempted from you with the lostResources() signal. Another situation in which
-        * this signal is emitted is when the application has resources aquired and ref \ref update()
-        * is used to "acquire" a modified set.
+        * that were preempted from you with the lostResources() signal (for this autoRelease must be off).
 	*/
 	void resourcesGranted(const QList<ResourcePolicy::ResourceType> &grantedOptionalResources);
 
@@ -344,7 +343,7 @@ signals:
 	* All the mandatory resources have also been updated. Note that a reply to an update()
 	* request may also be resourcesLost() if the update request is denied.
 	*/
-	void updateOK(const QList<ResourcePolicy::ResourceType> &grantedOptionalResources);
+        void updateOK();
 
 	/**
 	* This signal is emitted as a response to the acquire() request, in the
@@ -421,7 +420,7 @@ private slots:
 	void handleReleasedByManager();
 	void handleResourcesLost(quint32);
 	void handleResourcesBecameAvailable(quint32);
-	void handleUpdateOK(bool resend);
+        void handleUpdateOK();
 	void handleAudioPropertiesChanged(const QString &group, quint32 pid, const QString &name, const QString &value);
 	void handleVideoPropertiesChanged(quint32 pid);
 

@@ -85,8 +85,8 @@ bool ResourceSet::initialize()
                      this, SIGNAL(errorCallback(quint32, const char*)));
     QObject::connect(resourceEngine, SIGNAL(resourcesReleasedByManager()),
                      this, SLOT(handleReleasedByManager()));
-    QObject::connect(resourceEngine, SIGNAL(updateOK(bool)),
-                     this, SLOT(handleUpdateOK(bool)));
+    QObject::connect(resourceEngine, SIGNAL(updateOK()),
+                     this, SLOT(handleUpdateOK()));
 
     qDebug("initializing resource engine...");
     if (!resourceEngine->initialize()) {
@@ -589,7 +589,7 @@ void ResourceSet::handleGranted(quint32 bitmaskOfGrantedResources)
     QList<ResourceType> optionalResources;
     qDebug("Acquired resources: 0x%04x", bitmaskOfGrantedResources);
 
-    bool haveSomeResource   = false;
+    bool setChanged   = false;
 
     for(int i=0;i < NumberOfTypes; i++) {
 
@@ -605,28 +605,23 @@ void ResourceSet::handleGranted(quint32 bitmaskOfGrantedResources)
                 optionalResources << type;
             }
             resourceSet[i]->setGranted();
-            haveSomeResource = true;
+            setChanged = true;
             qDebug("Resource 0x%04x is now granted", i);
         }
         else
         {
             resourceSet[i]->unsetGranted();
+            setChanged = true;
         }
     }
 
     //When we come to this slot bitmaskOfGrantedResources contains resources.
-   /* if (inAcquireMode && haveSomeResource)
-    {
-        qDebug(" ResourceSet::%s - emitting updateOK(optionalResources) ",__FUNCTION__);
-        emit updateOK(optionalResources);
-    }
-    else
-    {
+    if ( alwaysReply || setChanged ) {
         qDebug(" ResourceSet::%s - emitting resourcesGranted(optionalResources) ",__FUNCTION__);
-       */ emit resourcesGranted(optionalResources);
-    //}
-    inAcquireMode = true;
+        emit resourcesGranted(optionalResources);
+    }
 
+    inAcquireMode = true;
     executeNextRequest();
 }
 
@@ -641,10 +636,7 @@ void ResourceSet::handleReleased()
     inAcquireMode = false;
 
     executeNextRequest();
-
     emit resourcesReleased();
-
-
 }
 
 void ResourceSet::handleDeny()
@@ -654,7 +646,6 @@ void ResourceSet::handleDeny()
             resourceSet[i]->unsetGranted();
         }
     }
-
     executeNextRequest();
     emit resourcesDenied();
 }
@@ -709,13 +700,12 @@ void ResourceSet::handleReleasedByManager()
    emit resourcesReleasedByManager();
 }
 
-void ResourceSet::handleUpdateOK(bool resend)
+void ResourceSet::handleUpdateOK()
 {    
     pendingUpdate = false;
+    qDebug("ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
 
-    if ( resend ) {
-
-        qDebug("ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
+   /* if ( resend ) {        
 
         QList<ResourceType> optionalResources;
 
@@ -729,10 +719,10 @@ void ResourceSet::handleUpdateOK(bool resend)
             if ( resourceSet[i]->isOptional() &&  resourceSet[i]->isGranted() )
                 optionalResources << type;
         }
-
+*/
         //Only way to reply if alwaysReply is off and the set doesn't change.
-        emit updateOK(optionalResources);
-    }
+        emit updateOK();
+  //  }
 
     qDebug("ResourceSet::%s()...about to exe next request....", __FUNCTION__);
     executeNextRequest();

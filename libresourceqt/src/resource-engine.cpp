@@ -46,9 +46,9 @@ ResourceEngine::ResourceEngine(ResourceSet *resourceSet)
         libresourceSet(NULL), requestId(0), messageMap(), connectionMode(0),
         identifier(resourceSet->id()), aboutToBeDeleted(false), isConnecting(false)
 {
-    if (resourceSet->alwaysGetReply()) {
+    //if (resourceSet->alwaysGetReply()) {
         connectionMode += RESMSG_MODE_ALWAYS_REPLY;
-    }
+    //}
     if (resourceSet->willAutoRelease()) {
         connectionMode += RESOURCE_AUTO_RELEASE;
     }
@@ -203,12 +203,14 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
                 emit resourcesLost(allResourcesToBitmask(resourceSet));
             }else
             {
-                //If alwaysReply is on and we didn't have resources at update() then we come from here to updateOK()
-                qDebug("ResourceEngine(%d) -- emitting signal updateOK() via receivedGrant.", identifier);
-                emit updateOK(true);
+                if ( resourceSet->alwaysGetReply() ) {
+                    //If alwaysReply is on and we didn't have resources at update() then we come from here to updateOK()
+                    qDebug("ResourceEngine(%d) -- emitting signal updateOK() via receivedGrant.", identifier);
+                    emit updateOK();
+                }
             }
 
-        }else if (originalMessageType == RESMSG_ACQUIRE) {
+        }else if (originalMessageType == RESMSG_ACQUIRE ) {
             qDebug("ResourceEngine(%d) -- request DENIED!", identifier);
             emit resourcesDenied();
         }
@@ -484,18 +486,18 @@ void ResourceEngine::handleStatusMessage(quint32 requestNo)
         qDebug("ResourceEngine(%d) - Update status", identifier);
         //We only come here if status ok.
 
-        bool hadGrantsWhenSentUpdate = false;
+        //bool hadGrantsWhenSentUpdate = false;
 
-        if ( wasInAcquireMode.contains(requestNo) )
-           hadGrantsWhenSentUpdate = wasInAcquireMode.take(requestNo);
+        //if ( wasInAcquireMode.contains(requestNo) )
+        //   hadGrantsWhenSentUpdate = wasInAcquireMode.take(requestNo);
 
         //if ( !hadGrantsWhenSentUpdate  &&  !resourceSet->alwaysGetReply() ) {
 
             //If alwaysReply is off and we didn't have resources at update() emit from here to
             //updateOK() (i.e. ACK that the set we are interested in is changed). Or if alwayReply
             // is off and our update does not change the granted set.
-            qDebug("ResourceEngine(%d) -- emitting signal updateOK() via handleStatusMessage.", identifier);
-            emit updateOK(false);
+            qDebug("ResourceEngine(%d) -- handleStatusMessage.", identifier);
+        //    emit updateOK(false);
         //}
 
     }
