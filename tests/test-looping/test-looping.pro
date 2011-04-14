@@ -19,29 +19,41 @@
 #  USA.                                                                      #
 ##############################################################################
 
-CONFIG  += ordered 
-TEMPLATE = subdirs
+include(../../common.pri)
+TEMPLATE = app
+TARGET = test-looping
+DESTDIR = build
+DEPENDPATH += $${POLICY} $${BASE}/src .
+INCLUDEPATH += $${LIBRESOURCEQT}/src $${LIBRESOURCEINC} $${LIBDBUSQEVENTLOOP}
 
-SUBDIRS = test-dbus-qeventloop              \
-          test-dbus-pong                    \
-          test-audio-resource               \
-          test-video-resource               \
-          test-resource                     \
-          test-resource-set                 \
-          test-resource-engine              \
-          test-init-and-connect             \
-          benchmark-resource-set            \
-          test-acquire                      \
-          test-update                       \
-          test-auto-release                 \
-          test-always-reply                 \
-          test-looping
+# Silence qDebug
+DEFINES += QT_NO_DEBUG_OUTPUT
 
-# Install options
-testsxml.path    = /usr/share/libresourceqt-tests/
-testsxml.files   = tests.xml
-testrunner.path  = /usr/lib/libresourceqt-tests/
-testrunner.files = test-dbus-qeventloop-runner.sh
-dbusconf.path    = /etc/dbus-1/system.d/
-dbusconf.files   = test-dbus-qeventloop.conf
-INSTALLS         = testsxml testrunner dbusconf
+# Input
+HEADERS +=  $${POLICY}/resources.h \
+            $${POLICY}/resource-set.h \
+            $${POLICY}/audio-resource.h \
+            $${LIBRESOURCEQT}/src/resource-engine.h \
+            test-looping.h
+
+SOURCES +=  $${LIBRESOURCEQT}/src/resource.cpp \
+            $${LIBRESOURCEQT}/src/resources.cpp \
+            $${LIBRESOURCEQT}/src/resource-engine.cpp \
+            $${LIBRESOURCEQT}/src/audio-resource.cpp \
+            $${LIBRESOURCEQT}/src/resource-set.cpp \
+            test-looping.cpp
+
+OBJECTS_DIR = build
+MOC_DIR = build
+
+QMAKE_CXXFLAGS += -Wall
+LIBS += -L$${LIBDBUSQEVENTLOOP}/build -ldbus-qeventloop
+
+CONFIG  += qt qtestlib debug warn_on link_pkgconfig
+QT -= gui
+PKGCONFIG += dbus-1 libresource0
+
+# Install directives
+INSTALLBASE    = /usr
+target.path    = $${INSTALLBASE}/lib/libresourceqt-tests/
+INSTALLS       = target
