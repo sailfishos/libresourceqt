@@ -299,8 +299,8 @@ public:
         * Assures that the resourcesGranted() signal are emitted even if we already
         * have the requested resources granted (i.e. the set does not change). By default
         * this feature is off, and note that in that case you will not receive the
-        * ref\ updateOK() signal. This flag should be set once only before calling anything else
-	* (excluding setAutoRelease()), and cannot be unset.
+        * ref\ updateOK() nor the resourcesDenied() signal. This flag should be set
+        * once only before calling anything else (excluding setAutoRelease()), and cannot be unset.
 	*/
 	bool setAlwaysReply();
 
@@ -391,9 +391,9 @@ private:
 	quint32 identifier;
 	const QString resourceClass;
 	Resource* resourceSet[NumberOfTypes];
-	ResourceEngine*resourceEngine;
-	AudioResource*audioResource;
-	VideoResource*videoResource;
+        ResourceEngine* resourceEngine;
+        AudioResource* audioResource;
+        VideoResource* videoResource;
 	bool autoRelease;
 	bool alwaysReply;
 	bool initialized;

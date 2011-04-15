@@ -213,7 +213,7 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
                 }
             }
 
-        }else if (originalMessageType == RESMSG_ACQUIRE ) {
+        }else if (originalMessageType == RESMSG_ACQUIRE && resourceSet->alwaysGetReply() ) {
             qDebug("ResourceEngine(%d) -- request DENIED!", identifier);
             emit resourcesDenied();
         }

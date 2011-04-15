@@ -24,7 +24,7 @@ USA.
 * ResourcePolicy::ResourceType
 *
 * \copyright Copyright (C) 2010 Nokia Corporation.
-* \author Wolf Bergenheim
+* \author Wolf Bergenheim and Robert Löfman
 * \par License
 * @license LGPL
 * This file is part of libresourceqt
