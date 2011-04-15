@@ -56,6 +56,8 @@ USA.
 #include <policy/resources.h>
 #include <policy/audio-resource.h>
 
+class ResourceSetPrivate;
+
 /**
 * \mainpage The Resource Policy API: Libresourceqt
 *
@@ -411,6 +413,7 @@ private:
 	QList<requestType> requestQ;
 	QMutex reqMutex;
 	bool ignoreQ;
+        ResourceSetPrivate* d;
 
 private slots:
 	void connectedHandler();

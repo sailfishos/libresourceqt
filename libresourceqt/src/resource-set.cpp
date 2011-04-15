@@ -24,6 +24,11 @@ using namespace ResourcePolicy;
 
 static quint32 resourceSetId=1;
 
+class ResourceSetPrivate
+{
+public:
+    ResourceSetPrivate();
+};
 
 
 ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent,
