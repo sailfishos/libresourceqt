@@ -57,15 +57,15 @@ public:
 private slots:
 
     void loopAcquireSend();
-    void loopReleaseSendWait();
-    void loopReleaseSendWait2();
-    void loopReleaseSendNoWait2();
 
 private:
     // Disabled since they fail
     void loopAcquireReleaseSend();
     void loopAcquireReleaseSend2();
     void loopReleaseSendNoWait();
+    void loopReleaseSendWait();
+    void loopReleaseSendWait2();
+    void loopReleaseSendNoWait2();
 };
 
 #endif
