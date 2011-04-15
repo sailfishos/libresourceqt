@@ -92,6 +92,7 @@ void TestLooping::waitForSignal(const QObject *sender, const char *signal, quint
     loop.exec();
 }
 
+// Do acquires in the loop and verify one acquire signal is received
 void TestLooping::loopAcquireSend()
 {
     ResourceSet resourceSet("player");
@@ -119,7 +120,38 @@ void TestLooping::loopAcquireSend()
     QCOMPARE(stateSpyReleased.count(), 1);
 }
 
-void TestLooping::loopAcquireSend2()
+// Do acquires and releases in the loop and verify one acquire and release
+// signal is received
+void TestLooping::loopAcquireReleaseSend()
+{
+    ResourceSet resourceSet("player");
+
+    QSignalSpy stateSpyGranted(&resourceSet,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted.isValid());
+    QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased.isValid());
+
+    resourceSet.addResource(AudioPlaybackType);
+    resourceSet.initAndConnect();
+    for (int i = 0; i < 10; i++) {
+        bool acquireOk = resourceSet.acquire();
+        QVERIFY(acquireOk);
+
+        bool releaseOk = resourceSet.release();
+        QVERIFY(releaseOk);
+    }
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+    // Wait for more possible signals..
+    QTest::qWait(1000);
+    QCOMPARE(stateSpyGranted.count(), 1);
+    QCOMPARE(stateSpyReleased.count(), 1);
+}
+
+// Do acquires and releases in the loop and verify one acquire and release
+// signal is received
+void TestLooping::loopAcquireReleaseSend2()
 {
     ResourceSet resourceSet("player");
 
@@ -146,47 +178,117 @@ void TestLooping::loopAcquireSend2()
     QCOMPARE(stateSpyReleased.count(), 1);
 }
 
-/*
-void BenchmarkResourceSet::benchmarkReleaseSend()
+// Do acquires and releases in the loop and verify one acquire and release
+// signal is received
+void TestLooping::loopReleaseSendWait()
 {
     ResourceSet resourceSet("player");
+
+    QSignalSpy stateSpyGranted(&resourceSet,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted.isValid());
+    QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased.isValid());
+
     resourceSet.addResource(AudioPlaybackType);
     resourceSet.initAndConnect();
-    resourceSet.acquire();
+
+    bool acquireOk = resourceSet.acquire();
+    QVERIFY(acquireOk);
     waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
 
-    QBENCHMARK {
-        resourceSet.release();
+    for (int i = 0; i < 10000; i++) {
+        bool releaseOk = resourceSet.release();
+        QVERIFY(releaseOk);
     }
+    //waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
     waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+    // Wait for more possible signals..
+    QTest::qWait(1000);
+    QCOMPARE(stateSpyGranted.count(), 1);
+    QCOMPARE(stateSpyReleased.count(), 1);
 }
 
-void BenchmarkResourceSet::benchmarkAcquire()
+void TestLooping::loopReleaseSendWait2()
 {
     ResourceSet resourceSet("player");
+
+    QSignalSpy stateSpyGranted(&resourceSet,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted.isValid());
+    QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased.isValid());
+
     resourceSet.addResource(AudioPlaybackType);
     resourceSet.initAndConnect();
-    QBENCHMARK {
-        resourceSet.acquire();
-        waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+
+    bool acquireOk = resourceSet.acquire();
+    QTest::qWait(200);
+    QVERIFY(acquireOk);
+    for (int i = 0; i < 10000; i++) {
+        bool releaseOk = resourceSet.release();
+        QVERIFY(releaseOk);
     }
-
-    resourceSet.release();
-    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
-}
-
-void BenchmarkResourceSet::benchmarkRelease()
-{
-    ResourceSet resourceSet("player");
-    resourceSet.addResource(AudioPlaybackType);
-    resourceSet.initAndConnect();
-    resourceSet.acquire();
     waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
-
-    QBENCHMARK {
-        resourceSet.release();
-        waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
-    }
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+    // Wait for more possible signals..
+    QTest::qWait(1000);
+    QCOMPARE(stateSpyGranted.count(), 1);
+    QCOMPARE(stateSpyReleased.count(), 1);
 }
-*/
+
+void TestLooping::loopReleaseSendNoWait()
+{
+    ResourceSet resourceSet("player");
+
+    QSignalSpy stateSpyGranted(&resourceSet,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted.isValid());
+    QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased.isValid());
+
+    resourceSet.addResource(AudioPlaybackType);
+    resourceSet.initAndConnect();
+
+    bool acquireOk = resourceSet.acquire();
+    QVERIFY(acquireOk);
+    for (int i = 0; i < 10000; i++) {
+        bool releaseOk = resourceSet.release();
+        QVERIFY(releaseOk);
+    }
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+    // Wait for more possible signals..
+    QTest::qWait(1000);
+    QCOMPARE(stateSpyGranted.count(), 1);
+    QCOMPARE(stateSpyReleased.count(), 1);
+}
+
+void TestLooping::loopReleaseSendNoWait2()
+{
+    ResourceSet resourceSet("player");
+
+    QSignalSpy stateSpyGranted(&resourceSet,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted.isValid());
+    QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased.isValid());
+
+    resourceSet.addResource(AudioPlaybackType);
+    resourceSet.initAndConnect();
+
+    bool acquireOk = resourceSet.acquire();
+    QVERIFY(acquireOk);
+    for (int i = 0; i < 10; i++) {
+        bool releaseOk = resourceSet.release();
+        QVERIFY(releaseOk);
+    }
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+    // Wait for more possible signals..
+    QTest::qWait(1000);
+    QCOMPARE(stateSpyGranted.count(), 1);
+    QCOMPARE(stateSpyReleased.count(), 1);
+}
+
 QTEST_MAIN(TestLooping)
