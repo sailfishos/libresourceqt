@@ -45,6 +45,10 @@
         <step expected_result="0">/usr/lib/libresourceqt-tests/test-always-reply</step>
       </case>
 
+      <case name="test-looping" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
+        <step expected_result="0">/usr/lib/libresourceqt-tests/test-looping</step>
+      </case>
+
       <environments>
         <scratchbox>false</scratchbox>
         <hardware>true</hardware>
