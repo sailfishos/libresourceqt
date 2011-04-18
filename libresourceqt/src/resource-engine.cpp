@@ -66,19 +66,9 @@ ResourceEngine::~ResourceEngine()
         qDebug("ResourceEngine::~ResourceEngine(%d) - unset userdata", identifier);
     }
     if (libresourceUsers==0) {
-//	DBusError dbusError;
-//	DBusConnection *dbusConnection;
+
         qDebug("ResourceEngine::~ResourceEngine(%d) - last libresourceUser!", identifier);
         ResourceEngine::libresourceConnection = NULL;
-//        dbus_error_init(&dbusError);
-//        dbusConnection = dbus_bus_get(DBUS_BUS_SESSION, &dbusError);
-//        if (dbus_error_is_set(&dbusError)) {
-//            qDebug("Error getting the session bus: %s", dbusError.message);
-//            dbus_error_free(&dbusError);
-//            return;
-//        }
-//        dbus_error_free(&dbusError);
-//        DBUSConnectionEventLoop::removeConnection(dbusConnection);
     }
     qDebug("ResourceEngine::~ResourceEngine(%d) is no more!", identifier);
 }
@@ -193,12 +183,8 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
         }else if ( originalMessageType == RESMSG_UPDATE ) {
             //An app can loose all resources with update() or if it had no resources,
             //it can be ACKed saying that the update() was OK but you have no resources yet.
-            //bool hadGrantsWhenSentUpdate = false;
 
-            //if ( wasInAcquireMode.contains(notifyMessage->reqno) )
-            //   hadGrantsWhenSentUpdate = wasInAcquireMode.take(notifyMessage->reqno);
-
-            if ( /*hadGrantsWhenSentUpdate*/ resourceSet->hasResourcesGranted() ) {
+            if ( resourceSet->hasResourcesGranted() ) {
                 qDebug("ResourceEngine(%d) -- emitting signal resourcesLost() for update", identifier);
                 emit resourcesLost(allResourcesToBitmask(resourceSet));
             }else
@@ -227,8 +213,6 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
     }
     else {
 
-        //Alhough if the resourset was reduced or increased we should emit updateOK(), i.e. only resourcesGranted() if
-        //this is the first grant (non-update). Emit resourcesGranted() if this is a grant after resourceLost() preemption.
         qDebug("ResourceEngine(%d) - emitting signal resourcesGranted(%02x).", identifier, notifyMessage->resrc);
         emit resourcesGranted(notifyMessage->resrc);
     }

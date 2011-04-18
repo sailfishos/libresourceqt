@@ -64,7 +64,7 @@ ResourceType VideoResource::type() const
 void VideoResource::setProcessID(quint32 newPID)
 {
     pid = newPID;
-    qDebug("New video PID = %u", pid);
+    qDebug("Video PID set = %u", pid);
     emit videoPropertiesChanged(pid);
 }
 
