@@ -97,14 +97,13 @@ class ResourceSetPrivate;
 * \code
 * ResourcePolicy::ResourceSet* mySet = new ResourcePolicy::ResourceSet("player");
 * \endcode
-* Then to add resources to the set, use the ResourceSet::addResource() method to add
-* resources to the ResourcePolicy::ResourceSet. Like this:
+* Then to add resources to the set, use the ResourceSet::addResource() method like this:
 * \code
 * mySet->addResource(AudioPlaybackType);
 * mySet->addResource(VideoPlaybackType);
 * \endcode
 * If you want to pre-populate the AudioResource with the audio group (it is a good idea)
-* and other audio parameters you can create an audio object yourself and then
+* and other audio parameters, you can create an audio object yourself and then
 * give that to the ResourcePolicy::ResourceSet. Note that you should NOT free this object.
 * The ResourcePolicy::ResourceSet takes ownership of this pointer.
 * \code
@@ -273,9 +272,9 @@ public:
 
 	/**
 	* Commits changes to the \ref ResourcePolicy::ResourceSet. Remember to call update()
-        * after adding and/or removing resources. Note that, if you do not have resources aquired when
+        * after adding and/or removing resources. Note that, if you do not have resources acquired when
         * calling update() then this method only informs the policy manager of which resources you are
-        * intersted in, and this request is acknowledged with a \ref updateOK() signal (if alwasReply is on by calling
+        * interested in, and this request is acknowledged with a \ref updateOK() signal (if alwaysReply is on by calling
         * \ref setAlwaysReply()).
         * If you do have resources granted then the application will be acknowledged with a \ref resourcesGranted()
         * or \ref lostResources() signal if you lose the resources (in this case you will receive the resources back when possible).

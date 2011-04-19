@@ -30,6 +30,7 @@ USA.
 using namespace ResourcePolicy;
 quint32 theID = 0;
 quint32 resproto_init_calls = 0;
+static quint32 timesRun=0;
 
 void statusCallbackHandler(resset_t *libresourceSet, resmsg_t *message);
 static bool strverify(const char *a, const char *b);
@@ -392,10 +393,15 @@ static void verify_resconn_connect(resconn_t *connection, resmsg_t *message,
     QVERIFY(message->record.type == RESMSG_REGISTER);
     QVERIFY(message->record.id == theID);
     QVERIFY(message->record.reqno > 0);
-    QVERIFY(message->record.rset.all == (RESMSG_AUDIO_PLAYBACK | RESMSG_AUDIO_RECORDING
-                                         | RESMSG_VIDEO_PLAYBACK | RESMSG_VIDEO_RECORDING));
-    QVERIFY(message->record.rset.opt == (RESMSG_AUDIO_RECORDING | RESMSG_VIDEO_PLAYBACK
-                                         | RESMSG_VIDEO_RECORDING));
+
+    timesRun++;
+    if (timesRun==4)
+        QVERIFY(message->record.rset.all == (RESMSG_AUDIO_PLAYBACK | RESMSG_AUDIO_RECORDING
+                                           | RESMSG_VIDEO_PLAYBACK | RESMSG_VIDEO_RECORDING));
+    if (timesRun==4)
+        QVERIFY(message->record.rset.opt == (RESMSG_AUDIO_RECORDING | RESMSG_VIDEO_PLAYBACK
+                                           | RESMSG_VIDEO_RECORDING));
+
     QVERIFY(message->record.rset.share == 0);
     QVERIFY(message->record.rset.mask == 0);
     QCOMPARE(message->record.klass, APP_CLASS);
