@@ -59,6 +59,7 @@ private slots:
     void testNoAlwaysReply();
     void testAlwaysReply();
     void testAlwaysReply2();
+    void testDoubleAcquire();
 };
 
 #endif

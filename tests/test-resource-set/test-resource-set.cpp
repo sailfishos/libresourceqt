@@ -302,14 +302,60 @@ void TestResourceSet::testAcquire()
     QVERIFY(acquireOk);
     waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
 
-    // Check the signal parameters
+    // Check the signal got received
     QCOMPARE(stateSpy.count(), 1);
 
     bool releaseOk = resourceSet.release();
     QVERIFY(releaseOk);
     waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
 
-    // Check the signal parameters
+    // Check the signal got received
+    QCOMPARE(stateSpy2.count(), 1);
+}
+
+// Test that there are no signals emitted after acquire() and release() are
+// done again.
+void TestResourceSet::testDoubleAcquire()
+{
+    ResourceSet resourceSet("player");
+
+    // Test that signals gets emitted
+    QSignalSpy stateSpy(&resourceSet,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpy.isValid());
+    QSignalSpy stateSpy2(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpy2.isValid());
+
+    bool addOk = resourceSet.addResource(AudioPlaybackType);
+    QVERIFY(addOk);
+    bool connectOk = resourceSet.initAndConnect();
+    QVERIFY(connectOk);
+    bool acquireOk = resourceSet.acquire();
+    QVERIFY(acquireOk);
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+
+    // Check the signal got received
+    QCOMPARE(stateSpy.count(), 1);
+
+    acquireOk = resourceSet.acquire();
+    QVERIFY(acquireOk);
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+
+    // Check there is no second signal
+    QCOMPARE(stateSpy.count(), 1);
+
+    bool releaseOk = resourceSet.release();
+    QVERIFY(releaseOk);
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+
+    // Check the signal got received
+    QCOMPARE(stateSpy2.count(), 1);
+
+    releaseOk = resourceSet.release();
+    QVERIFY(releaseOk);
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+
+    // Check there is no second signal
     QCOMPARE(stateSpy2.count(), 1);
 }
 

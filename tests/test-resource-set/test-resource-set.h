@@ -80,6 +80,7 @@ private slots:
     void testConnectEngine2();
 
     void testAcquire();
+    void testDoubleAcquire();
 };
 
 #endif
