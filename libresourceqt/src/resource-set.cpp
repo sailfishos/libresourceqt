@@ -621,7 +621,7 @@ void ResourceSet::handleGranted(quint32 bitmaskOfGrantedResources)
     }
 
     //When we come to this slot bitmaskOfGrantedResources contains resources.
-    if ( alwaysReply || setChanged ) {
+    if ( alwaysReply || ( !alwaysReply && setChanged ) ) {
         qDebug(" ResourceSet::%s - emitting resourcesGranted(optionalResources) ",__FUNCTION__);
         emit resourcesGranted(optionalResources);
     }
@@ -637,11 +637,14 @@ void ResourceSet::handleReleased()
             resourceSet[i]->unsetGranted();
         }
     }
+
+    if ( alwaysReply || ( !alwaysReply && inAcquireMode)  ) emit resourcesReleased();
+
     qDebug("ResourceSet(%d) - resourcesReleased!", identifier);
     inAcquireMode = false;
 
     executeNextRequest();
-    emit resourcesReleased();
+    //emit resourcesReleased();
 }
 
 void ResourceSet::handleDeny()
