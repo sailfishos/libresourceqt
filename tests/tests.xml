@@ -19,12 +19,6 @@
         <step expected_result="0">/usr/lib/libresourceqt-tests/test-resource-set</step>
       </case>
 
-<!--
-      <case name="test-resource-engine" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
-        <step expected_result="0">/usr/lib/libresourceqt-tests/test-resource-engine-wrapper</step>
-      </case>
--->
-
       <case name="test-acquire" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
         <step expected_result="0">/usr/lib/libresourceqt-tests/test-acquire</step>
       </case>
