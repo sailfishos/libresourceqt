@@ -28,7 +28,6 @@ SUBDIRS = test-dbus-qeventloop              \
           test-video-resource               \
           test-resource                     \
           test-resource-set                 \
-          test-resource-engine              \
           test-init-and-connect             \
           benchmark-resource-set            \
           test-acquire                      \

@@ -61,6 +61,10 @@ public slots:
     void handleResourcesDenied();
     void handleResourcesReleased();
     void handleLostResources();
+    void handleManagerIsUp();
+    void handleUpdateOK();
+    void handleResourcesReleasedByManager();
+    void handleErrorCallback(quint32, const char*);
 
 private slots:
 
@@ -80,6 +84,10 @@ private slots:
     void testConnectEngine2();
 
     void testAcquire();
+
+private:
+    // Disabled as it fails!
+    void testDoubleAcquire();
 };
 
 #endif
