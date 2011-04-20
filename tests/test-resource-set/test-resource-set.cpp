@@ -237,6 +237,30 @@ void TestResourceSet::testConnectToSignals()
         this, SLOT(handleLostResources()));
 
     QVERIFY(signalConnectionSucceeded);
+
+    signalConnectionSucceeded = QObject::connect(&resourceSet,
+        SIGNAL(managerIsUp()),
+        this, SLOT(handleManagerIsUp()));
+
+    QVERIFY(signalConnectionSucceeded);
+
+    signalConnectionSucceeded = QObject::connect(&resourceSet,
+        SIGNAL(updateOK()),
+        this, SLOT(handleUpdateOK()));
+
+    QVERIFY(signalConnectionSucceeded);
+
+    signalConnectionSucceeded = QObject::connect(&resourceSet,
+        SIGNAL(resourcesReleasedByManager()),
+        this, SLOT(handleResourcesReleasedByManager()));
+
+    QVERIFY(signalConnectionSucceeded);
+
+    signalConnectionSucceeded = QObject::connect(&resourceSet,
+        SIGNAL(errorCallback(quint32, const char*)),
+        this, SLOT(handleErrorCallback(quint32, const char*)));
+
+    QVERIFY(signalConnectionSucceeded);
 }
 
 void TestResourceSet::handleResourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)
@@ -256,6 +280,22 @@ void TestResourceSet::handleResourcesReleased()
 }
 
 void TestResourceSet::handleLostResources()
+{
+}
+
+void TestResourceSet::handleManagerIsUp()
+{
+}
+
+void TestResourceSet::handleUpdateOK()
+{
+}
+
+void TestResourceSet::handleResourcesReleasedByManager()
+{
+}
+
+void TestResourceSet::handleErrorCallback(quint32, const char*)
 {
 }
 
