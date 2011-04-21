@@ -102,6 +102,8 @@ void TestUpdate::testUpdate()
     QVERIFY(stateSpyGranted.isValid());
     QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
     QVERIFY(stateSpyReleased.isValid());
+    QSignalSpy stateSpyUpdateOK(&resourceSet, SIGNAL(updateOK()));
+    QVERIFY(stateSpyUpdateOK.isValid());
 
     bool addOk = resourceSet.addResource(AudioPlaybackType);
     QVERIFY(addOk);
@@ -112,20 +114,26 @@ void TestUpdate::testUpdate()
     QVERIFY(acquireOk);
     waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
 
-    // Check the signal parameters
+    // Check the granted signal was received
     QCOMPARE(stateSpyGranted.count(), 1);
 
     bool releaseOk = resourceSet.release();
     QVERIFY(releaseOk);
     waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
 
-    // Check the signal parameters
+    // Check the released signal was received
     QCOMPARE(stateSpyReleased.count(), 1);
 
     addOk = resourceSet.addResource(VideoPlaybackType);
     QVERIFY(addOk);
     bool updateOk = resourceSet.update();
     QVERIFY(updateOk);
+    waitForSignal(&resourceSet, SIGNAL(updateOK()));
+
+    // Check the released signal was received
+    QCOMPARE(stateSpyReleased.count(), 1);
+    QCOMPARE(stateSpyUpdateOK.count(), 0);
+    QCOMPARE(stateSpyGranted.count(), 1);
 }
 
 void TestUpdate::testUpdateGranted()
@@ -138,6 +146,8 @@ void TestUpdate::testUpdateGranted()
     QVERIFY(stateSpyGranted.isValid());
     QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
     QVERIFY(stateSpyReleased.isValid());
+    QSignalSpy stateSpyUpdateOK(&resourceSet, SIGNAL(updateOK()));
+    QVERIFY(stateSpyUpdateOK.isValid());
 
     bool addOk = resourceSet.addResource(AudioPlaybackType);
     QVERIFY(addOk);
@@ -148,19 +158,26 @@ void TestUpdate::testUpdateGranted()
     QVERIFY(acquireOk);
     waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
 
-    // Check the signal parameters
+    // Check the granted signal was received
     QCOMPARE(stateSpyGranted.count(), 1);
 
     addOk = resourceSet.addResource(VideoPlaybackType);
     QVERIFY(addOk);
     bool updateOk = resourceSet.update();
     QVERIFY(updateOk);
+    waitForSignal(&resourceSet, SIGNAL(updateOK()));
+
+    // Check the updateOK signal was not received and granted-signal was
+    // received
+    QCOMPARE(stateSpyUpdateOK.count(), 0);
+    QCOMPARE(stateSpyReleased.count(), 0);
+    QCOMPARE(stateSpyGranted.count(), 2);
 
     bool releaseOk = resourceSet.release();
     QVERIFY(releaseOk);
     waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
 
-    // Check the signal parameters
+    // Check the released signal was received
     QCOMPARE(stateSpyReleased.count(), 1);
 }
 
