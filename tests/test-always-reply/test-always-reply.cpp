@@ -299,7 +299,7 @@ void TestAlwaysReply::testAlwaysReply2()
 // done again.
 void TestAlwaysReply::testDoubleAcquire()
 {
-    ResourceSet resourceSet("player");
+    ResourceSet resourceSet("player", this, true, false);
 
     // Test that signals gets emitted
     QSignalSpy stateSpy(&resourceSet,
