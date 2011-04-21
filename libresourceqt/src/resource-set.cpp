@@ -609,12 +609,17 @@ void ResourceSet::handleGranted(quint32 bitmaskOfGrantedResources)
             if (resourceSet[i]->isOptional()) {
                 optionalResources << type;
             }
-            resourceSet[i]->setGranted();
-            setChanged = true;
+            if ( !resourceSet[i]->isGranted() )
+                setChanged = true;
+
+            resourceSet[i]->setGranted();            
             qDebug("Resource 0x%04x is now granted", i);
         }
         else
         {
+            if ( resourceSet[i]->isGranted() )
+                setChanged = true;
+
             resourceSet[i]->unsetGranted();
             setChanged = true;
         }
