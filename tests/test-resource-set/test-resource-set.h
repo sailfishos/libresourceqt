@@ -84,9 +84,6 @@ private slots:
     void testConnectEngine2();
 
     void testAcquire();
-
-private:
-    // Disabled as it fails!
     void testDoubleAcquire();
 };
 
