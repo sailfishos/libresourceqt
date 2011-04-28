@@ -405,7 +405,8 @@ static void verify_resconn_connect(resconn_t *connection, resmsg_t *message,
     QVERIFY(message->record.rset.share == 0);
     QVERIFY(message->record.rset.mask == 0);
     QCOMPARE(message->record.klass, APP_CLASS);
-    QVERIFY(message->record.mode == 0);
+    // the default mode was changed to "always reply"
+    QVERIFY(message->record.mode == RESMSG_MODE_ALWAYS_REPLY);
     QVERIFY(callbackFunction != NULL);
 }
 
