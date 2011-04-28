@@ -139,6 +139,10 @@ void TestAlwaysReply::testNoAlwaysReply()
     // The resource is not granted but there is no signaling when there is no
     // alwaysReply flag
 
+    // Wait for a while so that the signals would come
+    QTest::qWait(200);
+    QCOMPARE(stateSpyGranted2.count(), 0);
+
     // Release the resource from the first client
     bool releaseOk = resourceSet.release();
     QVERIFY(releaseOk);
@@ -147,8 +151,9 @@ void TestAlwaysReply::testNoAlwaysReply()
     QCOMPARE(stateSpyReleased.count(), 1);
 
     // Check there was no granted- or denied-signals for second client
-    QCOMPARE(stateSpyGranted2.count(), 0);
+    //QCOMPARE(stateSpyGranted2.count(), 0);
     QCOMPARE(stateSpyDenied2.count(), 0);
+    QCOMPARE(stateSpyReleased2.count(), 0);
 }
 
 // This test tests rejecting resource with alwaysReply flag
@@ -340,6 +345,96 @@ void TestAlwaysReply::testDoubleAcquire()
     // Check the second signal got received
     QCOMPARE(stateSpy2.count(), 2);
 }
+
+void TestAlwaysReply::testUpdate()
+{
+    ResourceSet resourceSet("player", this, true, false);
+
+    // Test that signals gets emitted
+    QSignalSpy stateSpyGranted(&resourceSet,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted.isValid());
+    QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased.isValid());
+    QSignalSpy stateSpyUpdateOK(&resourceSet, SIGNAL(updateOK()));
+    QVERIFY(stateSpyUpdateOK.isValid());
+
+    bool addOk = resourceSet.addResource(AudioPlaybackType);
+    QVERIFY(addOk);
+    bool connectOk = resourceSet.initAndConnect();
+    QVERIFY(connectOk);
+
+    bool acquireOk = resourceSet.acquire();
+    QVERIFY(acquireOk);
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+
+    // Check the granted signal was received
+    QCOMPARE(stateSpyGranted.count(), 1);
+
+    bool releaseOk = resourceSet.release();
+    QVERIFY(releaseOk);
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+
+    // Check the released signal was received
+    QCOMPARE(stateSpyReleased.count(), 1);
+
+    addOk = resourceSet.addResource(VideoPlaybackType);
+    QVERIFY(addOk);
+    bool updateOk = resourceSet.update();
+    QVERIFY(updateOk);
+    waitForSignal(&resourceSet, SIGNAL(updateOK()));
+
+    // Check the updateOK signal was received
+    QCOMPARE(stateSpyUpdateOK.count(), 1);
+    QCOMPARE(stateSpyReleased.count(), 1);
+    QCOMPARE(stateSpyGranted.count(), 1);
+}
+
+void TestAlwaysReply::testUpdateGranted()
+{
+    ResourceSet resourceSet("player", this, true, false);
+
+    // Test that signals gets emitted
+    QSignalSpy stateSpyGranted(&resourceSet,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted.isValid());
+    QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased.isValid());
+    QSignalSpy stateSpyUpdateOK(&resourceSet, SIGNAL(updateOK()));
+    QVERIFY(stateSpyUpdateOK.isValid());
+
+    bool addOk = resourceSet.addResource(AudioPlaybackType);
+    QVERIFY(addOk);
+    bool connectOk = resourceSet.initAndConnect();
+    QVERIFY(connectOk);
+
+    bool acquireOk = resourceSet.acquire();
+    QVERIFY(acquireOk);
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+
+    // Check the granted signal was received
+    QCOMPARE(stateSpyGranted.count(), 1);
+
+    addOk = resourceSet.addResource(VideoPlaybackType);
+    QVERIFY(addOk);
+    bool updateOk = resourceSet.update();
+    QVERIFY(updateOk);
+    waitForSignal(&resourceSet, SIGNAL(updateOK()));
+
+    // Check the updateOK signal was not received and granted-signal was
+    // received
+    QCOMPARE(stateSpyUpdateOK.count(), 0);
+    QCOMPARE(stateSpyReleased.count(), 0);
+    QCOMPARE(stateSpyGranted.count(), 2);
+
+    bool releaseOk = resourceSet.release();
+    QVERIFY(releaseOk);
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+
+    // Check the released signal was received
+    QCOMPARE(stateSpyReleased.count(), 1);
+}
+
 
 
 QTEST_MAIN(TestAlwaysReply)

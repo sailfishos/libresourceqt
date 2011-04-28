@@ -60,6 +60,8 @@ private slots:
     void testAlwaysReply();
     void testAlwaysReply2();
     void testDoubleAcquire();
+    void testUpdate();
+    void testUpdateGranted();
 };
 
 #endif
