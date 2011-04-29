@@ -233,9 +233,14 @@ void TestAcquire::testAcquiringAndDenyingResource()
     QVERIFY(stateSpyLost.isValid());
     QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
     QVERIFY(stateSpyReleased.isValid());
+    QSignalSpy stateSpyUpdateOK(&resourceSet, SIGNAL(updateOK()));
+    QVERIFY(stateSpyUpdateOK.isValid());
+
     QSignalSpy stateSpyGranted2(&resourceSet2,
             SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
     QVERIFY(stateSpyGranted2.isValid());
+    QSignalSpy stateSpyLost2(&resourceSet2, SIGNAL(lostResources()));
+    QVERIFY(stateSpyLost2.isValid());
     QSignalSpy stateSpyReleased2(&resourceSet2, SIGNAL(resourcesReleased()));
     QVERIFY(stateSpyReleased2.isValid());
     QSignalSpy stateSpyDenied2(&resourceSet2, SIGNAL(resourcesDenied()));
@@ -273,6 +278,31 @@ void TestAcquire::testAcquiringAndDenyingResource()
     // Wait for the released-signal
     waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
     QCOMPARE(stateSpyReleased.count(), 1);
+
+    // Now the second client gets the resource
+    // Wait for the granted-signal for the second client
+    waitForSignal(&resourceSet2, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted2.count(), 1);
+    QCOMPARE(stateSpyLost.count(), 0);
+    QCOMPARE(stateSpyDenied2.count(), 0);
+
+    // Release the resource from the second client
+    bool releaseOk2 = resourceSet2.release();
+    QVERIFY(releaseOk2);
+    // Wait for the released-signal
+    waitForSignal(&resourceSet2, SIGNAL(resourcesReleased()));
+    QCOMPARE(stateSpyReleased2.count(), 1);
+
+    // Check all the signals
+    QCOMPARE(stateSpyGranted.count(), 1);
+    QCOMPARE(stateSpyLost.count(), 0);
+    QCOMPARE(stateSpyReleased.count(), 1);
+    QCOMPARE(stateSpyUpdateOK.count(), 0);
+
+    QCOMPARE(stateSpyGranted2.count(), 1);
+    QCOMPARE(stateSpyLost2.count(), 0);
+    QCOMPARE(stateSpyDenied2.count(), 0);
+    QCOMPARE(stateSpyUpdateOK.count(), 0);
 }
 
 // This tests that lower priority second client gets denied-signal
@@ -289,6 +319,7 @@ void TestAcquire::testAcquiringAndDenyingResource2()
     QVERIFY(stateSpyLost.isValid());
     QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
     QVERIFY(stateSpyReleased.isValid());
+
     QSignalSpy stateSpyGranted2(&resourceSet2,
             SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
     QVERIFY(stateSpyGranted2.isValid());
