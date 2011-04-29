@@ -56,8 +56,8 @@ public:
 
 private slots:
 
-    void testBecameAvailable();
-    void testBecameAvailable2();
+    void testAcquire();
+    void testAcquiringAndDenyingResource();
 };
 
 #endif
