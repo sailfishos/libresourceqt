@@ -245,6 +245,8 @@ void TestAcquire::testAcquiringAndDenyingResource()
     QVERIFY(stateSpyReleased2.isValid());
     QSignalSpy stateSpyDenied2(&resourceSet2, SIGNAL(resourcesDenied()));
     QVERIFY(stateSpyDenied2.isValid());
+    QSignalSpy stateSpyUpdateOK2(&resourceSet2, SIGNAL(updateOK()));
+    QVERIFY(stateSpyUpdateOK2.isValid());
 
     // Create resource sets
     bool addOk = resourceSet.addResource(AudioPlaybackType);
@@ -302,7 +304,7 @@ void TestAcquire::testAcquiringAndDenyingResource()
     QCOMPARE(stateSpyGranted2.count(), 1);
     QCOMPARE(stateSpyLost2.count(), 0);
     QCOMPARE(stateSpyDenied2.count(), 0);
-    QCOMPARE(stateSpyUpdateOK.count(), 0);
+    QCOMPARE(stateSpyUpdateOK2.count(), 0);
 }
 
 // This tests that lower priority second client gets denied-signal
