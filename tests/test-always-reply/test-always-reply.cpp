@@ -183,7 +183,7 @@ void TestAlwaysReply::testAlwaysReply()
     QVERIFY(stateSpyUpdateOK2.isValid());
     QSignalSpy stateSpyResourcesReleased2(&resourceSet2, SIGNAL(resourcesReleasedByManager()));
     QVERIFY(stateSpyResourcesReleased2.isValid());
-    QSignalSpy stateSpyBecameAvailable2(&resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QSignalSpy stateSpyBecameAvailable2(&resourceSet2, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
     QVERIFY(stateSpyBecameAvailable2.isValid());
 
     // Create resource sets
@@ -222,7 +222,7 @@ void TestAlwaysReply::testAlwaysReply()
     // Now the second client gets the resource
     // Wait for the granted-signal for the second client
     waitForSignal(&resourceSet2, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
-    QCOMPARE(stateSpyBecameAvailable2.count(), 1);
+    QCOMPARE(stateSpyBecameAvailable2.count(), 3);
     QCOMPARE(stateSpyGranted2.count(), 1);
     QCOMPARE(stateSpyLost.count(), 0);
     QCOMPARE(stateSpyDenied2.count(), 1);
@@ -249,7 +249,7 @@ void TestAlwaysReply::testAlwaysReply()
     QCOMPARE(stateSpyDenied2.count(), 1);
     QCOMPARE(stateSpyUpdateOK2.count(), 0);
     QCOMPARE(stateSpyResourcesReleased2.count(), 0);
-    QCOMPARE(stateSpyBecameAvailable2.count(), 1);
+    QCOMPARE(stateSpyBecameAvailable2.count(), 3);
 }
 
 // This test tests simple acquire with two clients
@@ -288,7 +288,7 @@ void TestAlwaysReply::testAlwaysReply2()
     QVERIFY(stateSpyUpdateOK2.isValid());
     QSignalSpy stateSpyResourcesReleased2(&resourceSet2, SIGNAL(resourcesReleasedByManager()));
     QVERIFY(stateSpyResourcesReleased2.isValid());
-    QSignalSpy stateSpyBecameAvailable2(&resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QSignalSpy stateSpyBecameAvailable2(&resourceSet2, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
     QVERIFY(stateSpyBecameAvailable2.isValid());
 
     // Create resource sets
