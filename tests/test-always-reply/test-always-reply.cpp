@@ -63,6 +63,8 @@ void TestAlwaysReply::testNoAlwaysReply()
     QVERIFY(stateSpyUpdateOK.isValid());
     QSignalSpy stateSpyResourcesReleased(&resourceSet, SIGNAL(resourcesReleasedByManager()));
     QVERIFY(stateSpyResourcesReleased.isValid());
+    QSignalSpy stateSpyBecameAvailable(&resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable.isValid());
 
     QSignalSpy stateSpyGranted2(&resourceSet2,
             SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
@@ -77,6 +79,8 @@ void TestAlwaysReply::testNoAlwaysReply()
     QVERIFY(stateSpyUpdateOK2.isValid());
     QSignalSpy stateSpyResourcesReleased2(&resourceSet2, SIGNAL(resourcesReleasedByManager()));
     QVERIFY(stateSpyResourcesReleased2.isValid());
+    QSignalSpy stateSpyBecameAvailable2(&resourceSet2, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable2.isValid());
 
     // Create resource sets
     bool addOk = resourceSet.addResource(AudioPlaybackType);
@@ -138,6 +142,7 @@ void TestAlwaysReply::testNoAlwaysReply()
     QCOMPARE(stateSpyDenied.count(), 0);
     QCOMPARE(stateSpyUpdateOK.count(), 0);
     QCOMPARE(stateSpyResourcesReleased.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable.count(), 1);
 
     QCOMPARE(stateSpyGranted2.count(), 1);
     QCOMPARE(stateSpyLost2.count(), 0);
@@ -145,6 +150,7 @@ void TestAlwaysReply::testNoAlwaysReply()
     QCOMPARE(stateSpyDenied2.count(), 0);
     QCOMPARE(stateSpyUpdateOK2.count(), 0);
     QCOMPARE(stateSpyResourcesReleased2.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable2.count(), 1);
 }
 
 // This test tests rejecting resource with alwaysReply flag
