@@ -27,56 +27,7 @@ USA.
 
 using namespace ResourcePolicy;
 
-Resource * TestAutoRelease::resourceFromType(ResourceType type)
-{
-    switch (type) {
-    case AudioPlaybackType:
-        return new AudioResource;
-    case AudioRecorderType:
-        return new AudioRecorderResource;
-    case VideoPlaybackType:
-        return new VideoResource;
-    case VideoRecorderType:
-        return new VideoRecorderResource;
-    case VibraType:
-        return new VibraResource;
-    case LedsType:
-        return new LedsResource;
-    case BacklightType:
-        return new BacklightResource;
-    case SystemButtonType:
-        return new SystemButtonResource;
-    case LockButtonType:
-        return new LockButtonResource;
-    case ScaleButtonType:
-        return new ScaleButtonResource;
-    case SnapButtonType:
-        return new SnapButtonResource;
-    case LensCoverType:
-        return new LensCoverResource;
-    case HeadsetButtonsType:
-        return new HeadsetButtonsResource;
-    default:
-        return NULL;
-    }
-}
-
-using namespace ResourcePolicy;
-
 TestAutoRelease::TestAutoRelease()
-    : audioResource(NULL)
-    , audioRecorderResource(NULL)
-    , videoResource(NULL)
-    , videoRecorderResource(NULL)
-    , vibraResource(NULL)
-    , ledsResource(NULL)
-    , backlightResource(NULL)
-    , systemButtonResource(NULL)
-    , lockButtonResource(NULL)
-    , scaleButtonResource(NULL)
-    , snapButtonResource(NULL)
-    , lensCoverResource(NULL)
-    , headsetButtonsResource(NULL)
 {
 }
 
