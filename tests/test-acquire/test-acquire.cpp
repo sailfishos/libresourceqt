@@ -63,6 +63,8 @@ void TestAcquire::testAcquire()
     QVERIFY(stateSpyUpdateOK.isValid());
     QSignalSpy stateSpyResourcesReleased(&resourceSet, SIGNAL(resourcesReleasedByManager()));
     QVERIFY(stateSpyResourcesReleased.isValid());
+    QSignalSpy stateSpyBecameAvailable(&resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable.isValid());
 
     QSignalSpy stateSpyGranted2(&resourceSet2,
             SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
@@ -77,6 +79,8 @@ void TestAcquire::testAcquire()
     QVERIFY(stateSpyUpdateOK2.isValid());
     QSignalSpy stateSpyResourcesReleased2(&resourceSet2, SIGNAL(resourcesReleasedByManager()));
     QVERIFY(stateSpyResourcesReleased2.isValid());
+    QSignalSpy stateSpyBecameAvailable2(&resourceSet2, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable2.isValid());
 
     // Create resource sets
     bool addOk = resourceSet.addResource(AudioPlaybackType);
@@ -123,6 +127,7 @@ void TestAcquire::testAcquire()
     QCOMPARE(stateSpyDenied.count(), 0);
     QCOMPARE(stateSpyUpdateOK.count(), 0);
     QCOMPARE(stateSpyResourcesReleased.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable.count(), 1);
 
     QCOMPARE(stateSpyGranted2.count(), 1);
     QCOMPARE(stateSpyLost2.count(), 0);
@@ -130,6 +135,7 @@ void TestAcquire::testAcquire()
     QCOMPARE(stateSpyDenied2.count(), 0);
     QCOMPARE(stateSpyUpdateOK2.count(), 0);
     QCOMPARE(stateSpyResourcesReleased2.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable2.count(), 1);
 }
 
 // This test tests the case when second client stoles the resource from the
@@ -153,6 +159,8 @@ void TestAcquire::testAcquiringAndLosingResource()
     QVERIFY(stateSpyUpdateOK.isValid());
     QSignalSpy stateSpyResourcesReleased(&resourceSet, SIGNAL(resourcesReleasedByManager()));
     QVERIFY(stateSpyResourcesReleased.isValid());
+    QSignalSpy stateSpyBecameAvailable(&resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable.isValid());
 
     QSignalSpy stateSpyGranted2(&resourceSet2,
             SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
@@ -167,6 +175,8 @@ void TestAcquire::testAcquiringAndLosingResource()
     QVERIFY(stateSpyUpdateOK2.isValid());
     QSignalSpy stateSpyResourcesReleased2(&resourceSet2, SIGNAL(resourcesReleasedByManager()));
     QVERIFY(stateSpyResourcesReleased2.isValid());
+    QSignalSpy stateSpyBecameAvailable2(&resourceSet2, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable2.isValid());
 
     // Create resource sets
     bool addOk = resourceSet.addResource(AudioPlaybackType);
@@ -222,6 +232,7 @@ void TestAcquire::testAcquiringAndLosingResource()
     QCOMPARE(stateSpyDenied.count(), 0);
     QCOMPARE(stateSpyUpdateOK.count(), 0);
     QCOMPARE(stateSpyResourcesReleased.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable.count(), 1);
 
     QCOMPARE(stateSpyGranted2.count(), 1);
     QCOMPARE(stateSpyLost2.count(), 0);
@@ -229,6 +240,7 @@ void TestAcquire::testAcquiringAndLosingResource()
     QCOMPARE(stateSpyDenied2.count(), 0);
     QCOMPARE(stateSpyUpdateOK2.count(), 0);
     QCOMPARE(stateSpyResourcesReleased2.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable2.count(), 1);
 }
 
 // This tests that lower priority second client doesn't get the resource.
@@ -252,6 +264,8 @@ void TestAcquire::testAcquiringAndDenyingResource()
     QVERIFY(stateSpyUpdateOK.isValid());
     QSignalSpy stateSpyResourcesReleased(&resourceSet, SIGNAL(resourcesReleasedByManager()));
     QVERIFY(stateSpyResourcesReleased.isValid());
+    QSignalSpy stateSpyBecameAvailable(&resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable.isValid());
 
     QSignalSpy stateSpyGranted2(&resourceSet2,
             SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
@@ -266,6 +280,8 @@ void TestAcquire::testAcquiringAndDenyingResource()
     QVERIFY(stateSpyUpdateOK2.isValid());
     QSignalSpy stateSpyResourcesReleased2(&resourceSet2, SIGNAL(resourcesReleasedByManager()));
     QVERIFY(stateSpyResourcesReleased2.isValid());
+    QSignalSpy stateSpyBecameAvailable2(&resourceSet2, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable2.isValid());
 
     // Create resource sets
     bool addOk = resourceSet.addResource(AudioPlaybackType);
@@ -321,6 +337,7 @@ void TestAcquire::testAcquiringAndDenyingResource()
     QCOMPARE(stateSpyDenied.count(), 0);
     QCOMPARE(stateSpyUpdateOK.count(), 0);
     QCOMPARE(stateSpyResourcesReleased.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable.count(), 1);
 
     QCOMPARE(stateSpyGranted2.count(), 1);
     QCOMPARE(stateSpyLost2.count(), 0);
@@ -328,6 +345,7 @@ void TestAcquire::testAcquiringAndDenyingResource()
     QCOMPARE(stateSpyDenied2.count(), 0);
     QCOMPARE(stateSpyUpdateOK2.count(), 0);
     QCOMPARE(stateSpyResourcesReleased2.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable2.count(), 3);
 }
 
 // This tests that lower priority second client gets denied-signal
@@ -350,6 +368,8 @@ void TestAcquire::testAcquiringAndDenyingResource2()
     QVERIFY(stateSpyUpdateOK.isValid());
     QSignalSpy stateSpyResourcesReleased(&resourceSet, SIGNAL(resourcesReleasedByManager()));
     QVERIFY(stateSpyResourcesReleased.isValid());
+    QSignalSpy stateSpyBecameAvailable(&resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable.isValid());
 
     QSignalSpy stateSpyGranted2(&resourceSet2,
             SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
@@ -364,6 +384,8 @@ void TestAcquire::testAcquiringAndDenyingResource2()
     QVERIFY(stateSpyUpdateOK2.isValid());
     QSignalSpy stateSpyResourcesReleased2(&resourceSet2, SIGNAL(resourcesReleasedByManager()));
     QVERIFY(stateSpyResourcesReleased2.isValid());
+    QSignalSpy stateSpyBecameAvailable2(&resourceSet2, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable2.isValid());
 
     // Create resource sets
     bool addOk = resourceSet.addResource(AudioPlaybackType);
@@ -419,6 +441,7 @@ void TestAcquire::testAcquiringAndDenyingResource2()
     QCOMPARE(stateSpyDenied.count(), 0);
     QCOMPARE(stateSpyUpdateOK.count(), 0);
     QCOMPARE(stateSpyResourcesReleased.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable.count(), 1);
 
     QCOMPARE(stateSpyGranted2.count(), 1);
     QCOMPARE(stateSpyLost2.count(), 0);
@@ -426,6 +449,7 @@ void TestAcquire::testAcquiringAndDenyingResource2()
     QCOMPARE(stateSpyDenied2.count(), 1);
     QCOMPARE(stateSpyUpdateOK2.count(), 0);
     QCOMPARE(stateSpyResourcesReleased2.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable2.count(), 3);
 }
 
 QTEST_MAIN(TestAcquire)
