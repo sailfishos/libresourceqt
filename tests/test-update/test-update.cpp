@@ -27,56 +27,7 @@ USA.
 
 using namespace ResourcePolicy;
 
-Resource * TestUpdate::resourceFromType(ResourceType type)
-{
-    switch (type) {
-    case AudioPlaybackType:
-        return new AudioResource;
-    case AudioRecorderType:
-        return new AudioRecorderResource;
-    case VideoPlaybackType:
-        return new VideoResource;
-    case VideoRecorderType:
-        return new VideoRecorderResource;
-    case VibraType:
-        return new VibraResource;
-    case LedsType:
-        return new LedsResource;
-    case BacklightType:
-        return new BacklightResource;
-    case SystemButtonType:
-        return new SystemButtonResource;
-    case LockButtonType:
-        return new LockButtonResource;
-    case ScaleButtonType:
-        return new ScaleButtonResource;
-    case SnapButtonType:
-        return new SnapButtonResource;
-    case LensCoverType:
-        return new LensCoverResource;
-    case HeadsetButtonsType:
-        return new HeadsetButtonsResource;
-    default:
-        return NULL;
-    }
-}
-
-using namespace ResourcePolicy;
-
 TestUpdate::TestUpdate()
-    : audioResource(NULL)
-    , audioRecorderResource(NULL)
-    , videoResource(NULL)
-    , videoRecorderResource(NULL)
-    , vibraResource(NULL)
-    , ledsResource(NULL)
-    , backlightResource(NULL)
-    , systemButtonResource(NULL)
-    , lockButtonResource(NULL)
-    , scaleButtonResource(NULL)
-    , snapButtonResource(NULL)
-    , lensCoverResource(NULL)
-    , headsetButtonsResource(NULL)
 {
 }
 
@@ -96,14 +47,23 @@ void TestUpdate::testUpdate()
 {
     ResourceSet resourceSet("player");
 
-    // Test that signals gets emitted
+    // Install signal watchers
     QSignalSpy stateSpyGranted(&resourceSet,
             SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
     QVERIFY(stateSpyGranted.isValid());
+    QSignalSpy stateSpyLost(&resourceSet, SIGNAL(lostResources()));
+    QVERIFY(stateSpyLost.isValid());
     QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
     QVERIFY(stateSpyReleased.isValid());
+    QSignalSpy stateSpyDenied(&resourceSet, SIGNAL(resourcesDenied()));
+    QVERIFY(stateSpyDenied.isValid());
     QSignalSpy stateSpyUpdateOK(&resourceSet, SIGNAL(updateOK()));
     QVERIFY(stateSpyUpdateOK.isValid());
+    QSignalSpy stateSpyResourcesReleased(&resourceSet, SIGNAL(resourcesReleasedByManager()));
+    QVERIFY(stateSpyResourcesReleased.isValid());
+    QSignalSpy stateSpyBecameAvailable(&resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable.isValid());
+
 
     bool addOk = resourceSet.addResource(AudioPlaybackType);
     QVERIFY(addOk);
@@ -134,20 +94,36 @@ void TestUpdate::testUpdate()
     QCOMPARE(stateSpyReleased.count(), 1);
     QCOMPARE(stateSpyUpdateOK.count(), 0);
     QCOMPARE(stateSpyGranted.count(), 1);
+
+    QCOMPARE(stateSpyGranted.count(), 1);
+    QCOMPARE(stateSpyLost.count(), 0);
+    QCOMPARE(stateSpyReleased.count(), 1);
+    QCOMPARE(stateSpyDenied.count(), 0);
+    QCOMPARE(stateSpyUpdateOK.count(), 0);
+    QCOMPARE(stateSpyResourcesReleased.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable.count(), 2);
 }
 
 void TestUpdate::testUpdateGranted()
 {
     ResourceSet resourceSet("player");
 
-    // Test that signals gets emitted
+    // Install signal watchers
     QSignalSpy stateSpyGranted(&resourceSet,
             SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
     QVERIFY(stateSpyGranted.isValid());
+    QSignalSpy stateSpyLost(&resourceSet, SIGNAL(lostResources()));
+    QVERIFY(stateSpyLost.isValid());
     QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
     QVERIFY(stateSpyReleased.isValid());
+    QSignalSpy stateSpyDenied(&resourceSet, SIGNAL(resourcesDenied()));
+    QVERIFY(stateSpyDenied.isValid());
     QSignalSpy stateSpyUpdateOK(&resourceSet, SIGNAL(updateOK()));
     QVERIFY(stateSpyUpdateOK.isValid());
+    QSignalSpy stateSpyResourcesReleased(&resourceSet, SIGNAL(resourcesReleasedByManager()));
+    QVERIFY(stateSpyResourcesReleased.isValid());
+    QSignalSpy stateSpyBecameAvailable(&resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable.isValid());
 
     bool addOk = resourceSet.addResource(AudioPlaybackType);
     QVERIFY(addOk);
@@ -179,6 +155,14 @@ void TestUpdate::testUpdateGranted()
 
     // Check the released signal was received
     QCOMPARE(stateSpyReleased.count(), 1);
+
+    QCOMPARE(stateSpyGranted.count(), 2);
+    QCOMPARE(stateSpyLost.count(), 0);
+    QCOMPARE(stateSpyReleased.count(), 1);
+    QCOMPARE(stateSpyDenied.count(), 0);
+    QCOMPARE(stateSpyUpdateOK.count(), 0);
+    QCOMPARE(stateSpyResourcesReleased.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable.count(), 2);
 }
 
 QTEST_MAIN(TestUpdate)
