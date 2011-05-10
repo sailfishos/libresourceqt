@@ -414,10 +414,10 @@ void Client::readLine(int)
         QString resourceList;
         input >> resourceList;
 
-        if (!resourceSet)
+        if (!resourceSet) {
             qCritical("%s failed!", qPrintable(command));
-
-        if (resourceList.isEmpty() || resourceList.isNull()) {
+        }
+        else if (resourceList.isEmpty() || resourceList.isNull()) {
              qCritical("%s failed! List of desired resources is missing. Use help.",
                        qPrintable(command));
         }
