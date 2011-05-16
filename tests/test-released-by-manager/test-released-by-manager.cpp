@@ -65,8 +65,6 @@ void TestReleasedByManager::testAcquireLost()
     QVERIFY(stateSpyResourcesReleased.isValid());
     QSignalSpy stateSpyBecameAvailable(&resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
     QVERIFY(stateSpyBecameAvailable.isValid());
-    QSignalSpy stateSpyManagerReleased(&resourceSet, SIGNAL(resourcesReleasedByManager()));
-    QVERIFY(stateSpyManagerReleased.isValid());
 
     QSignalSpy stateSpyGranted2(&resourceSet2,
             SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
@@ -83,8 +81,6 @@ void TestReleasedByManager::testAcquireLost()
     QVERIFY(stateSpyResourcesReleased2.isValid());
     QSignalSpy stateSpyBecameAvailable2(&resourceSet2, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
     QVERIFY(stateSpyBecameAvailable2.isValid());
-    QSignalSpy stateSpyManagerReleased2(&resourceSet2, SIGNAL(resourcesReleasedByManager()));
-    QVERIFY(stateSpyManagerReleased2.isValid());
 
     // Create resource sets
     bool addOk = resourceSet.addResource(AudioPlaybackType);
@@ -116,7 +112,7 @@ void TestReleasedByManager::testAcquireLost()
     waitForSignal(&resourceSet2, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
     QCOMPARE(stateSpyGranted2.count(), 1);
     waitForSignal(&resourceSet, SIGNAL(resourcesReleasedByManager()));
-    QCOMPARE(stateSpyManagerReleased.count(), 1);
+    QCOMPARE(stateSpyResourcesReleased.count(), 1);
 
     // Release the resource from the second client
     bool releaseOk2 = resourceSet2.release();
@@ -141,9 +137,8 @@ void TestReleasedByManager::testAcquireLost()
     QCOMPARE(stateSpyReleased.count(), 1);
     QCOMPARE(stateSpyDenied.count(), 0);
     QCOMPARE(stateSpyUpdateOK.count(), 0);
-    QCOMPARE(stateSpyResourcesReleased.count(), 0);
+    QCOMPARE(stateSpyResourcesReleased.count(), 1);
     QCOMPARE(stateSpyBecameAvailable.count(), 1);
-    QCOMPARE(stateSpyManagerReleased.count(), 1);
 
     QCOMPARE(stateSpyGranted2.count(), 1);
     QCOMPARE(stateSpyLost2.count(), 0);
@@ -152,8 +147,6 @@ void TestReleasedByManager::testAcquireLost()
     QCOMPARE(stateSpyUpdateOK2.count(), 0);
     QCOMPARE(stateSpyResourcesReleased2.count(), 0);
     QCOMPARE(stateSpyBecameAvailable2.count(), 1);
-    QCOMPARE(stateSpyManagerReleased.count(), 0);
 }
-
 
 QTEST_MAIN(TestReleasedByManager)
