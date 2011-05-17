@@ -40,6 +40,8 @@ public:
 private slots:
 
     void testAcquireLost();
+    void testAcquireLostAlwaysReply();
+    void testAcquireLostAutoRelease();
 };
 
 #endif
