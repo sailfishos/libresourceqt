@@ -43,9 +43,14 @@ private slots:
     void testLostFirstPlayer();
     void testLostSecondPlayer();
     void testLostBothPlayer();
-    void testAcquireLostAlwaysReply();
-    void testAcquireLostAlwaysReplyPlayer();
-    void testAcquireLostAutoRelease();
+    void testLostAlwaysReplyNoPlayer();
+    void testLostAlwaysReplyFirstPlayer();
+    void testLostAlwaysReplySecondPlayer();
+    void testLostAlwaysReplyBothPlayer();
+    void testLostAutoReleaseNoPlayer();
+    void testLostAutoReleaseFirstPlayer();
+    void testLostAutoReleaseSecondPlayer();
+    void testLostAutoReleaseBothPlayer();
 };
 
 #endif

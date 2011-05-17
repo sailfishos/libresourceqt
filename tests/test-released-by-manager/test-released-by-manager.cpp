@@ -449,7 +449,7 @@ void TestReleasedByManager::testLostBothPlayer()
 }
 
 // This test tests simple acquire with two clients
-void TestReleasedByManager::testAcquireLostAlwaysReply()
+void TestReleasedByManager::testLostAlwaysReplyNoPlayer()
 {
     ResourceSet resourceSet("alarm", this, true, false);
     ResourceSet resourceSet2("alarm", this, true, false);
@@ -553,7 +553,215 @@ void TestReleasedByManager::testAcquireLostAlwaysReply()
 }
 
 // This test tests simple acquire with two clients
-void TestReleasedByManager::testAcquireLostAlwaysReplyPlayer()
+void TestReleasedByManager::testLostAlwaysReplyFirstPlayer()
+{
+    ResourceSet resourceSet("player", this, true, false);
+    ResourceSet resourceSet2("alarm", this, true, false);
+
+    // Install signal watchers
+    QSignalSpy stateSpyGranted(&resourceSet,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted.isValid());
+    QSignalSpy stateSpyLost(&resourceSet, SIGNAL(lostResources()));
+    QVERIFY(stateSpyLost.isValid());
+    QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased.isValid());
+    QSignalSpy stateSpyDenied(&resourceSet, SIGNAL(resourcesDenied()));
+    QVERIFY(stateSpyDenied.isValid());
+    QSignalSpy stateSpyUpdateOK(&resourceSet, SIGNAL(updateOK()));
+    QVERIFY(stateSpyUpdateOK.isValid());
+    QSignalSpy stateSpyResourcesReleased(&resourceSet, SIGNAL(resourcesReleasedByManager()));
+    QVERIFY(stateSpyResourcesReleased.isValid());
+    QSignalSpy stateSpyBecameAvailable(&resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable.isValid());
+
+    QSignalSpy stateSpyGranted2(&resourceSet2,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted2.isValid());
+    QSignalSpy stateSpyLost2(&resourceSet2, SIGNAL(lostResources()));
+    QVERIFY(stateSpyLost2.isValid());
+    QSignalSpy stateSpyReleased2(&resourceSet2, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased2.isValid());
+    QSignalSpy stateSpyDenied2(&resourceSet2, SIGNAL(resourcesDenied()));
+    QVERIFY(stateSpyDenied2.isValid());
+    QSignalSpy stateSpyUpdateOK2(&resourceSet2, SIGNAL(updateOK()));
+    QVERIFY(stateSpyUpdateOK2.isValid());
+    QSignalSpy stateSpyResourcesReleased2(&resourceSet2, SIGNAL(resourcesReleasedByManager()));
+    QVERIFY(stateSpyResourcesReleased2.isValid());
+    QSignalSpy stateSpyBecameAvailable2(&resourceSet2, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable2.isValid());
+
+    // Create resource sets
+    bool addOk = resourceSet.addResource(AudioPlaybackType);
+    QVERIFY(addOk);
+    bool connectOk = resourceSet.initAndConnect();
+    QVERIFY(connectOk);
+    bool addOk2 = resourceSet2.addResource(AudioPlaybackType);
+    QVERIFY(addOk2);
+    bool connectOk2 = resourceSet2.initAndConnect();
+    QVERIFY(connectOk2);
+
+    // Acquire the resource for the first client
+    bool acquireOk = resourceSet.acquire();
+    QVERIFY(acquireOk);
+    // Wait for the granted-signal for the first client
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted.count(), 1);
+
+    // Acquire the resource for the second client
+    bool acquireOk2 = resourceSet2.acquire();
+    QVERIFY(acquireOk2);
+    // Wait for the lost-signal for the first client
+    // The lost-signal for the first client must become before the granted-
+    // signal for the second client
+    waitForSignal(&resourceSet, SIGNAL(lostResources()));
+    //QCOMPARE(stateSpyGranted2.count(), 0);
+    QCOMPARE(stateSpyLost.count(), 1);
+    // Wait for the granted-signal for the second client
+    waitForSignal(&resourceSet2, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted2.count(), 1);
+
+    // Release the resource from the second client
+    bool releaseOk2 = resourceSet2.release();
+    QVERIFY(releaseOk2);
+    // Wait for the released-signal for the second client
+    waitForSignal(&resourceSet2, SIGNAL(resourcesReleased()));
+    QCOMPARE(stateSpyReleased2.count(), 1);
+    // Wait for the granted-signal for the first client
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted.count(), 2);
+
+    // Release the resource from the first client
+    bool releaseOk = resourceSet.release();
+    QVERIFY(releaseOk);
+    // Wait for the released-signal
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+    QCOMPARE(stateSpyReleased.count(), 1);
+
+    // Check all the signals
+    QCOMPARE(stateSpyGranted.count(), 2);
+    QCOMPARE(stateSpyLost.count(), 1);
+    QCOMPARE(stateSpyReleased.count(), 1);
+    QCOMPARE(stateSpyDenied.count(), 0);
+    QCOMPARE(stateSpyUpdateOK.count(), 0);
+    QCOMPARE(stateSpyResourcesReleased.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable.count(), 1);
+
+    QCOMPARE(stateSpyGranted2.count(), 1);
+    QCOMPARE(stateSpyLost2.count(), 0);
+    QCOMPARE(stateSpyReleased2.count(), 1);
+    QCOMPARE(stateSpyDenied2.count(), 0);
+    QCOMPARE(stateSpyUpdateOK2.count(), 0);
+    QCOMPARE(stateSpyResourcesReleased2.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable2.count(), 1);
+}
+
+// This test tests simple acquire with two clients
+void TestReleasedByManager::testLostAlwaysReplySecondPlayer()
+{
+    ResourceSet resourceSet("alarm", this, true, false);
+    ResourceSet resourceSet2("player", this, true, false);
+
+    // Install signal watchers
+    QSignalSpy stateSpyGranted(&resourceSet,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted.isValid());
+    QSignalSpy stateSpyLost(&resourceSet, SIGNAL(lostResources()));
+    QVERIFY(stateSpyLost.isValid());
+    QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased.isValid());
+    QSignalSpy stateSpyDenied(&resourceSet, SIGNAL(resourcesDenied()));
+    QVERIFY(stateSpyDenied.isValid());
+    QSignalSpy stateSpyUpdateOK(&resourceSet, SIGNAL(updateOK()));
+    QVERIFY(stateSpyUpdateOK.isValid());
+    QSignalSpy stateSpyResourcesReleased(&resourceSet, SIGNAL(resourcesReleasedByManager()));
+    QVERIFY(stateSpyResourcesReleased.isValid());
+    QSignalSpy stateSpyBecameAvailable(&resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable.isValid());
+
+    QSignalSpy stateSpyGranted2(&resourceSet2,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted2.isValid());
+    QSignalSpy stateSpyLost2(&resourceSet2, SIGNAL(lostResources()));
+    QVERIFY(stateSpyLost2.isValid());
+    QSignalSpy stateSpyReleased2(&resourceSet2, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased2.isValid());
+    QSignalSpy stateSpyDenied2(&resourceSet2, SIGNAL(resourcesDenied()));
+    QVERIFY(stateSpyDenied2.isValid());
+    QSignalSpy stateSpyUpdateOK2(&resourceSet2, SIGNAL(updateOK()));
+    QVERIFY(stateSpyUpdateOK2.isValid());
+    QSignalSpy stateSpyResourcesReleased2(&resourceSet2, SIGNAL(resourcesReleasedByManager()));
+    QVERIFY(stateSpyResourcesReleased2.isValid());
+    QSignalSpy stateSpyBecameAvailable2(&resourceSet2, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable2.isValid());
+
+    // Create resource sets
+    bool addOk = resourceSet.addResource(AudioPlaybackType);
+    QVERIFY(addOk);
+    bool connectOk = resourceSet.initAndConnect();
+    QVERIFY(connectOk);
+    bool addOk2 = resourceSet2.addResource(AudioPlaybackType);
+    QVERIFY(addOk2);
+    bool connectOk2 = resourceSet2.initAndConnect();
+    QVERIFY(connectOk2);
+
+    // Acquire the resource for the first client
+    bool acquireOk = resourceSet.acquire();
+    QVERIFY(acquireOk);
+    // Wait for the granted-signal for the first client
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted.count(), 1);
+
+    // Acquire the resource for the second client
+    bool acquireOk2 = resourceSet2.acquire();
+    QVERIFY(acquireOk2);
+    // Wait for the lost-signal for the first client
+    // The lost-signal for the first client must become before the granted-
+    // signal for the second client
+    waitForSignal(&resourceSet, SIGNAL(lostResources()));
+    //QCOMPARE(stateSpyGranted2.count(), 0);
+    QCOMPARE(stateSpyLost.count(), 1);
+    // Wait for the granted-signal for the second client
+    waitForSignal(&resourceSet2, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted2.count(), 1);
+
+    // Release the resource from the second client
+    bool releaseOk2 = resourceSet2.release();
+    QVERIFY(releaseOk2);
+    // Wait for the released-signal for the second client
+    waitForSignal(&resourceSet2, SIGNAL(resourcesReleased()));
+    QCOMPARE(stateSpyReleased2.count(), 1);
+    // Wait for the granted-signal for the first client
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted.count(), 2);
+
+    // Release the resource from the first client
+    bool releaseOk = resourceSet.release();
+    QVERIFY(releaseOk);
+    // Wait for the released-signal
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+    QCOMPARE(stateSpyReleased.count(), 1);
+
+    // Check all the signals
+    QCOMPARE(stateSpyGranted.count(), 2);
+    QCOMPARE(stateSpyLost.count(), 1);
+    QCOMPARE(stateSpyReleased.count(), 1);
+    QCOMPARE(stateSpyDenied.count(), 0);
+    QCOMPARE(stateSpyUpdateOK.count(), 0);
+    QCOMPARE(stateSpyResourcesReleased.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable.count(), 1);
+
+    QCOMPARE(stateSpyGranted2.count(), 1);
+    QCOMPARE(stateSpyLost2.count(), 0);
+    QCOMPARE(stateSpyReleased2.count(), 1);
+    QCOMPARE(stateSpyDenied2.count(), 0);
+    QCOMPARE(stateSpyUpdateOK2.count(), 0);
+    QCOMPARE(stateSpyResourcesReleased2.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable2.count(), 1);
+}
+
+// This test tests simple acquire with two clients
+void TestReleasedByManager::testLostAlwaysReplyBothPlayer()
 {
     ResourceSet resourceSet("player", this, true, false);
     ResourceSet resourceSet2("player", this, true, false);
@@ -617,9 +825,8 @@ void TestReleasedByManager::testAcquireLostAlwaysReplyPlayer()
     // Wait for the granted-signal for the second client
     waitForSignal(&resourceSet2, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
     QCOMPARE(stateSpyGranted2.count(), 1);
-    // Wait for the lost-signal for the first client
-    waitForSignal(&resourceSet, SIGNAL(lostResources()));
-    QCOMPARE(stateSpyLost.count(), 1);
+    // No Lost-signal
+    QCOMPARE(stateSpyLost.count(), 0);
 
     // Release the resource from the second client
     bool releaseOk2 = resourceSet2.release();
@@ -630,7 +837,7 @@ void TestReleasedByManager::testAcquireLostAlwaysReplyPlayer()
 
     // Check all the signals
     QCOMPARE(stateSpyGranted.count(), 1);
-    QCOMPARE(stateSpyLost.count(), 1);
+    QCOMPARE(stateSpyLost.count(), 0);
     QCOMPARE(stateSpyReleased.count(), 0);
     QCOMPARE(stateSpyDenied.count(), 0);
     QCOMPARE(stateSpyUpdateOK.count(), 0);
@@ -647,7 +854,319 @@ void TestReleasedByManager::testAcquireLostAlwaysReplyPlayer()
 }
 
 // This test tests simple acquire with two clients
-void TestReleasedByManager::testAcquireLostAutoRelease()
+void TestReleasedByManager::testLostAutoReleaseNoPlayer()
+{
+    ResourceSet resourceSet("alarm", this, false, true);
+    ResourceSet resourceSet2("alarm", this, false, true);
+
+    // Install signal watchers
+    QSignalSpy stateSpyGranted(&resourceSet,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted.isValid());
+    QSignalSpy stateSpyLost(&resourceSet, SIGNAL(lostResources()));
+    QVERIFY(stateSpyLost.isValid());
+    QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased.isValid());
+    QSignalSpy stateSpyDenied(&resourceSet, SIGNAL(resourcesDenied()));
+    QVERIFY(stateSpyDenied.isValid());
+    QSignalSpy stateSpyUpdateOK(&resourceSet, SIGNAL(updateOK()));
+    QVERIFY(stateSpyUpdateOK.isValid());
+    QSignalSpy stateSpyResourcesReleased(&resourceSet, SIGNAL(resourcesReleasedByManager()));
+    QVERIFY(stateSpyResourcesReleased.isValid());
+    QSignalSpy stateSpyBecameAvailable(&resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable.isValid());
+
+    QSignalSpy stateSpyGranted2(&resourceSet2,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted2.isValid());
+    QSignalSpy stateSpyLost2(&resourceSet2, SIGNAL(lostResources()));
+    QVERIFY(stateSpyLost2.isValid());
+    QSignalSpy stateSpyReleased2(&resourceSet2, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased2.isValid());
+    QSignalSpy stateSpyDenied2(&resourceSet2, SIGNAL(resourcesDenied()));
+    QVERIFY(stateSpyDenied2.isValid());
+    QSignalSpy stateSpyUpdateOK2(&resourceSet2, SIGNAL(updateOK()));
+    QVERIFY(stateSpyUpdateOK2.isValid());
+    QSignalSpy stateSpyResourcesReleased2(&resourceSet2, SIGNAL(resourcesReleasedByManager()));
+    QVERIFY(stateSpyResourcesReleased2.isValid());
+    QSignalSpy stateSpyBecameAvailable2(&resourceSet2, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable2.isValid());
+
+    // Create resource sets
+    bool addOk = resourceSet.addResource(AudioPlaybackType);
+    QVERIFY(addOk);
+    bool connectOk = resourceSet.initAndConnect();
+    QVERIFY(connectOk);
+    bool addOk2 = resourceSet2.addResource(AudioPlaybackType);
+    QVERIFY(addOk2);
+    bool connectOk2 = resourceSet2.initAndConnect();
+    QVERIFY(connectOk2);
+
+    // Acquire the resource for the first client
+    bool acquireOk = resourceSet.acquire();
+    QVERIFY(acquireOk);
+    // Wait for the granted-signal for the first client
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted.count(), 1);
+
+    // Acquire the resource for the second client
+    bool acquireOk2 = resourceSet2.acquire();
+    QVERIFY(acquireOk2);
+    // Wait for the lost-signal for the first client
+    // The lost-signal for the first client must become before the granted-
+    // signal for the second client
+    waitForSignal(&resourceSet, SIGNAL(lostResources()));
+    //QCOMPARE(stateSpyGranted2.count(), 0);
+    QCOMPARE(stateSpyLost.count(), 1);
+    // Wait for the granted-signal for the second client
+    waitForSignal(&resourceSet2, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted2.count(), 1);
+
+    // Release the resource from the second client
+    bool releaseOk2 = resourceSet2.release();
+    QVERIFY(releaseOk2);
+    // Wait for the released-signal for the second client
+    waitForSignal(&resourceSet2, SIGNAL(resourcesReleased()));
+    QCOMPARE(stateSpyReleased2.count(), 1);
+    // Wait for the granted-signal for the first client
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted.count(), 2);
+
+    // Release the resource from the first client
+    bool releaseOk = resourceSet.release();
+    QVERIFY(releaseOk);
+    // Wait for the released-signal
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+    QCOMPARE(stateSpyReleased.count(), 1);
+
+    // Check all the signals
+    QCOMPARE(stateSpyGranted.count(), 2);
+    QCOMPARE(stateSpyLost.count(), 1);
+    QCOMPARE(stateSpyReleased.count(), 1);
+    QCOMPARE(stateSpyDenied.count(), 0);
+    QCOMPARE(stateSpyUpdateOK.count(), 0);
+    QCOMPARE(stateSpyResourcesReleased.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable.count(), 1);
+
+    QCOMPARE(stateSpyGranted2.count(), 1);
+    QCOMPARE(stateSpyLost2.count(), 0);
+    QCOMPARE(stateSpyReleased2.count(), 1);
+    QCOMPARE(stateSpyDenied2.count(), 0);
+    QCOMPARE(stateSpyUpdateOK2.count(), 0);
+    QCOMPARE(stateSpyResourcesReleased2.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable2.count(), 1);
+}
+
+// This test tests simple acquire with two clients
+void TestReleasedByManager::testLostAutoReleaseFirstPlayer()
+{
+    ResourceSet resourceSet("player", this, false, true);
+    ResourceSet resourceSet2("alarm", this, false, true);
+
+    // Install signal watchers
+    QSignalSpy stateSpyGranted(&resourceSet,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted.isValid());
+    QSignalSpy stateSpyLost(&resourceSet, SIGNAL(lostResources()));
+    QVERIFY(stateSpyLost.isValid());
+    QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased.isValid());
+    QSignalSpy stateSpyDenied(&resourceSet, SIGNAL(resourcesDenied()));
+    QVERIFY(stateSpyDenied.isValid());
+    QSignalSpy stateSpyUpdateOK(&resourceSet, SIGNAL(updateOK()));
+    QVERIFY(stateSpyUpdateOK.isValid());
+    QSignalSpy stateSpyResourcesReleased(&resourceSet, SIGNAL(resourcesReleasedByManager()));
+    QVERIFY(stateSpyResourcesReleased.isValid());
+    QSignalSpy stateSpyBecameAvailable(&resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable.isValid());
+
+    QSignalSpy stateSpyGranted2(&resourceSet2,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted2.isValid());
+    QSignalSpy stateSpyLost2(&resourceSet2, SIGNAL(lostResources()));
+    QVERIFY(stateSpyLost2.isValid());
+    QSignalSpy stateSpyReleased2(&resourceSet2, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased2.isValid());
+    QSignalSpy stateSpyDenied2(&resourceSet2, SIGNAL(resourcesDenied()));
+    QVERIFY(stateSpyDenied2.isValid());
+    QSignalSpy stateSpyUpdateOK2(&resourceSet2, SIGNAL(updateOK()));
+    QVERIFY(stateSpyUpdateOK2.isValid());
+    QSignalSpy stateSpyResourcesReleased2(&resourceSet2, SIGNAL(resourcesReleasedByManager()));
+    QVERIFY(stateSpyResourcesReleased2.isValid());
+    QSignalSpy stateSpyBecameAvailable2(&resourceSet2, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable2.isValid());
+
+    // Create resource sets
+    bool addOk = resourceSet.addResource(AudioPlaybackType);
+    QVERIFY(addOk);
+    bool connectOk = resourceSet.initAndConnect();
+    QVERIFY(connectOk);
+    bool addOk2 = resourceSet2.addResource(AudioPlaybackType);
+    QVERIFY(addOk2);
+    bool connectOk2 = resourceSet2.initAndConnect();
+    QVERIFY(connectOk2);
+
+    // Acquire the resource for the first client
+    bool acquireOk = resourceSet.acquire();
+    QVERIFY(acquireOk);
+    // Wait for the granted-signal for the first client
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted.count(), 1);
+
+    // Acquire the resource for the second client
+    bool acquireOk2 = resourceSet2.acquire();
+    QVERIFY(acquireOk2);
+    // Wait for the lost-signal for the first client
+    // The lost-signal for the first client must become before the granted-
+    // signal for the second client
+    waitForSignal(&resourceSet, SIGNAL(lostResources()));
+    //QCOMPARE(stateSpyGranted2.count(), 0);
+    QCOMPARE(stateSpyLost.count(), 1);
+    // Wait for the granted-signal for the second client
+    waitForSignal(&resourceSet2, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted2.count(), 1);
+
+    // Release the resource from the second client
+    bool releaseOk2 = resourceSet2.release();
+    QVERIFY(releaseOk2);
+    // Wait for the released-signal for the second client
+    waitForSignal(&resourceSet2, SIGNAL(resourcesReleased()));
+    QCOMPARE(stateSpyReleased2.count(), 1);
+    // Wait for the granted-signal for the first client
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted.count(), 2);
+
+    // Release the resource from the first client
+    bool releaseOk = resourceSet.release();
+    QVERIFY(releaseOk);
+    // Wait for the released-signal
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+    QCOMPARE(stateSpyReleased.count(), 1);
+
+    // Check all the signals
+    QCOMPARE(stateSpyGranted.count(), 2);
+    QCOMPARE(stateSpyLost.count(), 1);
+    QCOMPARE(stateSpyReleased.count(), 1);
+    QCOMPARE(stateSpyDenied.count(), 0);
+    QCOMPARE(stateSpyUpdateOK.count(), 0);
+    QCOMPARE(stateSpyResourcesReleased.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable.count(), 1);
+
+    QCOMPARE(stateSpyGranted2.count(), 1);
+    QCOMPARE(stateSpyLost2.count(), 0);
+    QCOMPARE(stateSpyReleased2.count(), 1);
+    QCOMPARE(stateSpyDenied2.count(), 0);
+    QCOMPARE(stateSpyUpdateOK2.count(), 0);
+    QCOMPARE(stateSpyResourcesReleased2.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable2.count(), 1);
+}
+
+// This test tests simple acquire with two clients
+void TestReleasedByManager::testLostAutoReleaseSecondPlayer()
+{
+    ResourceSet resourceSet("alarm", this, false, true);
+    ResourceSet resourceSet2("player", this, false, true);
+
+    // Install signal watchers
+    QSignalSpy stateSpyGranted(&resourceSet,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted.isValid());
+    QSignalSpy stateSpyLost(&resourceSet, SIGNAL(lostResources()));
+    QVERIFY(stateSpyLost.isValid());
+    QSignalSpy stateSpyReleased(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased.isValid());
+    QSignalSpy stateSpyDenied(&resourceSet, SIGNAL(resourcesDenied()));
+    QVERIFY(stateSpyDenied.isValid());
+    QSignalSpy stateSpyUpdateOK(&resourceSet, SIGNAL(updateOK()));
+    QVERIFY(stateSpyUpdateOK.isValid());
+    QSignalSpy stateSpyResourcesReleased(&resourceSet, SIGNAL(resourcesReleasedByManager()));
+    QVERIFY(stateSpyResourcesReleased.isValid());
+    QSignalSpy stateSpyBecameAvailable(&resourceSet, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable.isValid());
+
+    QSignalSpy stateSpyGranted2(&resourceSet2,
+            SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyGranted2.isValid());
+    QSignalSpy stateSpyLost2(&resourceSet2, SIGNAL(lostResources()));
+    QVERIFY(stateSpyLost2.isValid());
+    QSignalSpy stateSpyReleased2(&resourceSet2, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpyReleased2.isValid());
+    QSignalSpy stateSpyDenied2(&resourceSet2, SIGNAL(resourcesDenied()));
+    QVERIFY(stateSpyDenied2.isValid());
+    QSignalSpy stateSpyUpdateOK2(&resourceSet2, SIGNAL(updateOK()));
+    QVERIFY(stateSpyUpdateOK2.isValid());
+    QSignalSpy stateSpyResourcesReleased2(&resourceSet2, SIGNAL(resourcesReleasedByManager()));
+    QVERIFY(stateSpyResourcesReleased2.isValid());
+    QSignalSpy stateSpyBecameAvailable2(&resourceSet2, SIGNAL(resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &)));
+    QVERIFY(stateSpyBecameAvailable2.isValid());
+
+    // Create resource sets
+    bool addOk = resourceSet.addResource(AudioPlaybackType);
+    QVERIFY(addOk);
+    bool connectOk = resourceSet.initAndConnect();
+    QVERIFY(connectOk);
+    bool addOk2 = resourceSet2.addResource(AudioPlaybackType);
+    QVERIFY(addOk2);
+    bool connectOk2 = resourceSet2.initAndConnect();
+    QVERIFY(connectOk2);
+
+    // Acquire the resource for the first client
+    bool acquireOk = resourceSet.acquire();
+    QVERIFY(acquireOk);
+    // Wait for the granted-signal for the first client
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted.count(), 1);
+
+    // Acquire the resource for the second client
+    bool acquireOk2 = resourceSet2.acquire();
+    QVERIFY(acquireOk2);
+    // Wait for the lost-signal for the first client
+    // The lost-signal for the first client must become before the granted-
+    // signal for the second client
+    waitForSignal(&resourceSet, SIGNAL(lostResources()));
+    //QCOMPARE(stateSpyGranted2.count(), 0);
+    QCOMPARE(stateSpyLost.count(), 1);
+    // Wait for the granted-signal for the second client
+    waitForSignal(&resourceSet2, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted2.count(), 1);
+
+    // Release the resource from the second client
+    bool releaseOk2 = resourceSet2.release();
+    QVERIFY(releaseOk2);
+    // Wait for the released-signal for the second client
+    waitForSignal(&resourceSet2, SIGNAL(resourcesReleased()));
+    QCOMPARE(stateSpyReleased2.count(), 1);
+    // Wait for the granted-signal for the first client
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted.count(), 2);
+
+    // Release the resource from the first client
+    bool releaseOk = resourceSet.release();
+    QVERIFY(releaseOk);
+    // Wait for the released-signal
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+    QCOMPARE(stateSpyReleased.count(), 1);
+
+    // Check all the signals
+    QCOMPARE(stateSpyGranted.count(), 2);
+    QCOMPARE(stateSpyLost.count(), 1);
+    QCOMPARE(stateSpyReleased.count(), 1);
+    QCOMPARE(stateSpyDenied.count(), 0);
+    QCOMPARE(stateSpyUpdateOK.count(), 0);
+    QCOMPARE(stateSpyResourcesReleased.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable.count(), 1);
+
+    QCOMPARE(stateSpyGranted2.count(), 1);
+    QCOMPARE(stateSpyLost2.count(), 0);
+    QCOMPARE(stateSpyReleased2.count(), 1);
+    QCOMPARE(stateSpyDenied2.count(), 0);
+    QCOMPARE(stateSpyUpdateOK2.count(), 0);
+    QCOMPARE(stateSpyResourcesReleased2.count(), 0);
+    QCOMPARE(stateSpyBecameAvailable2.count(), 1);
+}
+
+// This test tests simple acquire with two clients
+void TestReleasedByManager::testLostAutoReleaseBothPlayer()
 {
     ResourceSet resourceSet("player", this, false, true);
     ResourceSet resourceSet2("player", this, false, true);
@@ -714,8 +1233,6 @@ void TestReleasedByManager::testAcquireLostAutoRelease()
     // Wait for the granted-signal for the second client
     waitForSignal(&resourceSet2, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
     QCOMPARE(stateSpyGranted2.count(), 1);
-    waitForSignal(&resourceSet, SIGNAL(resourcesReleasedByManager()));
-    QCOMPARE(stateSpyResourcesReleased.count(), 0);
 
     // Release the resource from the second client
     bool releaseOk2 = resourceSet2.release();
@@ -751,5 +1268,6 @@ void TestReleasedByManager::testAcquireLostAutoRelease()
     QCOMPARE(stateSpyResourcesReleased2.count(), 0);
     QCOMPARE(stateSpyBecameAvailable2.count(), 1);
 }
+
 
 QTEST_MAIN(TestReleasedByManager)
