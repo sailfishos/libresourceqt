@@ -142,8 +142,8 @@ void TestAcquire::testAcquire()
 // first client.
 void TestAcquire::testAcquiringAndLosingResource()
 {
-    ResourceSet resourceSet("player");
-    ResourceSet resourceSet2("player");
+    ResourceSet resourceSet("alarm");
+    ResourceSet resourceSet2("alarm");
 
     // Install signal watchers
     QSignalSpy stateSpyGranted(&resourceSet,
