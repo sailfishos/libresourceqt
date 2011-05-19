@@ -150,7 +150,7 @@ void TestAlwaysReply::testNoAlwaysReply()
     QCOMPARE(stateSpyDenied2.count(), 0);
     QCOMPARE(stateSpyUpdateOK2.count(), 0);
     QCOMPARE(stateSpyResourcesReleased2.count(), 0);
-    QCOMPARE(stateSpyBecameAvailable2.count(), 3);
+    QCOMPARE(stateSpyBecameAvailable2.count(), 1);
 }
 
 // This test tests rejecting resource with alwaysReply flag
