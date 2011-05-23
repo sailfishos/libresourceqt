@@ -78,6 +78,31 @@ void TestAudioResource::testConstruct2()
     delete audioResource;
 }
 
+void TestAudioResource::testCopyConstruct()
+{
+    AudioResource *audioResource = new AudioResource;
+    QVERIFY(audioResource);
+    AudioResource *copyResource = new AudioResource(*audioResource);
+    delete audioResource;
+    audioResource = NULL;
+
+    // Test that no signals get emitted
+    QSignalSpy stateSpy(copyResource,
+            SIGNAL(audioPropertiesChanged(const QString&, quint32,
+            const QString&, const QString &)));
+    QVERIFY(stateSpy.isValid());
+
+    QCOMPARE(copyResource->audioGroupIsSet(), false);
+    QCOMPARE(copyResource->audioGroup(), QString(""));
+    QCOMPARE(copyResource->processID(), (quint32) 0);
+    QCOMPARE(copyResource->streamTagIsSet(), false);
+    QCOMPARE(copyResource->streamTagName(), QString(""));
+    QCOMPARE(copyResource->streamTagValue(), QString(""));
+
+    QCOMPARE(stateSpy.count(), 0);
+    delete copyResource;
+}
+
 void TestAudioResource::testSetAudioGroup()
 {
     AudioResource *audioResource = new AudioResource();

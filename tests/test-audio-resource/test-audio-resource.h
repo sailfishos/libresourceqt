@@ -42,6 +42,7 @@ private slots:
 
     void testConstruct1();
     void testConstruct2();
+    void testCopyConstruct();
     void testSetAudioGroup();
     void testSetProcessId();
     void testSetStreamTag();
