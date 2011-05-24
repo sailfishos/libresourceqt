@@ -236,6 +236,30 @@ void TestResourceSet::testContainsSet()
     QVERIFY(containsSubset);
 }
 
+void TestResourceSet::testSetAutoRelease()
+{
+    ResourceSet resourceSet("player");
+    bool connectOk = resourceSet.initAndConnect();
+    QVERIFY(connectOk);
+    bool isSet = resourceSet.willAutoRelease();
+    QVERIFY(!isSet);
+    bool rv = resourceSet.setAutoRelease();
+    QVERIFY(!rv);
+    isSet = resourceSet.willAutoRelease();
+    QVERIFY(!isSet);
+}
+
+void TestResourceSet::testSetAutoReleaseNoInit()
+{
+    ResourceSet resourceSet("player");
+    bool isSet = resourceSet.willAutoRelease();
+    QVERIFY(!isSet);
+    bool rv = resourceSet.setAutoRelease();
+    QVERIFY(rv);
+    isSet = resourceSet.willAutoRelease();
+    QVERIFY(isSet);
+}
+
 void TestResourceSet::testConnectToSignals()
 {
     ResourceSet resourceSet("player");

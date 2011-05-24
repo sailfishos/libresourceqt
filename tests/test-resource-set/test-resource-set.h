@@ -81,6 +81,9 @@ private slots:
     void testAddResourceObjectVideo();
     void testDelResource();
 
+    void testSetAutoRelease();
+    void testSetAutoReleaseNoInit();
+
     void testConnectToSignals();
 
     void testConnectEngine();
