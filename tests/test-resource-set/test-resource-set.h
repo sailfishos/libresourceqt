@@ -94,6 +94,7 @@ private slots:
 
     void testAcquire();
     void testDoubleAcquire();
+    void testUpdateNoInit();
 
     void testUninitializedRelease();
 };

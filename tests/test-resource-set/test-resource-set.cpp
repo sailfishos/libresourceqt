@@ -489,6 +489,17 @@ void TestResourceSet::testDoubleAcquire()
     QCOMPARE(stateSpy2.count(), 1);
 }
 
+void TestResourceSet::testUpdateNoInit()
+{
+    ResourceSet resourceSet("player");
+    bool updateOk = resourceSet.update();
+    QVERIFY(updateOk);
+    bool addOk = resourceSet.addResource(AudioPlaybackType);
+    QVERIFY(addOk);
+    updateOk = resourceSet.update();
+    QVERIFY(updateOk);
+}
+
 void TestResourceSet::testUninitializedRelease()
 {
     ResourceSet resourceSet("player");
