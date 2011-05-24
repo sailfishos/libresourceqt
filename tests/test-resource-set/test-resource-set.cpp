@@ -260,6 +260,30 @@ void TestResourceSet::testSetAutoReleaseNoInit()
     QVERIFY(isSet);
 }
 
+void TestResourceSet::testSetAlwaysReply()
+{
+    ResourceSet resourceSet("player");
+    bool connectOk = resourceSet.initAndConnect();
+    QVERIFY(connectOk);
+    bool isSet = resourceSet.alwaysGetReply();
+    QVERIFY(!isSet);
+    bool rv = resourceSet.setAlwaysReply();
+    QVERIFY(!rv);
+    isSet = resourceSet.alwaysGetReply();
+    QVERIFY(!isSet);
+}
+
+void TestResourceSet::testSetAlwaysReplyNoInit()
+{
+    ResourceSet resourceSet("player");
+    bool isSet = resourceSet.alwaysGetReply();
+    QVERIFY(!isSet);
+    bool rv = resourceSet.setAlwaysReply();
+    QVERIFY(rv);
+    isSet = resourceSet.alwaysGetReply();
+    QVERIFY(isSet);
+}
+
 void TestResourceSet::testConnectToSignals()
 {
     ResourceSet resourceSet("player");

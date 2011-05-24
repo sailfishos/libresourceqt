@@ -83,6 +83,8 @@ private slots:
 
     void testSetAutoRelease();
     void testSetAutoReleaseNoInit();
+    void testSetAlwaysReply();
+    void testSetAlwaysReplyNoInit();
 
     void testConnectToSignals();
 
