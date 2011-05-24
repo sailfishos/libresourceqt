@@ -85,9 +85,12 @@ private slots:
 
     void testConnectEngine();
     void testConnectEngine2();
+    void testDoubleInit();
 
     void testAcquire();
     void testDoubleAcquire();
+
+    void testUninitializedRelease();
 };
 
 #endif

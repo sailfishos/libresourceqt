@@ -347,6 +347,16 @@ void TestResourceSet::testConnectEngine2()
     QVERIFY(connectOk);
 }
 
+void TestResourceSet::testDoubleInit()
+{
+    ResourceSet resourceSet("player");
+    QVERIFY(resourceSet.isConnectedToManager() == false);
+    bool rv = resourceSet.initAndConnect();
+    QVERIFY(rv);
+    rv = resourceSet.initAndConnect();
+    QVERIFY(rv);
+}
+
 void TestResourceSet::waitForSignal(const QObject *sender, const char *signal, quint32 timeout)
 {
     QEventLoop loop;
@@ -429,6 +439,21 @@ void TestResourceSet::testDoubleAcquire()
 
     // Check there is no second signal
     QCOMPARE(stateSpy2.count(), 1);
+}
+
+void TestResourceSet::testUninitializedRelease()
+{
+    ResourceSet resourceSet("player");
+
+    QSignalSpy stateSpy(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpy.isValid());
+
+    bool releaseOk = resourceSet.release();
+    QVERIFY(releaseOk);
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+
+    // Check that no signal got received
+    QCOMPARE(stateSpy.count(), 0);
 }
 
 QTEST_MAIN(TestResourceSet)
