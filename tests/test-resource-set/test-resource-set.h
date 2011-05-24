@@ -76,6 +76,9 @@ private slots:
 
     void testAddResource();
     void testAddResourceObject();
+    void testAddResourceObjectNull();
+    void testAddResourceObjectAudio();
+    void testAddResourceObjectVideo();
     void testDelResource();
 
     void testConnectToSignals();
