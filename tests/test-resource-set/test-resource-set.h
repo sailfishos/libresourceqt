@@ -76,15 +76,27 @@ private slots:
 
     void testAddResource();
     void testAddResourceObject();
+    void testAddResourceObjectNull();
+    void testAddResourceObjectAudio();
+    void testAddResourceObjectVideo();
     void testDelResource();
+
+    void testSetAutoRelease();
+    void testSetAutoReleaseNoInit();
+    void testSetAlwaysReply();
+    void testSetAlwaysReplyNoInit();
 
     void testConnectToSignals();
 
     void testConnectEngine();
     void testConnectEngine2();
+    void testDoubleInit();
 
     void testAcquire();
     void testDoubleAcquire();
+    void testUpdateNoInit();
+
+    void testUninitializedRelease();
 };
 
 #endif

@@ -362,17 +362,23 @@ signals:
 	void resourcesReleased();
 
 	/**
-        * This signal is emitted when the manager releases your acquired resources,
-        * so that you have to acquire them again when the you wish to use them.
+        * This signal is emitted when the manager releases the acquired resources, so that you have to re-acquire them again when you wish to use them.
+        * Use this signal to implement permanent playback stopping logic in situations where you do not want playback to continue automatically (in contrast to waiting
+        * for resourcesGranted() in order to continue playback after a lostResources() signal emission) after your application's resources are preempted because of some other event.
+        * Note that when autoRelease is used, you will not receive the resourcesReleasedByManager() ever, but rather you should interpret the
+        * resourcesLost() also as an implicit resourcesReleasedByManager().
 	*/
 	void resourcesReleasedByManager();
 
 	/**
         * This signal is emitted when some other application with a higher priority
-        * supersedes your application, and as a result you loose all our resources.
+        * supersedes your application, and as a result you loose all our resources temporarily.
 	* It is very important to connect to this signal as it is signaling when
         * the acquired resources shouldn't be used anymore. When resourcesGranted() is
-        * is emitted then the resources can be used again.
+        * is emitted then the resources can be used again. Note that, when autoRelease mode is used,
+        * this signal also signifies that the resources are lost permanently in the sense that they have to be
+        * re-acquired when indicated available by the resourcesBecameAvailable() signal  (i.e. they are not granted back
+        * automatically when freed by an other application in this case).
 	*/
 	void lostResources();
 

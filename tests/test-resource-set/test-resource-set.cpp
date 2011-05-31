@@ -96,7 +96,7 @@ void TestResourceSet::testConstructor1()
     // Test it has no any resources
     QList<Resource*> resources = resourceSet.resources();
     QVERIFY(resources.isEmpty());
-    for (int i = 0;i < NumberOfTypes;i++) {
+    for (int i = 0;i < NumberOfTypes; i++) {
         ResourceType type = (ResourceType)i;
         Resource *res = resourceSet.resource(type);
         QVERIFY(res == NULL);
@@ -117,7 +117,7 @@ void TestResourceSet::testConstructor2()
     // Test it has no any resources
     QList<Resource*> resources = resourceSet.resources();
     QVERIFY(resources.isEmpty());
-    for (int i = 0;i < NumberOfTypes;i++) {
+    for (int i = 0;i < NumberOfTypes; i++) {
         ResourceType type = (ResourceType)i;
         Resource *res = resourceSet.resource(type);
         QVERIFY(res == NULL);
@@ -138,7 +138,7 @@ void TestResourceSet::testIdentifier()
 void TestResourceSet::testAddResource()
 {
     ResourceSet resourceSet("player");
-    for (int i = 0;i < NumberOfTypes;i++) {
+    for (int i = 0; i < NumberOfTypes; i++) {
         ResourceType type = (ResourceType)i;
         resourceSet.addResource(type);
         bool setContainsGivenResource = resourceSet.contains(type);
@@ -149,7 +149,7 @@ void TestResourceSet::testAddResource()
 void TestResourceSet::testAddResourceObject()
 {
     ResourceSet resourceSet("player");
-    for (int i = 0;i < NumberOfTypes;i++) {
+    for (int i = 0; i < NumberOfTypes; i++) {
         ResourceType type = (ResourceType)i;
         Resource *resource = resourceFromType(type);
         resourceSet.addResourceObject(resource);
@@ -158,17 +158,49 @@ void TestResourceSet::testAddResourceObject()
     }
 }
 
+void TestResourceSet::testAddResourceObjectNull()
+{
+    ResourceSet resourceSet("player");
+    resourceSet.addResourceObject(NULL);
+    for (int i = 0; i < NumberOfTypes; i++) {
+        ResourceType type = (ResourceType)i;
+        bool setContainsGivenResource = resourceSet.contains(type);
+        QCOMPARE(setContainsGivenResource, false);
+    }
+}
+
+void TestResourceSet::testAddResourceObjectAudio()
+{
+    AudioResource *resource = new AudioResource("group");
+    resource->setProcessID(1234);
+    resource->setStreamTag("media.name", "teststream");
+    ResourceSet resourceSet("player");
+    resourceSet.addResourceObject(resource);
+    bool setContainsGivenResource = resourceSet.contains(AudioPlaybackType);
+    QCOMPARE(setContainsGivenResource, true);
+}
+
+void TestResourceSet::testAddResourceObjectVideo()
+{
+    VideoResource *resource = new VideoResource;
+    resource->setProcessID(1234);
+    ResourceSet resourceSet("player");
+    resourceSet.addResourceObject(resource);
+    bool setContainsGivenResource = resourceSet.contains(VideoPlaybackType);
+    QCOMPARE(setContainsGivenResource, true);
+}
+
 void TestResourceSet::testDelResource()
 {
     ResourceSet resourceSet("player");
-    for (int i = 0;i < NumberOfTypes;i++) {
+    for (int i = 0; i < NumberOfTypes; i++) {
         ResourceType type = (ResourceType)i;
         resourceSet.addResource(type);
         bool setContainsGivenResource = resourceSet.contains(type);
         QVERIFY(setContainsGivenResource);
     }
 
-    for (int i = 0;i < NumberOfTypes;i++) {
+    for (int i = 0; i < NumberOfTypes; i++) {
         ResourceType type = (ResourceType)i;
         resourceSet.deleteResource(type);
         bool setNoLongerContainType = !resourceSet.contains(type);
@@ -189,7 +221,7 @@ void TestResourceSet::testContainsSet()
     ResourceSet resourceSet("player");
     QList<ResourceType> types, subset;
 
-    for (int i = 0;i < NumberOfTypes;i++) {
+    for (int i = 0; i < NumberOfTypes; i++) {
         ResourceType type = (ResourceType)i;
         resourceSet.addResource(type);
         types.append(type);
@@ -202,6 +234,54 @@ void TestResourceSet::testContainsSet()
     bool containsSubset = resourceSet.contains(subset);
     QVERIFY(containsAll);
     QVERIFY(containsSubset);
+}
+
+void TestResourceSet::testSetAutoRelease()
+{
+    ResourceSet resourceSet("player");
+    bool connectOk = resourceSet.initAndConnect();
+    QVERIFY(connectOk);
+    bool isSet = resourceSet.willAutoRelease();
+    QVERIFY(!isSet);
+    bool rv = resourceSet.setAutoRelease();
+    QVERIFY(!rv);
+    isSet = resourceSet.willAutoRelease();
+    QVERIFY(!isSet);
+}
+
+void TestResourceSet::testSetAutoReleaseNoInit()
+{
+    ResourceSet resourceSet("player");
+    bool isSet = resourceSet.willAutoRelease();
+    QVERIFY(!isSet);
+    bool rv = resourceSet.setAutoRelease();
+    QVERIFY(rv);
+    isSet = resourceSet.willAutoRelease();
+    QVERIFY(isSet);
+}
+
+void TestResourceSet::testSetAlwaysReply()
+{
+    ResourceSet resourceSet("player");
+    bool connectOk = resourceSet.initAndConnect();
+    QVERIFY(connectOk);
+    bool isSet = resourceSet.alwaysGetReply();
+    QVERIFY(!isSet);
+    bool rv = resourceSet.setAlwaysReply();
+    QVERIFY(!rv);
+    isSet = resourceSet.alwaysGetReply();
+    QVERIFY(!isSet);
+}
+
+void TestResourceSet::testSetAlwaysReplyNoInit()
+{
+    ResourceSet resourceSet("player");
+    bool isSet = resourceSet.alwaysGetReply();
+    QVERIFY(!isSet);
+    bool rv = resourceSet.setAlwaysReply();
+    QVERIFY(rv);
+    isSet = resourceSet.alwaysGetReply();
+    QVERIFY(isSet);
 }
 
 void TestResourceSet::testConnectToSignals()
@@ -315,6 +395,16 @@ void TestResourceSet::testConnectEngine2()
     QVERIFY(connectOk);
 }
 
+void TestResourceSet::testDoubleInit()
+{
+    ResourceSet resourceSet("player");
+    QVERIFY(resourceSet.isConnectedToManager() == false);
+    bool rv = resourceSet.initAndConnect();
+    QVERIFY(rv);
+    rv = resourceSet.initAndConnect();
+    QVERIFY(rv);
+}
+
 void TestResourceSet::waitForSignal(const QObject *sender, const char *signal, quint32 timeout)
 {
     QEventLoop loop;
@@ -397,6 +487,32 @@ void TestResourceSet::testDoubleAcquire()
 
     // Check there is no second signal
     QCOMPARE(stateSpy2.count(), 1);
+}
+
+void TestResourceSet::testUpdateNoInit()
+{
+    ResourceSet resourceSet("player");
+    bool updateOk = resourceSet.update();
+    QVERIFY(updateOk);
+    bool addOk = resourceSet.addResource(AudioPlaybackType);
+    QVERIFY(addOk);
+    updateOk = resourceSet.update();
+    QVERIFY(updateOk);
+}
+
+void TestResourceSet::testUninitializedRelease()
+{
+    ResourceSet resourceSet("player");
+
+    QSignalSpy stateSpy(&resourceSet, SIGNAL(resourcesReleased()));
+    QVERIFY(stateSpy.isValid());
+
+    bool releaseOk = resourceSet.release();
+    QVERIFY(releaseOk);
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+
+    // Check that no signal got received
+    QCOMPARE(stateSpy.count(), 0);
 }
 
 QTEST_MAIN(TestResourceSet)

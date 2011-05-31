@@ -19,33 +19,38 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
 USA.
 *************************************************************************/
 
-#ifndef TESTAUDIORESOURCE_H
-#define TESTAUDIORESOURCE_H
+#ifndef TEST_RESOURCE_SET_H
+#define TEST_RESOURCE_SET_H
 
-#include <QtTest/QTest>
 #include <QObject>
-#include <policy/audio-resource.h>
+#include <QList>
+#include <QtTest/QTest>
+#include <policy/resource-set.h>
 
-using namespace ResourcePolicy;
-
-class TestAudioResource: public QObject
+class TestReleasedByManager: public QObject
 {
     Q_OBJECT
 private:
-    AudioResource *audioResource;
+    void waitForSignal(const QObject *sender, const char *signal, quint32 timeout = 500);
 
 public:
-    TestAudioResource();
-    ~TestAudioResource();
+    TestReleasedByManager();
+    ~TestReleasedByManager();
 
 private slots:
 
-    void testConstruct1();
-    void testConstruct2();
-    void testCopyConstruct();
-    void testSetAudioGroup();
-    void testSetProcessId();
-    void testSetStreamTag();
+    void testLostNoPlayer();
+    void testLostFirstPlayer();
+    void testLostSecondPlayer();
+    void testLostBothPlayer();
+    void testLostAlwaysReplyNoPlayer();
+    void testLostAlwaysReplyFirstPlayer();
+    void testLostAlwaysReplySecondPlayer();
+    void testLostAlwaysReplyBothPlayer();
+    void testLostAutoReleaseNoPlayer();
+    void testLostAutoReleaseFirstPlayer();
+    void testLostAutoReleaseSecondPlayer();
+    void testLostAutoReleaseBothPlayer();
 };
 
-#endif // TESTAUDIORESOURCE_H
+#endif
