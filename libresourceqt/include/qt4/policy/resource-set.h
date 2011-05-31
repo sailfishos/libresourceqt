@@ -69,7 +69,7 @@ class ResourceSetPrivate;
 *
 * The Libresourceqt API provides:
 *
-* <table border="1">
+* <table>
 * <caption>
 *   <big><b>
 *     Classes in Libresourceqt API
