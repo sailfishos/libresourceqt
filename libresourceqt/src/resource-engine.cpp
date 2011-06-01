@@ -66,15 +66,7 @@ ResourceEngine::~ResourceEngine()
         qDebug("ResourceEngine::~ResourceEngine(%d) - unset userdata", identifier);
     }
     if (libresourceUsers==0) {
-	// Removing D-BUS connection from event loop
-	DBUSConnectionEventLoop::removeConnection(dbusConnection);
 
-	// Closing and cleaning the D-BUS connection
-	dbus_connection_close(dbusConnection);
-	dbus_connection_unref(dbusConnection);
-	dbusConnection = NULL;
-
-	// Cleaning libresource connection
         qDebug("ResourceEngine::~ResourceEngine(%d) - last libresourceUser!", identifier);
         ResourceEngine::libresourceConnection = NULL;
     }
