@@ -223,6 +223,7 @@ void ResourceSet::deleteResource(ResourceType type)
     if(type == AudioPlaybackType) {
         audioResource->disconnect();
         audioResource = NULL;
+        pendingAudioProperties = false;
     }
     delete resourceSet[type];
     resourceSet[type] = NULL;
