@@ -1,7 +1,7 @@
 /*************************************************************************
 This file is part of libresourceqt
 
-Copyright (C) 2010 Nokia Corporation.
+Copyright (C) 2011 Nokia Corporation.
 
 This library is free software; you can redistribute
 it and/or modify it under the terms of the GNU Lesser General Public

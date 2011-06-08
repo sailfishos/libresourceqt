@@ -1,7 +1,7 @@
 /*************************************************************************
 This file is part of libresourceqt
 
-Copyright (C) 2010 Nokia Corporation.
+Copyright (C) 2011 Nokia Corporation.
 
 This library is free software; you can redistribute
 it and/or modify it under the terms of the GNU Lesser General Public
@@ -22,13 +22,13 @@ USA.
 * \file audio-resource.h
 * \brief Declaration of ResourcePolicy::AudioResource resource class.
 *
-* \copyright Copyright (C) 2010 Nokia Corporation.
+* \copyright Copyright (C) 2011 Nokia Corporation.
 * \author Wolf Bergenheim and Robert Löfman
 * \par License
 * @license LGPL
 * This file is part of libresourceqt
 * \par
-* Copyright (C) 2010 Nokia Corporation.
+* Copyright (C) 2011 Nokia Corporation.
 * \par
 * This library is free software; you can redistribute
 * it and/or modify it under the terms of the GNU Lesser General Public
@@ -149,6 +149,8 @@ signals:
 	*/
 	void audioPropertiesChanged(const QString &group, quint32 pid, const QString &name, const QString &value);
 };
+
+//extern void myDebug(const char* fmt, ...);
 }
 
 #endif

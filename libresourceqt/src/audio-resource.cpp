@@ -1,7 +1,7 @@
 /*************************************************************************
 This file is part of libresourceqt
 
-Copyright (C) 2010 Nokia Corporation.
+Copyright (C) 2011 Nokia Corporation.
 
 This library is free software; you can redistribute
 it and/or modify it under the terms of the GNU Lesser General Public
@@ -54,9 +54,7 @@ bool AudioResource::audioGroupIsSet() const
 
 void AudioResource::setAudioGroup(const QString &newGroup)
 {
-    qDebug("this = %p", this);
     group = newGroup;
-    qDebug() << "Audio group changed! New group is: " << newGroup;
     emit audioPropertiesChanged(group, pid, streamName, streamValue);
 }
 
@@ -68,7 +66,6 @@ quint32 AudioResource::processID() const
 void AudioResource::setProcessID(quint32 newPID)
 {
     pid = newPID;
-    qDebug("New PID = %u", pid);
     emit audioPropertiesChanged(group, pid, streamName, streamValue);
 }
 

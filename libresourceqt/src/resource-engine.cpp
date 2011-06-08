@@ -1,7 +1,7 @@
 /*************************************************************************
 This file is part of libresourceqt
 
-Copyright (C) 2010 Nokia Corporation.
+Copyright (C) 2011 Nokia Corporation.
 
 This library is free software; you can redistribute
 it and/or modify it under the terms of the GNU Lesser General Public
@@ -41,6 +41,8 @@ static void handleGrantMessage(resmsg_t *msg, resset_t *rs, void *data);
 static void handleAdviceMessage(resmsg_t *msg, resset_t *rs, void *data);
 static void handleReleaseMessage(resmsg_t *message, resset_t *rs, void *data);
 
+extern bool printLogs;
+
 ResourceEngine::ResourceEngine(ResourceSet *resourceSet)
         : QObject(), connected(false), resourceSet(resourceSet),
         libresourceSet(NULL), requestId(0), messageMap(), connectionMode(0),
@@ -52,30 +54,30 @@ ResourceEngine::ResourceEngine(ResourceSet *resourceSet)
     if (resourceSet->willAutoRelease()) {
         connectionMode += RESOURCE_AUTO_RELEASE;
     }
-    qDebug("ResourceEngine::ResourceEngine(%d) - connectionMode = %04x", identifier, connectionMode);
+    LOG_DEBUG("ResourceEngine::ResourceEngine(%d) - connectionMode = %04x", identifier, connectionMode);
 }
 
 ResourceEngine::~ResourceEngine()
 {
-    qDebug("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+    LOG_DEBUG("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
     QMutexLocker locker(&mutex);
-    qDebug("ResourceEngine::~ResourceEngine(%d) - starting destruction", identifier);
+    LOG_DEBUG("ResourceEngine::~ResourceEngine(%d) - starting destruction", identifier);
     libresourceUsers--;
     if (libresourceSet != NULL) {
         libresourceSet->userdata = NULL;
-        qDebug("ResourceEngine::~ResourceEngine(%d) - unset userdata", identifier);
+        LOG_DEBUG("ResourceEngine::~ResourceEngine(%d) - unset userdata", identifier);
     }
     if (libresourceUsers==0) {
 
-        qDebug("ResourceEngine::~ResourceEngine(%d) - last libresourceUser!", identifier);
+        LOG_DEBUG("ResourceEngine::~ResourceEngine(%d) - last libresourceUser!", identifier);
         ResourceEngine::libresourceConnection = NULL;
     }
-    qDebug("ResourceEngine::~ResourceEngine(%d) is no more!", identifier);
+    LOG_DEBUG("ResourceEngine::~ResourceEngine(%d) is no more!", identifier);
 }
-	
+
 bool ResourceEngine::initialize()
 {
-    qDebug("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+    LOG_DEBUG("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
     QMutexLocker locker(&mutex);
     DBusError dbusError;
     DBusConnection *dbusConnection;
@@ -85,7 +87,7 @@ bool ResourceEngine::initialize()
         dbus_error_init(&dbusError);
         dbusConnection = dbus_bus_get_private(DBUS_BUS_SYSTEM, &dbusError);
         if (dbus_error_is_set(&dbusError)) {
-            qDebug("Error getting the system bus: %s", dbusError.message);
+            LOG_DEBUG("Error getting the system bus: %s", dbusError.message);
             dbus_error_free(&dbusError);
             return false;
         }
@@ -95,7 +97,7 @@ bool ResourceEngine::initialize()
         ResourceEngine::libresourceConnection = resproto_init(RESPROTO_ROLE_CLIENT, RESPROTO_TRANSPORT_DBUS,
                                               connectionIsUp, dbusConnection);
         if (ResourceEngine::libresourceConnection == NULL) {
-            qDebug("resproto_init failed!");
+            LOG_DEBUG("resproto_init failed!");
             return false;
         }
         ResourceEngine::libresourceUsers = 1;
@@ -110,7 +112,7 @@ bool ResourceEngine::initialize()
         engineMap.insert(ResourceEngine::libresourceConnection, this);
     }
 
-    qDebug("ResourceEngine (%u, %p) is now initialized. %d users",
+    LOG_DEBUG("ResourceEngine (%u, %p) is now initialized. %d users",
            identifier, ResourceEngine::libresourceConnection,
            ResourceEngine::libresourceUsers);
     return true;
@@ -118,16 +120,16 @@ bool ResourceEngine::initialize()
 
 static void handleUnregisterMessage(resmsg_t *message, resset_t *libresourceSet, void *)
 {
-    qDebug("**************** %s() - locking....", __FUNCTION__);
+    LOG_DEBUG("**************** %s() - locking....", __FUNCTION__);
     QMutexLocker locker(&mutex);
     if (NULL == libresourceSet->userdata) {
-        qDebug("IGNORING unregister, no context");
+        LOG_DEBUG("IGNORING unregister, no context");
         return;
     }
     ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(libresourceSet->userdata);
-    qDebug("recv: unregister: id=%d, engine->id() = %d", message->any.id, engine->id());
+    LOG_DEBUG("recv: unregister: id=%d, engine->id() = %d", message->any.id, engine->id());
     if(engine->id() != message->any.id) {
-        qDebug("Received an unregister notification, but it is not for us. Ignoring (%d != %d)",
+        LOG_DEBUG("Received an unregister notification, but it is not for us. Ignoring (%d != %d)",
                message->any.id, engine->id());
         return;
     }
@@ -137,26 +139,26 @@ static void handleUnregisterMessage(resmsg_t *message, resset_t *libresourceSet,
 
 void ResourceEngine::disconnected()
 {
-    qDebug("ResourceEngine(%d) - disconnected", identifier);
+    LOG_DEBUG("ResourceEngine(%d) - disconnected", identifier);
     connected = false;
     emit disconnectedFromManager();
 }
 
 static void handleGrantMessage(resmsg_t *message, resset_t *libresourceSet, void *)
 {
-    qDebug("**************** %s() - locking....", __FUNCTION__);
+    LOG_DEBUG("**************** %s() - locking....", __FUNCTION__);
     QMutexLocker locker(&mutex);
     if (NULL == libresourceSet->userdata) {
-        qDebug("IGNORING grant, no context: type=0x%04x, id=0x%04x, reqno=0x%04x, resc=0x%04x",
+        LOG_DEBUG("IGNORING grant, no context: type=0x%04x, id=0x%04x, reqno=0x%04x, resc=0x%04x",
                message->notify.type, message->notify.id, message->notify.reqno, message->notify.resrc);
         return;
     }
     ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(libresourceSet->userdata);
-    qDebug("recv: grant: type=%d, id=%d, reqno=%d, resc=0x%04x engine->id() = %d",
+    LOG_DEBUG("recv: grant: type=%d, id=%d, reqno=%d, resc=0x%04x engine->id() = %d",
            message->notify.type, message->notify.id, message->notify.reqno,
            message->notify.resrc, engine->id());
     if(engine->id() != message->any.id) {
-        qDebug("Received a grant message, but it is not for us. Ignoring (%d != %d)",
+        LOG_DEBUG("Received a grant message, but it is not for us. Ignoring (%d != %d)",
                engine->id(), message->any.id);
         return;
     }
@@ -165,7 +167,7 @@ static void handleGrantMessage(resmsg_t *message, resset_t *libresourceSet, void
 
 void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
 {
-    qDebug("ResourceEngine(%d) -- receivedGrant: type=0x%04x, id=0x%04x, reqno=0x%04x, resc=0x%04x",
+    LOG_DEBUG("ResourceEngine(%d) -- receivedGrant: type=0x%04x, id=0x%04x, reqno=0x%04x, resc=0x%04x",
            identifier, notifyMessage->type, notifyMessage->id, notifyMessage->reqno, notifyMessage->resrc);
 
     if (notifyMessage->resrc == 0) {
@@ -173,11 +175,11 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
         bool unkownRequest                = !messageMap.contains(notifyMessage->reqno);
         resmsg_type_t originalMessageType =  messageMap.take(notifyMessage->reqno);
 
-        qDebug("ResourceEngine(%d) -- originalMessageType=%u", identifier, originalMessageType);
+        LOG_DEBUG("ResourceEngine(%d) -- originalMessageType=%u", identifier, originalMessageType);
 
         if (unkownRequest ) {
             //we don't know this req number => it must be a server override
-            qDebug("ResourceEngine(%d) -- emiting signal resourcesLost()", identifier);
+            LOG_DEBUG("ResourceEngine(%d) -- emiting signal resourcesLost()", identifier);
             emit resourcesLost(allResourcesToBitmask(resourceSet));
 
         }else if ( originalMessageType == RESMSG_UPDATE ) {
@@ -185,13 +187,13 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
             //it can be ACKed saying that the update() was OK but you have no resources yet.
 
             if ( resourceSet->hasResourcesGranted() ) {
-                qDebug("ResourceEngine(%d) -- emitting signal resourcesLost() for update", identifier);
+                LOG_DEBUG("ResourceEngine(%d) -- emitting signal resourcesLost() for update", identifier);
                 emit resourcesLost(allResourcesToBitmask(resourceSet));
             }else
             {
                 if ( resourceSet->alwaysGetReply() ) {
                     //If alwaysReply is on and we didn't have resources at update() then we come from here to updateOK()
-                    qDebug("ResourceEngine(%d) -- emitting signal updateOK() via receivedGrant.", identifier);
+                    LOG_DEBUG("ResourceEngine(%d) -- emitting signal updateOK() via receivedGrant.", identifier);
                     emit updateOK(true);
                 }
                 else {
@@ -200,20 +202,20 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
             }
 
         }else if (originalMessageType == RESMSG_ACQUIRE && resourceSet->alwaysGetReply() ) {
-            qDebug("ResourceEngine(%d) -- request DENIED!", identifier);
+            LOG_DEBUG("ResourceEngine(%d) -- request DENIED!", identifier);
             emit resourcesDenied();
         }
         else if (originalMessageType == RESMSG_RELEASE) {
-            qDebug("ResourceEngine(%d) -- confirmation to release", identifier);
+            LOG_DEBUG("ResourceEngine(%d) -- confirmation to release", identifier);
             emit resourcesReleased();
         }
         else {
-            qDebug("ResourceEngine(%d) -- Ignoring the receivedGrant because original message unknown.", identifier);
+            LOG_DEBUG("ResourceEngine(%d) -- Ignoring the receivedGrant because original message unknown.", identifier);
         }
     }
     else {
 
-        qDebug("ResourceEngine(%d) - emitting signal resourcesGranted(%02x).", identifier, notifyMessage->resrc);
+        LOG_DEBUG("ResourceEngine(%d) - emitting signal resourcesGranted(%02x).", identifier, notifyMessage->resrc);
         emit resourcesGranted(notifyMessage->resrc);
     }
 
@@ -223,18 +225,18 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
 
 static void handleReleaseMessage(resmsg_t *message, resset_t *rs, void *)
 {
-    qDebug("**************** %s() - locking....", __FUNCTION__);
+    LOG_DEBUG("**************** %s() - locking....", __FUNCTION__);
     QMutexLocker locker(&mutex);
     if (NULL == rs->userdata) {
-        qDebug("IGNORING release, no context");
+        LOG_DEBUG("IGNORING release, no context");
         return;
     }
     ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(rs->userdata);
-    qDebug("recv: release: type=%d, id=%d, reqno=%d, resc=0x%04x engine->id() = %d",
+    LOG_DEBUG("recv: release: type=%d, id=%d, reqno=%d, resc=0x%04x engine->id() = %d",
            message->notify.type, message->notify.id, message->notify.reqno,
            message->notify.resrc, engine->id());
     if(engine->id() != message->any.id) {
-        qDebug("Received an advice message, but it is not for us. Ignoring (%d != %d)",
+        LOG_DEBUG("Received an advice message, but it is not for us. Ignoring (%d != %d)",
                engine->id(), message->any.id);
         return;
     }
@@ -245,24 +247,24 @@ static void handleReleaseMessage(resmsg_t *message, resset_t *rs, void *)
 void ResourceEngine::receivedRelease(resmsg_notify_t *message)
 {
     uint32_t allResources = allResourcesToBitmask(resourceSet);
-    qDebug("ResourceEngine(%d) - %s: have: %02x got %02x", identifier, __FUNCTION__, allResources, message->resrc);
+    LOG_DEBUG("ResourceEngine(%d) - %s: have: %02x got %02x", identifier, __FUNCTION__, allResources, message->resrc);
     emit resourcesReleasedByManager();
 }
 
 static void handleAdviceMessage(resmsg_t *message, resset_t *libresourceSet, void *)
 {
-    qDebug("**************** %s() - locking....", __FUNCTION__);
+    LOG_DEBUG("**************** %s() - locking....", __FUNCTION__);
     QMutexLocker locker(&mutex);
     if (NULL == libresourceSet->userdata) {
-        qDebug("IGNORING advice, no context");
+        LOG_DEBUG("IGNORING advice, no context");
         return;
     }
     ResourceEngine *engine = reinterpret_cast<ResourceEngine *>(libresourceSet->userdata);
-    qDebug("recv: advice: type=%d, id=%d, reqno=%d, resc=0x%04x engine->id() = %d",
+    LOG_DEBUG("recv: advice: type=%d, id=%d, reqno=%d, resc=0x%04x engine->id() = %d",
            message->notify.type, message->notify.id, message->notify.reqno,
            message->notify.resrc, engine->id());
     if(engine->id() != message->any.id) {
-        qDebug("Received an advice message, but it is not for us. Ignoring (%d != %d)",
+        LOG_DEBUG("Received an advice message, but it is not for us. Ignoring (%d != %d)",
                engine->id(), message->any.id);
         return;
     }
@@ -273,16 +275,16 @@ static void handleAdviceMessage(resmsg_t *message, resset_t *libresourceSet, voi
 void ResourceEngine::receivedAdvice(resmsg_notify_t *message)
 {
     uint32_t allResources = allResourcesToBitmask(resourceSet);
-    qDebug("ResourceEngine(%d) - %s: have: %02x got %02x", identifier, __FUNCTION__, allResources, message->resrc);
+    LOG_DEBUG("ResourceEngine(%d) - %s: have: %02x got %02x", identifier, __FUNCTION__, allResources, message->resrc);
     emit resourcesBecameAvailable(message->resrc);
 }
 
 bool ResourceEngine::connectToManager()
 {
-    qDebug("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+    LOG_DEBUG("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
     QMutexLocker locker(&mutex);
     if (isConnecting) {
-        qDebug("ResourceEngine::%s().... allready connecting, ignoring request", __FUNCTION__);
+        LOG_DEBUG("ResourceEngine::%s().... allready connecting, ignoring request", __FUNCTION__);
         return true;
     }
     isConnecting = true;
@@ -308,27 +310,27 @@ bool ResourceEngine::connectToManager()
 
     resourceMessage.record.mode = connectionMode;
 
-    qDebug("ResourceEngine(%d) - ResourceEngine is now connecting(%d, %d, %d)",
+    LOG_DEBUG("ResourceEngine(%d) - ResourceEngine is now connecting(%d, %d, %d)",
            identifier, resourceMessage.record.id, resourceMessage.record.reqno,
            resourceMessage.record.rset.all);
     libresourceSet = resconn_connect(ResourceEngine::libresourceConnection, &resourceMessage,
-                                     statusCallbackHandler);                                     
+                                     statusCallbackHandler);
     if (libresourceSet == NULL)
         return false;
     libresourceSet->userdata = this; //save our context
     //locker.unlock();
-    qDebug("ResourceEngine(%d)::%s() - **************** unlocked! returning true", identifier, __FUNCTION__);
+    LOG_DEBUG("ResourceEngine(%d)::%s() - **************** unlocked! returning true", identifier, __FUNCTION__);
     return true;
 }
 
 bool ResourceEngine::disconnectFromManager()
 {
-    qDebug("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+    LOG_DEBUG("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
     QMutexLocker locker(&mutex);
     resmsg_t resourceMessage;
     memset(&resourceMessage, 0, sizeof(resmsg_t));
 
-    qDebug("ResourceEngine(%d)::%s() - disconnecting from manager - %p",
+    LOG_DEBUG("ResourceEngine(%d)::%s() - disconnecting from manager - %p",
            identifier, __FUNCTION__, ResourceEngine::libresourceConnection);
     connected = false;
     aboutToBeDeleted = true;
@@ -357,10 +359,10 @@ static inline quint32 allResourcesToBitmask(const ResourceSet *resourceSet)
     quint32 bitmask = 0;
     for (int i = 0; i < resourceList.size(); i++) {
         quint32 bits = resourceTypeToLibresourceType(resourceList[i]->type());
-        qDebug("Converted Resource 0x%02x to 0x%02x", resourceList[i]->type(), bits);
+        LOG_DEBUG("Converted Resource 0x%02x to 0x%02x", resourceList[i]->type(), bits);
         bitmask += bits;
     }
-    qDebug("All resources as bitmask is 0x%04x", bitmask);
+    LOG_DEBUG("All resources as bitmask is 0x%04x", bitmask);
     return bitmask;
 }
 
@@ -394,7 +396,7 @@ quint32 ResourcePolicy::resourceTypeToLibresourceType(ResourceType type)
     case HeadsetButtonsType:
         return RESMSG_HEADSET_BUTTONS;
     default:
-        qDebug("Unknown resource Type %d", quint32(type));
+        LOG_DEBUG("Unknown resource Type %d", quint32(type));
         return 0xffff;
     }
 }
@@ -413,37 +415,37 @@ static inline quint32 optionalResourcesToBitmask(const ResourceSet *resourceSet)
 
 static void statusCallbackHandler(resset_t *libresourceSet, resmsg_t *message)
 {
-    qDebug("**************** %s().... %d", __FUNCTION__, __LINE__);
-    //qDebug("**************** %s() - locking....", __FUNCTION__);
+    LOG_DEBUG("**************** %s().... %d", __FUNCTION__, __LINE__);
+    //LOG_DEBUG("**************** %s() - locking....", __FUNCTION__);
     QMutexLocker locker(&mutex);
     if (NULL == libresourceSet->userdata) {
-        qDebug("IGNORING status message, no context: type=0x%04x, id=0x%04x, reqno=0x%04x, errcod=%d",
+        LOG_DEBUG("IGNORING status message, no context: type=0x%04x, id=0x%04x, reqno=0x%04x, errcod=%d",
                message->status.type, message->status.id, message->status.reqno, message->status.errcod);
         return;
     }
-    qDebug("**************** %s().... %d", __FUNCTION__, __LINE__);
+    LOG_DEBUG("**************** %s().... %d", __FUNCTION__, __LINE__);
     ResourceEngine *resourceEngine = reinterpret_cast<ResourceEngine *>(libresourceSet->userdata);
-    qDebug("**************** %s().... %d", __FUNCTION__, __LINE__);
-    qDebug("**************** %s().... %d", __FUNCTION__, __LINE__);
-    qDebug("recv: status: id=%d, engine->id() = %d", message->any.id, resourceEngine->id());
-    qDebug("**************** %s().... %d", __FUNCTION__, __LINE__);
+    LOG_DEBUG("**************** %s().... %d", __FUNCTION__, __LINE__);
+    LOG_DEBUG("**************** %s().... %d", __FUNCTION__, __LINE__);
+    LOG_DEBUG("recv: status: id=%d, engine->id() = %d", message->any.id, resourceEngine->id());
+    LOG_DEBUG("**************** %s().... %d", __FUNCTION__, __LINE__);
     if(resourceEngine->id() != libresourceSet->id) {
-        qDebug("Received a status notification, but it is not for us. Ignoring (%d != %d)",
+        LOG_DEBUG("Received a status notification, but it is not for us. Ignoring (%d != %d)",
                resourceEngine->id(), libresourceSet->id);
         return;
     }
-    qDebug("Received a status notification");
+    LOG_DEBUG("Received a status notification");
     if (message->type != RESMSG_STATUS) {
-        qDebug("Invalid message type.. (got %x, expected %x", message->type, RESMSG_STATUS);
+        LOG_DEBUG("Invalid message type.. (got %x, expected %x", message->type, RESMSG_STATUS);
         return;
     }
     if (message->status.errcod) {
         resourceEngine->handleError(message->status.reqno, message->status.errcod, message->status.errmsg);
     }
     else {
-        qDebug("Received a status message with id %02x and #:%u", message->status.id, message->status.reqno);
+        LOG_DEBUG("Received a status message with id %02x and #:%u", message->status.id, message->status.reqno);
         if(!resourceEngine->isConnectedToManager() && resourceEngine->toBeDeleted()) {
-            qDebug("%s(%d) - delete resourceEngine %p", __FUNCTION__, __LINE__, resourceEngine);
+            LOG_DEBUG("%s(%d) - delete resourceEngine %p", __FUNCTION__, __LINE__, resourceEngine);
             delete resourceEngine;
         }
         else {
@@ -455,22 +457,22 @@ static void statusCallbackHandler(resset_t *libresourceSet, resmsg_t *message)
 void ResourceEngine::handleStatusMessage(quint32 requestNo)
 {
     resmsg_type_t originalMessageType = messageMap.value(requestNo);
-    qDebug("Received a status message: %u(0x%02x)", requestNo, originalMessageType);
+    LOG_DEBUG("Received a status message: %u(0x%02x)", requestNo, originalMessageType);
     if (originalMessageType == RESMSG_REGISTER) {
-        qDebug("ResourceEngine(%d) - connected!", identifier);
+        LOG_DEBUG("ResourceEngine(%d) - connected!", identifier);
         connected = true;
         isConnecting = false;
         emit connectedToManager();
         messageMap.remove(requestNo);
     }
     else if (originalMessageType == RESMSG_UNREGISTER) {
-        qDebug("ResourceEngine(%d) - disconnected!", identifier);
+        LOG_DEBUG("ResourceEngine(%d) - disconnected!", identifier);
         connected = false;
         emit disconnectedFromManager();
         messageMap.remove(requestNo);
     }
     else if(originalMessageType == RESMSG_UPDATE) {
-        qDebug("ResourceEngine(%d) - Update status", identifier);
+        LOG_DEBUG("ResourceEngine(%d) - Update status", identifier);
         //We only come here if status ok.
 
         //bool hadGrantsWhenSentUpdate = false;
@@ -483,16 +485,16 @@ void ResourceEngine::handleStatusMessage(quint32 requestNo)
             //If alwaysReply is off and we didn't have resources at update() emit from here to
             //updateOK() (i.e. ACK that the set we are interested in is changed). Or if alwayReply
             // is off and our update does not change the granted set.
-            qDebug("ResourceEngine(%d) -- handleStatusMessage.", identifier);
+            LOG_DEBUG("ResourceEngine(%d) -- handleStatusMessage.", identifier);
             emit updateOK(false);
         //}
 
     }
     else if(originalMessageType == RESMSG_ACQUIRE) {
-        qDebug("ResourceEngine(%d) - Acquire status", identifier);
+        LOG_DEBUG("ResourceEngine(%d) - Acquire status", identifier);
     }
     else if(originalMessageType == RESMSG_RELEASE) {
-        qDebug("ResourceEngine(%d) - Release status", identifier);
+        LOG_DEBUG("ResourceEngine(%d) - Release status", identifier);
     }
     else {
         messageMap.remove(requestNo);
@@ -502,11 +504,11 @@ void ResourceEngine::handleStatusMessage(quint32 requestNo)
 void ResourceEngine::handleError(quint32 requestNo, qint32 code, const char *message)
 {
     resmsg_type_t originalMessageType = messageMap.take(requestNo);
-    qDebug("ResourceEngine(%d) - Error on request %u(0x%02x): %d - %s",
+    LOG_DEBUG("ResourceEngine(%d) - Error on request %u(0x%02x): %d - %s",
            identifier, requestNo, originalMessageType, code, message);
     messageMap.remove(requestNo);
 
-    qDebug("emitting errorCallback");
+    LOG_DEBUG("emitting errorCallback");
     emit errorCallback(code, message);
 }
 
@@ -522,7 +524,7 @@ bool ResourceEngine::isConnectingToManager()
 
 bool ResourceEngine::acquireResources()
 {
-    qDebug("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+    LOG_DEBUG("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
     QMutexLocker locker(&mutex);
     resmsg_t message;
     memset(&message, 0, sizeof(resmsg_t));
@@ -533,7 +535,7 @@ bool ResourceEngine::acquireResources()
 
     messageMap.insert(requestId, RESMSG_ACQUIRE);
 
-    qDebug("ResourceEngine(%d) - acquire %u:%u", identifier, resourceSet->id(), requestId);
+    LOG_DEBUG("ResourceEngine(%d) - acquire %u:%u", identifier, resourceSet->id(), requestId);
     int success = resproto_send_message(libresourceSet, &message, statusCallbackHandler);
 
     if(!success)
@@ -544,7 +546,7 @@ bool ResourceEngine::acquireResources()
 
 bool ResourceEngine::releaseResources()
 {
-    qDebug("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+    LOG_DEBUG("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
     QMutexLocker locker(&mutex);
     resmsg_t message;
     memset(&message, 0, sizeof(resmsg_t));
@@ -554,7 +556,7 @@ bool ResourceEngine::releaseResources()
     message.possess.reqno = ++requestId;
 
     messageMap.insert(requestId, RESMSG_RELEASE);
-    qDebug("ResourceEngine(%d) - release %u:%u", identifier, resourceSet->id(), requestId);
+    LOG_DEBUG("ResourceEngine(%d) - release %u:%u", identifier, resourceSet->id(), requestId);
     int success = resproto_send_message(libresourceSet, &message, statusCallbackHandler);
 
     if(!success)
@@ -565,7 +567,7 @@ bool ResourceEngine::releaseResources()
 
 bool ResourceEngine::updateResources()
 {
-    qDebug("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+    LOG_DEBUG("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
     QMutexLocker locker(&mutex);
     resmsg_t message;
     memset(&message, 0, sizeof(resmsg_t));
@@ -591,7 +593,7 @@ bool ResourceEngine::updateResources()
 
     wasInAcquireMode.insert(requestId, hasGranted /*hasResourcesGranted()*/ );
 
-    qDebug("ResourceEngine(%d) - update %u:%u", identifier, resourceSet->id(), requestId);
+    LOG_DEBUG("ResourceEngine(%d) - update %u:%u", identifier, resourceSet->id(), requestId);
     int success = resproto_send_message(libresourceSet, &message, statusCallbackHandler);
 
     if(!success)
@@ -603,7 +605,7 @@ bool ResourceEngine::updateResources()
 bool ResourceEngine::registerAudioProperties(const QString &audioGroup, quint32 pid,
                                               const QString &name, const QString &value)
 {
-    qDebug("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+    LOG_DEBUG("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
     QMutexLocker locker(&mutex);
     resmsg_t message;
     memset(&message, 0, sizeof(resmsg_t));
@@ -611,13 +613,13 @@ bool ResourceEngine::registerAudioProperties(const QString &audioGroup, quint32 
 
     if (pid != 0) {
         message.audio.pid = pid;
-        qDebug("ResourceEngine(%d) - audio pid %u", identifier, pid);
+        LOG_DEBUG("ResourceEngine(%d) - audio pid %u", identifier, pid);
     }
     if (!audioGroup.isEmpty() && !audioGroup.isNull()) {
         resmsg_audio_t    *audio;
         groupBa = audioGroup.toLatin1();
         message.audio.group = groupBa.data();
-        qDebug("ResourceEngine(%d) - audio group: %s", identifier, message.audio.group);
+        LOG_DEBUG("ResourceEngine(%d) - audio group: %s", identifier, message.audio.group);
         audio    = &message.audio;
     }
     if (!name.isEmpty() && !name.isNull() && !value.isEmpty() && !value.isNull()) {
@@ -626,7 +628,7 @@ bool ResourceEngine::registerAudioProperties(const QString &audioGroup, quint32 
         message.audio.property.name = nameBa.data();
         message.audio.property.match.method  = resmsg_method_equals;
         message.audio.property.match.pattern = valueBa.data();
-        qDebug("ResourceEngine(%d) - audio stream tag is %s:%s",
+        LOG_DEBUG("ResourceEngine(%d) - audio stream tag is %s:%s",
                identifier, message.audio.property.name, message.audio.property.match.pattern);
     }
 
@@ -638,9 +640,9 @@ bool ResourceEngine::registerAudioProperties(const QString &audioGroup, quint32 
 
     messageMap.insert(requestId, RESMSG_AUDIO);
 
-    qDebug("ResourceEngine(%d) - audio %u:%u", identifier, resourceSet->id(), requestId);
+    LOG_DEBUG("ResourceEngine(%d) - audio %u:%u", identifier, resourceSet->id(), requestId);
     int success = resproto_send_message(libresourceSet, &message, statusCallbackHandler);
-    qDebug("ResourceEngine(%d) - resproto_send_message returned %d", identifier, success);
+    LOG_DEBUG("ResourceEngine(%d) - resproto_send_message returned %d", identifier, success);
 
     if(!success)
         return false;
@@ -650,13 +652,13 @@ bool ResourceEngine::registerAudioProperties(const QString &audioGroup, quint32 
 
 bool ResourceEngine::registerVideoProperties(quint32 pid)
 {
-    qDebug("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+    LOG_DEBUG("ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
     QMutexLocker locker(&mutex);
     resmsg_t message;
     memset(&message, 0, sizeof(resmsg_t));
 
     if (pid <= 0) {
-        qDebug("ResourceEngine(%d) - erroneous pid %u", identifier, pid);
+        LOG_DEBUG("ResourceEngine(%d) - erroneous pid %u", identifier, pid);
         return false;
     }
 
@@ -668,9 +670,9 @@ bool ResourceEngine::registerVideoProperties(quint32 pid)
 
     messageMap.insert(requestId, RESMSG_VIDEO);
 
-    qDebug("ResourceEngine(%d) - video %u:%u", identifier, resourceSet->id(), requestId);
+    LOG_DEBUG("ResourceEngine(%d) - video %u:%u", identifier, resourceSet->id(), requestId);
     int success = resproto_send_message(libresourceSet, &message, statusCallbackHandler);
-    qDebug("ResourceEngine(%d) - resproto_send_message returned %d", identifier, success);
+    LOG_DEBUG("ResourceEngine(%d) - resproto_send_message returned %d", identifier, success);
 
     if(!success)
         return false;
@@ -680,10 +682,10 @@ bool ResourceEngine::registerVideoProperties(quint32 pid)
 
 static void connectionIsUp(resconn_t *connection)
 {
-    qDebug("**************** %s() - locking....", __FUNCTION__);
+    LOG_DEBUG("**************** %s() - locking....", __FUNCTION__);
     QMutexLocker locker(&mutex);
 
-    qDebug("connection is up");
+    LOG_DEBUG("connection is up");
 
     QList<ResourceEngine*> engines = engineMap.values(connection);
     for (int i = 0; i < engines.size(); ++i) {
@@ -696,11 +698,11 @@ void ResourceEngine::handleConnectionIsUp(resconn_t *connection)
 {
 
     if(ResourceEngine::libresourceConnection == connection) {
-        qDebug("ResourceEngine(%d) - connected to manager, connection=%p", identifier, connection);
+        LOG_DEBUG("ResourceEngine(%d) - connected to manager, connection=%p", identifier, connection);
         emit connectedToManager();
     }
     else {
-        qDebug("ResourceEngine(%d) - ignoring Connection is up, it is not for us (%p != %p)",
+        LOG_DEBUG("ResourceEngine(%d) - ignoring Connection is up, it is not for us (%p != %p)",
                identifier, ResourceEngine::libresourceConnection, connection);
     }
 }

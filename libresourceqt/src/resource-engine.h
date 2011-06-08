@@ -1,7 +1,7 @@
 /*************************************************************************
 This file is part of libresourceqt
 
-Copyright (C) 2010 Nokia Corporation.
+Copyright (C) 2011 Nokia Corporation.
 
 This library is free software; you can redistribute
 it and/or modify it under the terms of the GNU Lesser General Public
@@ -29,6 +29,11 @@ USA.
 #include <res-conn.h>
 #include <policy/resource-set.h>
 #include <dbusconnectioneventloop.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stdio.h>
+
+#define LOG_DEBUG(...) do { if (printLogs) qDebug(__VA_ARGS__);  } while(0)
 
 namespace ResourcePolicy {
 
@@ -103,6 +108,7 @@ private:
     bool aboutToBeDeleted;
     bool isConnecting;
 };
+
 }
 
 #endif

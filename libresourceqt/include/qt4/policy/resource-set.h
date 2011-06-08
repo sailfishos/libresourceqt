@@ -1,7 +1,7 @@
 /*************************************************************************
 This file is part of libresourceqt
 
-Copyright (C) 2010 Nokia Corporation.
+Copyright (C) 2011 Nokia Corporation.
 
 This library is free software; you can redistribute
 it and/or modify it under the terms of the GNU Lesser General Public
@@ -22,13 +22,13 @@ USA.
 * \file resource-set.h
 * \brief Declaration of ResourcePolicy::ResourceSet
 *
-* \copyright Copyright (C) 2010 Nokia Corporation.
+* \copyright Copyright (C) 2011 Nokia Corporation.
 * \author Wolf Bergenheim and Robert Löfman
 * \par License
 * @license LGPL
 * This file is part of libresourceqt
 * \par
-* Copyright (C) 2010 Nokia Corporation.
+* Copyright (C) 2011 Nokia Corporation.
 * \par
 * This library is free software; you can redistribute
 * it and/or modify it under the terms of the GNU Lesser General Public
@@ -55,8 +55,12 @@ USA.
 #include <QList>
 #include <policy/resources.h>
 #include <policy/audio-resource.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 class ResourceSetPrivate;
+
 
 /**
 * \mainpage The Meego Resource Policy Qt API: Libresourceqt
@@ -388,9 +392,10 @@ signals:
 	*/
 	void errorCallback(quint32, const char*);
 
-	/**
-	* This signals that the manager has started and is available.
-	*/
+        /**
+        * This signals that the manager has started and is available. This signal was called connectedToManager() before,
+        * but that name is now changed to managerIsUp() as that better describes that the manager has booted.
+        */
 	void managerIsUp();
 
 

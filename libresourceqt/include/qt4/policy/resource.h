@@ -1,7 +1,7 @@
 /*************************************************************************
 This file is part of libresourceqt
 
-Copyright (C) 2010 Nokia Corporation.
+Copyright (C) 2011 Nokia Corporation.
 
 This library is free software; you can redistribute
 it and/or modify it under the terms of the GNU Lesser General Public
@@ -23,13 +23,13 @@ USA.
 * \brief Declaration of ResourcePolicy::Resource and
 * ResourcePolicy::ResourceType
 *
-* \copyright Copyright (C) 2010 Nokia Corporation.
+* \copyright Copyright (C) 2011 Nokia Corporation.
 * \author Wolf Bergenheim and Robert Löfman
 * \par License
 * @license LGPL
 * This file is part of libresourceqt
 * \par
-* Copyright (C) 2010 Nokia Corporation.
+* Copyright (C) 2011 Nokia Corporation.
 * \par
 * This library is free software; you can redistribute
 * it and/or modify it under the terms of the GNU Lesser General Public
