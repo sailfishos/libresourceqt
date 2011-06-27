@@ -68,9 +68,12 @@ ResourceEngine::~ResourceEngine()
         LOG_DEBUG("ResourceEngine::~ResourceEngine(%d) - unset userdata", identifier);
     }
     if (libresourceUsers==0) {
-
+        // Let's just print a log message and still keep
+        // ResourceEngine::libresourceConnection around in case we get new
+        // users (previously it was set to null, effectively leaking the
+        // d-bus socket fd). We'll still leak the socket fd when the client
+        // terminates though.
         LOG_DEBUG("ResourceEngine::~ResourceEngine(%d) - last libresourceUser!", identifier);
-        ResourceEngine::libresourceConnection = NULL;
     }
     LOG_DEBUG("ResourceEngine::~ResourceEngine(%d) is no more!", identifier);
 }
