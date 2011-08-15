@@ -27,7 +27,8 @@ public:
     Streamer(QObject *parent);
     ~Streamer();
 
-    void play(void);
+    void play();
+    void pause(void);
     void stop(void);
     void setLocation(const QString location);
     void setWindowid(gulong id);

@@ -132,9 +132,16 @@ QBool Streamer::initPlayback(streamer_t *streamer)
   return QBool(true);
 }
 
-void Streamer::play(void)
+void Streamer::play()
 {
   mutex.lock();
+
+  if ( streamer.pipeline && GST_STATE(streamer.pipeline) == GST_STATE_PAUSED ) {
+      gst_element_set_state(streamer.pipeline, GST_STATE_PLAYING);
+      mutex.unlock();
+      return;
+  }
+
   streamer.pipeline = gst_pipeline_new("Playback pipeline");
 
   if (!initPlayback(&streamer)) {
@@ -147,8 +154,30 @@ void Streamer::play(void)
   attachBusCallbacks(streamer.pipeline);
 
   gst_element_set_state(streamer.pipeline, GST_STATE_PLAYING);
+
+  //In case we are paused, seek to position.
+  //gst_element_seek_simple (streamer.pipeline, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH, pos);
+
   mutex.unlock();
 }
+
+
+void Streamer::pause(void)
+{
+GstElement *pipeline;
+
+  mutex.lock();
+  pipeline = streamer.pipeline;
+
+  if (pipeline) {
+   gst_element_set_state(pipeline, GST_STATE_PAUSED);
+    //gst_element_set_state(pipeline, GST_STATE_NULL);
+    //gst_object_unref(GST_OBJECT(pipeline));
+    //streamer.pipeline = NULL;
+  }
+  mutex.unlock();
+}
+
 
 
 void Streamer::stop(void)
@@ -218,7 +247,13 @@ Streamer::~Streamer()
 }
 
 void Streamer::setPosition(quint64 pos) {
-  gst_element_seek_simple (streamer.pipeline, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH, pos);
+
+  //gst_element_seek_simple (streamer.pipeline, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH, pos);
+
+  gst_element_seek (streamer.pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
+  GST_SEEK_TYPE_SET, pos*1000*1000,
+  GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
+
 }
 
 Streamer::State Streamer::state() {

@@ -95,6 +95,7 @@ private slots:
     void togglePolicyAwareness();
     void setPlayingIcon();
     void setPausedIcon();
+    void handleDenied();
     void playOrPause();
     void onPositionChanged();
     void sliderPressed();

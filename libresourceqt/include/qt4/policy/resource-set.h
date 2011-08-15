@@ -378,7 +378,7 @@ signals:
         * This signal is emitted when some other application with a higher priority
         * supersedes your application, and as a result you loose all our resources temporarily.
 	* It is very important to connect to this signal as it is signaling when
-        * the acquired resources shouldn't be used anymore. When resourcesGranted() is
+        * the acquired resources shouldn't be used. When resourcesGranted() is
         * is emitted then the resources can be used again. Note that, when autoRelease mode is used,
         * this signal also signifies that the resources are lost permanently in the sense that they have to be
         * re-acquired when indicated available by the resourcesBecameAvailable() signal  (i.e. they are not granted back

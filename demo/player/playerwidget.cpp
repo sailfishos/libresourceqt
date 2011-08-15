@@ -69,6 +69,10 @@ PlayerWidget::PlayerWidget(Streamer *streamer)
           this,        SLOT(resourceAcquiredHandler(const QList<ResourcePolicy::ResourceType>&)));
   connect(resourceSet, SIGNAL(lostResources()),     this, SLOT(resourceLostHandler()));
   connect(resourceSet, SIGNAL(resourcesReleased()), this, SLOT(resourceReleasedHandler()));
+  connect(resourceSet, SIGNAL(resourcesReleased()), this, SLOT(resourceReleasedHandler()));
+  connect(resourceSet, SIGNAL(resourcesReleasedByManager()), this, SLOT(resourceReleasedByManagerHandler()));
+  connect(resourceSet, SIGNAL(resourcesDenied()), this, SLOT(resourcesDeniedHandler()));
+
 
   // playback timer
   startTimer(100);
@@ -85,7 +89,8 @@ void PlayerWidget::eos(void)
 {
     qDebug() << QString("end of stream");
 
-    pause();
+    stop();
+    //pause();
 }
 
 /**
@@ -142,7 +147,9 @@ void PlayerWidget::play() {
   *
   */
 void PlayerWidget::beginPlayback() {
+
   streamer->play();
+  seek(d.pos) ;
   emit playing();
 }
 
@@ -156,10 +163,23 @@ void PlayerWidget::beginPlayback() {
   * \see MVideoWidget::pause().
   */
 void PlayerWidget::pause(bool releaseResources) {
-  streamer->stop();
+  streamer->pause();
   if (releaseResources && policyAware())  release();
   emit paused();
 }
+
+
+/**
+
+  * \see MVideoWidget::stop().
+  */
+void PlayerWidget::stop(bool releaseResources) {
+  streamer->stop();
+  if (releaseResources && policyAware())  release();
+  setPosition(0);
+  emit paused();
+}
+
 
 /**
   * The most interesting kind of event in resource policy.  This event
@@ -185,6 +205,28 @@ void PlayerWidget::resourceAcquiredHandler(const QList<ResourcePolicy::ResourceT
 void PlayerWidget::resourceReleasedHandler() {
   qDebug("PlayerWidget::resourceReleasedHandler()");
 }
+
+/**
+  * This signals that the resources has been released by the manager, for instance
+  * when the headset is released or after a call.
+  *
+  * \see signal ResourcePolicy::ResourceSet::resourceReleasedByManager().
+  */
+void PlayerWidget::resourceReleasedByManagerHandler() {
+    qDebug("PlayerWidget::resourceReleasedByManagerHandler()");
+    if (state() == Streamer::PlayingState) {
+      pause(false);
+    }
+}
+
+
+void PlayerWidget::resourcesDeniedHandler() {
+
+    emit denied();
+
+}
+
+
 
 /**
   * Handles the event of a resource being taken by another application.
@@ -213,20 +255,28 @@ void PlayerWidget::resourceLostHandler() {
 void PlayerWidget::timerEvent(QTimerEvent */*event*/) {
   // MVideoWidget doesn't update position on audio files, so we'll keep our own count
   // /* position = videoWidget->position(); */
+    
+  if ( length() < d.pos && state() == Streamer::PlayingState) {
+        stop();
+        d.pos = 0;
+        emit playerPositionChanged();
+        return;
+  }
 
   qDebug() << "PlayerWidget::timerEvent state=" << (int)state();
 
   if (state() == Streamer::PlayingState) {
     d.pos += 100;
+    emit playerPositionChanged();
   }
 
   if (state() == Streamer::StoppedState && prevState != state()) {
-    d.pos = 0;
+    //d.pos = 0;
     pause();
     prevState = state();
   }
 
-  emit playerPositionChanged();
+  //emit playerPositionChanged();
 }
 
 /**
@@ -265,6 +315,7 @@ quint64 PlayerWidget::position() {
   */
 void PlayerWidget::setPosition(quint64 pos) {
   d.pos = pos;
+  emit playerPositionChanged();
 }
 
 /**

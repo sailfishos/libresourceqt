@@ -55,6 +55,7 @@ void PlayerPage::createContent() {
   connect(playerWidget, SIGNAL(playerPositionChanged()), this, SLOT(onPositionChanged()));
   connect(playerWidget, SIGNAL(playing()), this, SLOT(setPlayingIcon()));
   connect(playerWidget, SIGNAL(paused()),  this, SLOT(setPausedIcon()));
+  connect(playerWidget, SIGNAL(denied()),  this, SLOT(handleDenied()));
 
   // labels
   lblTitle = new MLabel("Tap audio or video button to load a file", this);
@@ -129,6 +130,8 @@ void PlayerPage::makeControlBar(MLinearLayoutPolicy *controlBarPolicy) {
 
   connect(seekbar, SIGNAL(sliderPressed()),  this, SLOT(sliderPressed()));
   connect(seekbar, SIGNAL(sliderReleased()), this, SLOT(seekToNewPosition()));
+
+  seekbar->setValue(0);
 }
 
 /**
@@ -169,10 +172,17 @@ void PlayerPage::updateLabelsVisibility() {
   * \see PlayerPage::openFile()
   */
 void PlayerPage::openAudioFile() {
+
+  setPausedIcon();
+  playerWidget->stop();
+
   playerWidget->filetype = PlayerWidget::AUDIO;
   openFile("/home/user/MyDocs/.sounds/");
 
-//  playerWidget->setVisible(false);
+  seekbar->setRange(0, playerWidget->length() > 0 ? playerWidget->length() : 10);
+  seekbar->setValue(0);
+
+  //playerWidget->setVisible(false);
 }
 
 /**
@@ -200,6 +210,7 @@ void PlayerPage::openFile(QString dir) {
                                                   tr("All Files (*.*)"));
 
   if (fileName != "") {
+    playerWidget->setPosition(0);
     playerWidget->open(fileName);
 
     QString prettyName = fileName;
@@ -210,7 +221,9 @@ void PlayerPage::openFile(QString dir) {
     setEnabled(btnPlay, true);
     setEnabled(seekbar, true);
     updateLabelsVisibility();
-  }
+  }  
+
+  seekbar->setValue(0);
 }
 
 /**
@@ -238,6 +251,12 @@ void PlayerPage::setPlayingIcon() {
   */
 void PlayerPage::setPausedIcon() {
   btnPlay->setIconID("icon-m-common-play");
+}
+
+
+void PlayerPage::handleDenied() {
+
+     lblTitle->setText("Not allowed to play at the moment, please wait");
 }
 
 /**

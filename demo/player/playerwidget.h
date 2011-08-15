@@ -49,6 +49,7 @@ public:
   void play();
   void beginPlayback();
   void pause(bool releaseResources = true);
+  void stop(bool releaseResources = true);
   void acquire();
   void release();
 
@@ -86,10 +87,13 @@ private slots:
   void resourceAcquiredHandler(const QList<ResourcePolicy::ResourceType>& /*grantedOptionalResList*/);
   void resourceReleasedHandler();
   void resourceLostHandler();
+  void resourceReleasedByManagerHandler();
+  void resourcesDeniedHandler();
 
 signals:
   void playerPositionChanged();
   void playing();
   void paused();
+  void denied();
 
 };
