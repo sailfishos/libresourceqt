@@ -147,6 +147,7 @@ void Streamer::play()
   if (!initPlayback(&streamer)) {
     gst_object_unref(GST_OBJECT(streamer.pipeline));
     streamer.pipeline = NULL;
+    mutex.unlock();    
     return;
   }
 
