@@ -23,7 +23,7 @@ USA.
 #include <cstdio>
 
 PlayerPage::PlayerPage()
-  : MApplicationPage(), labelsVisible(true) {
+  : MApplicationPage() {
 }
 
 /**
@@ -135,37 +135,6 @@ void PlayerPage::makeControlBar(MLinearLayoutPolicy *controlBarPolicy) {
 }
 
 /**
-  * Shows/hides labels depending on orientation.
-  *
-  * \see PlayerPage::updateLabelsVisibility()
-  */
-void PlayerPage::orientationChangeEvent(MOrientationChangeEvent */*event*/) {
-  if (isContentCreated())  updateLabelsVisibility();
-}
-
-/**
-  * Shows/hides labels depending on orientation.  For audio files we show labels
-  * at all times, and for video playback we hide the labels in landscape orientation,
-  * since most of the space is occupied by the player widget.
-  *
-  */
-void PlayerPage::updateLabelsVisibility() {
-  if (sceneManager()->orientation() == M::Portrait || playerWidget->filetype == PlayerWidget::AUDIO) {
-    if (!labelsVisible) {
-      layoutPolicy->insertItem(0, lblTitle, Qt::AlignVCenter);
-      layoutPolicy->insertItem(2, lblPosition, Qt::AlignVCenter);
-      labelsVisible = true;
-    }
-  } else if (playerWidget->filetype == PlayerWidget::VIDEO) {
-    if (labelsVisible) {
-      layoutPolicy->removeItem(lblTitle);
-      layoutPolicy->removeItem(lblPosition);
-      labelsVisible = false;
-    }
-  }
-}
-
-/**
   * Opens the file open dialog on the .sounds directory of the user,
   * sets the "filetype" variable to AUDIO.
   *
@@ -220,7 +189,6 @@ void PlayerPage::openFile(QString dir) {
     seekbarPressed = false;
     setEnabled(btnPlay, true);
     setEnabled(seekbar, true);
-    updateLabelsVisibility();
   }  
 
   seekbar->setValue(0);

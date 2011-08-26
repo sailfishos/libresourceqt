@@ -29,7 +29,6 @@ USA.
 #include <MLinearLayoutPolicy>
 #include <MButton>
 #include <MSlider>
-#include <MOrientationChangeEvent>
 #include <MApplicationMenu>
 #include <MAction>
 #include <MLabel>
@@ -72,11 +71,9 @@ public:
 private:
     void     createContent();
     void     makeControlBar(MLinearLayoutPolicy *controlBarPolicy);
-    void     orientationChangeEvent(MOrientationChangeEvent *event);
     void     openFile(QString dir);
     void     setEnabled(MWidget *widget, bool enabled);
     MButton* makeButton(QString iconID, bool enabled = true);
-    void     updateLabelsVisibility();
 
     MLinearLayoutPolicy *layoutPolicy, *controlBarPolicy;
     MButton             *btnLoadAudio, *btnLoadVideo, *btnPlay;
@@ -86,7 +83,6 @@ private:
     MAction             *menuAction;
 
     bool seekbarPressed;
-    bool labelsVisible;
 
 private slots:
     void openAudioFile();
