@@ -22,27 +22,17 @@ static void pad_added(GstElement *element __attribute__ ((unused)),
     return;
 
   if (g_strrstr(gst_structure_get_name(str), "audio")) {
-    // gst_bin_add_many(GST_BIN (streamer->pipeline),
-    //     streamer->audio_queue, streamer->audio_sink, NULL);
-    //sink_pad = gst_element_get_static_pad(streamer->audio_sink, "audio sink");
     sink_pad = gst_element_get_compatible_pad(streamer->audio_queue, pad, NULL);
   }
 
   if (sink_pad) {
     gst_pad_link(pad, sink_pad);
-    // gst_object_unref(sink_pad);
   }
 }
 
 void Streamer::busSyncCallback(GstBus *bus, GstMessage *message)
 {
   Q_UNUSED(bus);
-
-//  if (!streamer.video_windowid)
-//    g_printerr("Window ID is not set properly\n");
-//
-//  gst_x_overlay_set_xwindow_id(GST_X_OVERLAY (GST_MESSAGE_SRC (message)),
-//                               streamer.video_windowid);
 
   gst_message_unref(message);
 }
@@ -121,11 +111,6 @@ QBool Streamer::initPlayback(streamer_t *streamer)
     return QBool(false);
   }
 
-//  if (!gst_element_link(streamer->video_queue, streamer->video_sink)) {
-//    emit error(QString("Failed to link video sink element"));
-//    return QBool(false);
-//  }
-
   g_signal_connect(G_OBJECT(streamer->decoder), "pad-added",
                    G_CALLBACK(pad_added), streamer);
 
@@ -137,9 +122,9 @@ void Streamer::play()
   mutex.lock();
 
   if ( streamer.pipeline && GST_STATE(streamer.pipeline) == GST_STATE_PAUSED ) {
-      gst_element_set_state(streamer.pipeline, GST_STATE_PLAYING);
-      mutex.unlock();
-      return;
+    gst_element_set_state(streamer.pipeline, GST_STATE_PLAYING);
+    mutex.unlock();
+    return;
   }
 
   streamer.pipeline = gst_pipeline_new("Playback pipeline");
@@ -156,25 +141,19 @@ void Streamer::play()
 
   gst_element_set_state(streamer.pipeline, GST_STATE_PLAYING);
 
-  //In case we are paused, seek to position.
-  //gst_element_seek_simple (streamer.pipeline, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH, pos);
-
   mutex.unlock();
 }
 
 
 void Streamer::pause(void)
 {
-GstElement *pipeline;
+  GstElement *pipeline;
 
   mutex.lock();
   pipeline = streamer.pipeline;
 
   if (pipeline) {
    gst_element_set_state(pipeline, GST_STATE_PAUSED);
-    //gst_element_set_state(pipeline, GST_STATE_NULL);
-    //gst_object_unref(GST_OBJECT(pipeline));
-    //streamer.pipeline = NULL;
   }
   mutex.unlock();
 }
@@ -183,7 +162,7 @@ GstElement *pipeline;
 
 void Streamer::stop(void)
 {
-GstElement *pipeline;
+  GstElement *pipeline;
 
   mutex.lock();
   pipeline = streamer.pipeline;
@@ -198,7 +177,7 @@ GstElement *pipeline;
 
 void Streamer::setLocation(const QString location)
 {
-mutex.lock();
+  mutex.lock();
   strncpy(location_file, (const char*)location.toAscii().data(), 256);
   location_file[255] = 0;
   /* Set options for GStreamer elements */
@@ -241,10 +220,7 @@ Streamer::~Streamer()
 }
 
 void Streamer::setPosition(quint64 pos) {
-
-  //gst_element_seek_simple (streamer.pipeline, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH, pos);
-
-  gst_element_seek (streamer.pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
+gst_element_seek (streamer.pipeline, 1.0, GST_FORMAT_TIME, GST_SEEK_FLAG_FLUSH,
   GST_SEEK_TYPE_SET, pos*1000*1000,
   GST_SEEK_TYPE_NONE, GST_CLOCK_TIME_NONE);
 

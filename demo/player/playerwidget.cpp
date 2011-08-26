@@ -31,20 +31,23 @@ using namespace ResourcePolicy;
   * have to set the pid of the audio renderer, which in our case is the same as the pid of the application,
   * and stream tag, which we simply set to an all-allowing "*".
   *
-  * Also, we connect to three signals:
+  * Also, we connect to five signals:
   * - resourcesGranted, which is triggered whenever the resource we asked for is granted to us;
   * - lostResources, which is triggered whenever another application has been granted with our resource
   * and we are no longer able to use it;
   * - resourcesReleased, which is triggered whenever a call to release() is done and the resource
   * has been successfully released.
-  *
+  * - resourcesReleasedByManager, which is triggered whenever resources has been released by the manager
+  * (e.g. headset is released)
+  * - resourcesresourcesDenied, which is triggered whenever resources has been denied by the manager
+  * 
   * At last, we add a timer which fires every 100 milliseconds in order to update the current playback position.
-  * This is done because MVideoWidget currently only updates said position for video files, and not for audio.
-  * It might not be as precise, but will serve our needs for the demo.
   *
   * \see PlayerWidget::resourceAcquiredHandler
   * \see PlayerWidget::resourceLostHandler
   * \see PlayerWidget::resourceReleasedHandler
+  * \see PlayerWidget::resourceReleasedByManagerHandler
+  * \see PlayerWidget::resourcesDeniedHandler
   */
 PlayerWidget::PlayerWidget(Streamer *streamer)
   : QObject() {
@@ -57,8 +60,6 @@ PlayerWidget::PlayerWidget(Streamer *streamer)
 
   qDebug("PlayerWidget::PlayerWidget");
   resourceSet = new ResourceSet("player", this);
-//  resourceSet->setAlwaysReply();
-//  resourceSet->setAutoRelease();
 
   audioResource = new ResourcePolicy::AudioResource("player");
   audioResource->setProcessID(QCoreApplication::applicationPid());
@@ -79,17 +80,14 @@ PlayerWidget::PlayerWidget(Streamer *streamer)
 
 void PlayerWidget::error(const QString message)
 {
-    qCritical() << QString("Streamer error: %1").arg(message);
-
-    pause();
+  qCritical() << QString("Streamer error: %1").arg(message);
+  pause();
 }
 
 void PlayerWidget::eos(void)
 {
-    qDebug() << QString("end of stream");
-
-    stop();
-    //pause();
+  qDebug() << QString("end of stream");
+  stop();
 }
 
 /**
@@ -119,11 +117,8 @@ void PlayerWidget::release() {
 }
 
 /**
-  * Overrides parent play() method to add wrapping with resource policy handling.
   * If we are in resource policy aware mode, asks to acquire the resource,
   * otherwise begins playback immediately.
-  *
-  * \see MVideoWidget::play().
   */
 void PlayerWidget::play() {
   qDebug("PlayerWidget::play()");
@@ -140,20 +135,16 @@ void PlayerWidget::play() {
   *
   */
 void PlayerWidget::beginPlayback() {
-
   streamer->play();
   seek(d.pos) ;
   emit playing();
 }
 
-
 /**
-  * Overrides parent pause() method.  Releases the audio resource on pause so
+  * Releases the audio resource on pause so
   * that another application can start using it immediately.  Emits paused() signal.
   * An optional parameter releaseResources is added to opt out of releasing the
   * resource in PlayerWidget::resourceLostHandler() handler.
-  *
-  * \see MVideoWidget::pause().
   */
 void PlayerWidget::pause(bool releaseResources) {
   streamer->pause();
@@ -161,10 +152,9 @@ void PlayerWidget::pause(bool releaseResources) {
   emit paused();
 }
 
-
 /**
-
-  * \see MVideoWidget::stop().
+  * If we are in resource policy aware mode, asks to release the resource,
+  * otherwise just stop playback.
   */
 void PlayerWidget::stop(bool releaseResources) {
   streamer->stop();
@@ -172,7 +162,6 @@ void PlayerWidget::stop(bool releaseResources) {
   setPosition(0);
   emit paused();
 }
-
 
 /**
   * The most interesting kind of event in resource policy.  This event
@@ -184,7 +173,6 @@ void PlayerWidget::stop(bool releaseResources) {
   * \see signal ResourcePolicy::ResourceSet::resourcesGranted().
   */
 void PlayerWidget::resourceAcquiredHandler(const QList<ResourcePolicy::ResourceType>& /*grantedOptionalResList*/) {
-
   qDebug("PlayerWidget::resourceAcquiredHandler()");
   beginPlayback();
 }
@@ -206,20 +194,20 @@ void PlayerWidget::resourceReleasedHandler() {
   * \see signal ResourcePolicy::ResourceSet::resourceReleasedByManager().
   */
 void PlayerWidget::resourceReleasedByManagerHandler() {
-    qDebug("PlayerWidget::resourceReleasedByManagerHandler()");
-    if (state() == Streamer::PlayingState) {
-      pause(false);
-    }
+  qDebug("PlayerWidget::resourceReleasedByManagerHandler()");
+  if (state() == Streamer::PlayingState) {
+  pause(false);
+  }
 }
 
-
+/**
+  * This signals that the resources has been denied by the manager
+  *
+  * \see signal ResourcePolicy::ResourceSet::resourcesDenied().
+  */
 void PlayerWidget::resourcesDeniedHandler() {
-
-    emit denied();
-
+  emit denied();
 }
-
-
 
 /**
   * Handles the event of a resource being taken by another application.
@@ -238,17 +226,13 @@ void PlayerWidget::resourceLostHandler() {
 }
 
 /**
-  * Timer event is used to update current playback position, since MVideoWidget updates it
-  * only for video files and not audio files.  Our own instance variable, d.pos, is used.
+  * Timer event is used to update current playback position.  Our own instance variable, d.pos, is used.
   * It also handles the Stopped state, in which case paused() signal will be issued.
   * Every time we emit playerPositionChanged() for the subscribed widget to do its own
   * processing as well.
   *
   */
-void PlayerWidget::timerEvent(QTimerEvent */*event*/) {
-  // MVideoWidget doesn't update position on audio files, so we'll keep our own count
-  // /* position = videoWidget->position(); */
-    
+void PlayerWidget::timerEvent(QTimerEvent */*event*/) {    
   if ( length() < d.pos && state() == Streamer::PlayingState) {
         stop();
         d.pos = 0;
@@ -264,12 +248,10 @@ void PlayerWidget::timerEvent(QTimerEvent */*event*/) {
   }
 
   if (state() == Streamer::StoppedState && prevState != state()) {
-    //d.pos = 0;
     pause();
     prevState = state();
   }
 
-  //emit playerPositionChanged();
 }
 
 /**
@@ -295,16 +277,14 @@ void PlayerWidget::setPolicyAware(bool aware) {
 }
 
 /**
-  * Getter for position property, our own current playback position counter.  Note that
-  * this overrides parent method, but we could call it with full qualification if needed.
+  * Getter for position property, our own current playback position counter.
   */
 quint64 PlayerWidget::position() {
   return d.pos;
 }
 
 /**
-  * Setter for position property, our own current playback position counter.  Note that
-  * this overrides parent method, but we could call it with full qualification if needed.
+  * Setter for position property, our own current playback position counter.
   */
 void PlayerWidget::setPosition(quint64 pos) {
   d.pos = pos;
@@ -312,25 +292,31 @@ void PlayerWidget::setPosition(quint64 pos) {
 }
 
 /**
-  * Overrides parent seek() method, which prior to seek() also updates our own playback position
-  * counter.
-  *
-  * \see PlayerWidget::position()
+  * Updates our own playback position counter.
   */
 void PlayerWidget::seek(quint64 pos) {
   setPosition(pos);
   streamer->setPosition(pos);
 }
 
-
+/**
+  * Setter for current audio file.
+  */
 void PlayerWidget::open(const QString& filename) {
   streamer->setLocation(filename);
 }
 
+/**
+  * Getter for streamer state.   
+  * Can return PlayingState, PausedState or StoppedState
+  */
 Streamer::State PlayerWidget::state() {
   return streamer->state();
 }
 
+/**
+  * Getter for audio file length.   
+  */
 quint64 PlayerWidget::length() {
   return streamer->duration();
 }

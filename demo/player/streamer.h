@@ -51,8 +51,8 @@ private:
 
     static gboolean bus_callback(GstBus *bus, GstMessage *message, gpointer data)
     {
-	reinterpret_cast<Streamer*>(data)->busCallback(bus, message);
-	return TRUE;
+		reinterpret_cast<Streamer*>(data)->busCallback(bus, message);
+		return TRUE;
     }
 
     static GstBusSyncReply bus_sync_callback(GstBus *bus, GstMessage *message, gpointer data)
@@ -61,8 +61,8 @@ private:
 	    !gst_structure_has_name(message->structure, "prepare-xwindow-id"))
 	    return GST_BUS_PASS;
 
-	reinterpret_cast<Streamer*>(data)->busSyncCallback(bus, message);
-	return GST_BUS_DROP;
+		reinterpret_cast<Streamer*>(data)->busSyncCallback(bus, message);
+		return GST_BUS_DROP;
     }
 
     streamer_t streamer;

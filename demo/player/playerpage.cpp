@@ -28,9 +28,7 @@ PlayerPage::PlayerPage()
 
 /**
   * Creates a menu action to enable or disable "policy awareness", layouts,
-  * the player widget (our own subclass of MVideoWidget) and labels that show
-  * the file name and playback position.
-  *
+  * the player widget and labels that show the file name and playback position.
   */
 void PlayerPage::createContent() {
   // 1. create menu
@@ -44,13 +42,8 @@ void PlayerPage::createContent() {
   MLayout *layout = new MLayout(centralWidget());
   layoutPolicy = new MLinearLayoutPolicy(layout, Qt::Vertical);
 
-  // video widget
   Streamer *streamer = new Streamer(this);
   playerWidget = new PlayerWidget(streamer);
-//  mediaPlayer->setVideoOutput(playerWidget);
-
-  // height is hard-coded for a lack of a better option
-//  playerWidget->setMaximumSize(1000, 300);
 
   connect(playerWidget, SIGNAL(playerPositionChanged()), this, SLOT(onPositionChanged()));
   connect(playerWidget, SIGNAL(playing()), this, SLOT(setPlayingIcon()));
@@ -107,10 +100,9 @@ void PlayerPage::setEnabled(MWidget *widget, bool enabled) {
 
 /**
   * Creates a control bar.  It consists of the play/pause button, a seek bar to
-  * scrub through media content, and two buttons to open audio and video files.
+  * scrub through media content, and a button to open audio files.
   */
 void PlayerPage::makeControlBar(MLinearLayoutPolicy *controlBarPolicy) {
-
   btnPlay = makeButton("icon-m-common-play", false);
 
   seekbar = new MSeekBar();
@@ -118,10 +110,8 @@ void PlayerPage::makeControlBar(MLinearLayoutPolicy *controlBarPolicy) {
   setEnabled(seekbar, false);
 
   btnLoadAudio = makeButton("icon-m-content-audio");
-//  btnLoadVideo = makeButton("icon-m-common-video");
 
   connect(btnLoadAudio, SIGNAL(clicked()), this, SLOT(openAudioFile()));
-//  connect(btnLoadVideo, SIGNAL(clicked()), this, SLOT(openVideoFile()));
   connect(btnPlay, SIGNAL(clicked()), this, SLOT(playOrPause()));
 
   connect(seekbar, SIGNAL(sliderPressed()),  this, SLOT(sliderPressed()));
@@ -136,7 +126,6 @@ void PlayerPage::makeControlBar(MLinearLayoutPolicy *controlBarPolicy) {
   * \see PlayerPage::openFile()
   */
 void PlayerPage::openAudioFile() {
-
   setPausedIcon();
   playerWidget->stop();
 
@@ -145,12 +134,10 @@ void PlayerPage::openAudioFile() {
   seekbar->setRange(0, playerWidget->length() > 0 ? playerWidget->length() : 10);
   seekbar->setValue(0);
 
-  //playerWidget->setVisible(false);
 }
 
 /**
   * Opens the file open dialog, and then loads the file selected.
-  * Helper function for PlayerPage::openAudioFile() and PlayerPage::openVideoFile().
   */
 void PlayerPage::openFile(QString dir) {
   qDebug("openFile");
@@ -202,10 +189,11 @@ void PlayerPage::setPausedIcon() {
   btnPlay->setIconID("icon-m-common-play");
 }
 
-
+/**
+  * Sets title text to display info text that playback is not possible at the moment.
+  */
 void PlayerPage::handleDenied() {
-
-     lblTitle->setText("Not allowed to play at the moment, please wait");
+  lblTitle->setText("Not allowed to play at the moment, please wait");
 }
 
 /**

@@ -43,7 +43,7 @@ USA.
   * Demonstrates how to use libresourceqt to create a policy-aware application.
   *
   * There are two classes:
-  * \see PlayerPage creates the UI consisting of a control bar and a video widget
+  * \see PlayerPage creates the UI consisting of a control bar and a audio widget
   * \see PlayerWidget contains all of policy-related customizations
   * to make the application behave well in concurrent world.
   *
