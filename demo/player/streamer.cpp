@@ -4,7 +4,7 @@
 
 #include "streamer.h"
 
-static char location_file[256] = "./test.avi";
+static char location_file[256] = "./default.mp3";
 
 static void pad_added(GstElement *element __attribute__ ((unused)),
                       GstPad *pad, gpointer data)
@@ -206,13 +206,6 @@ mutex.lock();
 
   printf("streamer> location: %s\n", location_file);
 
-  mutex.unlock();
-}
-
-void Streamer::setWindowid(gulong id)
-{
-  mutex.lock();
-//  streamer.video_windowid = id;
   mutex.unlock();
 }
 

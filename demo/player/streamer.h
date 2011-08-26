@@ -8,15 +8,10 @@
 
 typedef struct {
     GstElement *pipeline;
-
     GstElement *file_source;
     GstElement *decoder;
     GstElement *audio_sink;
     GstElement *audio_queue;
-    GstElement *video_sink;
-    GstElement *video_queue;
-
-    gulong video_windowid;
 } streamer_t;
 
 class Streamer : public QThread
@@ -31,7 +26,6 @@ public:
     void pause(void);
     void stop(void);
     void setLocation(const QString location);
-    void setWindowid(gulong id);
     void setPosition(quint64 pos);
 
     enum State {

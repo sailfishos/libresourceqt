@@ -58,7 +58,7 @@ void PlayerPage::createContent() {
   connect(playerWidget, SIGNAL(denied()),  this, SLOT(handleDenied()));
 
   // labels
-  lblTitle = new MLabel("Tap audio or video button to load a file", this);
+  lblTitle = new MLabel("Tap audio button to load a file", this);
   lblTitle->setAlignment(Qt::AlignCenter);
   QFont titleFont;
   titleFont.setPixelSize(20);
@@ -76,11 +76,7 @@ void PlayerPage::createContent() {
   controlBarPolicy = new MLinearLayoutPolicy(controlBarLayout, Qt::Horizontal);
   makeControlBar(controlBarPolicy);
 
-  QGraphicsProxyWidget *proxy = new QGraphicsProxyWidget(this);
-//  proxy->setWidget(playerWidget);
-
   layoutPolicy->addItem(lblTitle,    Qt::AlignVCenter);
-  layoutPolicy->addItem(proxy);
   layoutPolicy->addItem(lblPosition, Qt::AlignVCenter);
   layoutPolicy->addStretch();
   layoutPolicy->addItem(controlBarLayout, Qt::AlignBottom);
@@ -135,8 +131,7 @@ void PlayerPage::makeControlBar(MLinearLayoutPolicy *controlBarPolicy) {
 }
 
 /**
-  * Opens the file open dialog on the .sounds directory of the user,
-  * sets the "filetype" variable to AUDIO.
+  * Opens the file open dialog on the .sounds directory of the user
   *
   * \see PlayerPage::openFile()
   */
@@ -145,26 +140,12 @@ void PlayerPage::openAudioFile() {
   setPausedIcon();
   playerWidget->stop();
 
-  playerWidget->filetype = PlayerWidget::AUDIO;
   openFile("/home/user/MyDocs/.sounds/");
 
   seekbar->setRange(0, playerWidget->length() > 0 ? playerWidget->length() : 10);
   seekbar->setValue(0);
 
   //playerWidget->setVisible(false);
-}
-
-/**
-  * Opens the file open dialog on the .videos directory of the user,
-  * sets the "filetype" variable to VIDEO.
-  *
-  * \see PlayerPage::openFile()
-  */
-void PlayerPage::openVideoFile() {
-  playerWidget->filetype = PlayerWidget::VIDEO;
-  openFile("/home/user/MyDocs/.videos/");
-
-//  playerWidget->setVisible(true);
 }
 
 /**

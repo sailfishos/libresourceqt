@@ -43,7 +43,6 @@ class PlayerWidget : public QObject {
 public:
   PlayerWidget(Streamer *streamer = 0);
 
-  enum {VIDEO, AUDIO} filetype;
   Streamer::State prevState;
 
   void play();

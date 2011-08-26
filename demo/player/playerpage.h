@@ -33,9 +33,6 @@ USA.
 #include <MAction>
 #include <MLabel>
 #include <MSeekBar>
-#include <MSceneManager>
-
-#include <QGraphicsProxyWidget>
 
 #include "playerwidget.h"
 #include "streamer.h"
@@ -76,7 +73,7 @@ private:
     MButton* makeButton(QString iconID, bool enabled = true);
 
     MLinearLayoutPolicy *layoutPolicy, *controlBarPolicy;
-    MButton             *btnLoadAudio, *btnLoadVideo, *btnPlay;
+    MButton             *btnLoadAudio, *btnPlay;
     MSeekBar            *seekbar;
     PlayerWidget        *playerWidget;
     MLabel              *lblTitle, *lblPosition;
@@ -86,8 +83,6 @@ private:
 
 private slots:
     void openAudioFile();
-    void openVideoFile();
-
     void togglePolicyAwareness();
     void setPlayingIcon();
     void setPausedIcon();

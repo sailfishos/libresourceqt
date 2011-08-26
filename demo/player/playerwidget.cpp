@@ -69,7 +69,6 @@ PlayerWidget::PlayerWidget(Streamer *streamer)
           this,        SLOT(resourceAcquiredHandler(const QList<ResourcePolicy::ResourceType>&)));
   connect(resourceSet, SIGNAL(lostResources()),     this, SLOT(resourceLostHandler()));
   connect(resourceSet, SIGNAL(resourcesReleased()), this, SLOT(resourceReleasedHandler()));
-  connect(resourceSet, SIGNAL(resourcesReleased()), this, SLOT(resourceReleasedHandler()));
   connect(resourceSet, SIGNAL(resourcesReleasedByManager()), this, SLOT(resourceReleasedByManagerHandler()));
   connect(resourceSet, SIGNAL(resourcesDenied()), this, SLOT(resourcesDeniedHandler()));
 
@@ -101,12 +100,6 @@ void PlayerWidget::eos(void)
   *
   */
 void PlayerWidget::acquire() {
-  if (filetype == VIDEO) {
-    resourceSet->addResource(ResourcePolicy::VideoPlaybackType);
-  } else {
-    resourceSet->deleteResource(ResourcePolicy::VideoPlaybackType);
-  }
-
   resourceSet->acquire();
 }
 
