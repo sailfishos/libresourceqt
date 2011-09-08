@@ -48,7 +48,7 @@ MOC_DIR = moc
 
 CONFIG  += qt link_pkgconfig dll
 QT = core
-PKGCONFIG += dbus-1 libresource0
+PKGCONFIG += dbus-1 libresource
 
 dox.commands   = doxygen Doxyfile
 QMAKE_EXTRA_TARGETS += dox

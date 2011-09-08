@@ -37,7 +37,7 @@ LIBS += -L$${LIBDBUSQEVENTLOOP}/build -L$${LIBRESOURCEQT}/build -ldbus-qeventloo
 
 CONFIG  += qt debug warn_on link_pkgconfig
 QT -= gui
-PKGCONFIG += dbus-1 libresource0
+PKGCONFIG += dbus-1 libresource
 
 # Install directives
 INSTALLBASE    = /usr

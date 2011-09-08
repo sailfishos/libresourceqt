@@ -20,7 +20,7 @@ MOC_DIR = moc
 
 CONFIG  += qt dll
 QT += dbus
-PKGCONFIG += dbus-1 libresource0
+PKGCONFIG += dbus-1 libresource
 
 QMAKE_DISTCLEAN += -r moc build
 
