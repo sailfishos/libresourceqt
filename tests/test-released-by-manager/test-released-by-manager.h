@@ -31,7 +31,7 @@ class TestReleasedByManager: public QObject
 {
     Q_OBJECT
 private:
-    void waitForSignal(const QObject *sender, const char *signal, quint32 timeout = 500);
+    void waitForSignal(const QObject *sender, const char *signal, quint32 timeout = 1000);
 
 public:
     TestReleasedByManager();
