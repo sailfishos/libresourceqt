@@ -134,8 +134,6 @@ class ResourceSetPrivate;
 * \section see_further_info Further information
 * For a more detailed guide see the
 * <a href="http://wiki.meego.com/images/Meego-policy-framework-developer-guide.pdf">MeeGo Policy Framework Developer Guide (PDF)</a>.
-*
-* An updated online version of the developer guide can be found <a href="https://projects.maemo.org/trac/resourcepolicy/wiki/">here</a>.
 */
 
 /**
