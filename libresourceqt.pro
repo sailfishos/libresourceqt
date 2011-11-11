@@ -27,8 +27,7 @@ SUBDIRS = libdbus-qeventloop  \
           libmediaoverridesqt \
           resourceqt-client   \
           mediaoverrider      \
-          tests               \
-          demo/player
+          tests
 
 dist.commands   = ./makedist.sh
 FORCE.commands = $(CHK_DIR_EXISTS) libresourceqt/docs/man || mkdir -p libresourceqt/docs/man ;\
