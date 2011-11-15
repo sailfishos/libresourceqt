@@ -1,48 +1,44 @@
 #include "mediaoverrider.h"
 
-MediaOverrider::MediaOverrider(int argc, char **argv, QObject *parent):
-    QObject(parent), app(argc, argv)
+MediaOverrider::MediaOverrider()
+     : MApplicationPage()
 {
-//    MTheme::loadCSS("MediaOverrider.css");
-    window = new MApplicationWindow;
-    page = new MApplicationPage;
-
-    layout = new MLayout;
+    layout = new MLayout();
     policy = new MGridLayoutPolicy(layout);
-    policy->setSpacing(10);
-    
-    page->setTitle("Resource Overrider");
-    MLabel * label = new MLabel("Press the toggle buttons to change overrides");
-    policy->addItem(label, 0, 1);
+    policy->setSpacing(20);
+    policy->setColumnMinimumWidth 	(  0,  200 );
+
+    MLabel * label = new MLabel("Toggle buttons to change overrides");
+    policy->addItem(label, 0, 0);
     label->setObjectName("label");
     label->setAlignment(Qt::AlignCenter);
 
-    muteButton = new MButton(page->centralWidget());
+    muteButton = new MButton(centralWidget());
     muteButton->setText("Mute");
     muteButton->setViewType(MButton::toggleType);
     muteButton->setCheckable(true);
     policy->addItem(muteButton, 1, 0);
     muteButton->setObjectName("button");
 
-    privacyButton = new MButton(page->centralWidget());
+    privacyButton = new MButton(centralWidget());
     privacyButton->setText("Privacy");
     privacyButton->setViewType(MButton::toggleType);
     privacyButton->setCheckable(true);
-    policy->addItem(privacyButton, 1, 1);
+    policy->addItem(privacyButton, 2, 0);
     privacyButton->setObjectName("button");
 
-    btButton = new MButton(page->centralWidget());
+    btButton = new MButton(centralWidget());
     btButton->setText("BT");
     btButton->setViewType(MButton::toggleType);
     btButton->setCheckable(true);
-    policy->addItem(btButton, 1, 2);
+    policy->addItem(btButton, 3, 0);
     btButton->setObjectName("button");
 
-    page->centralWidget()->setLayout(layout);
+    centralWidget()->setLayout(layout);
 
-    mute = ResourcePolicy::createMute(this);
+    mute                    = ResourcePolicy::createMute(this);
     privacyOverride = ResourcePolicy::createPrivacyOverride(this);
-    btOverride = ResourcePolicy::createBluetoothOVerride(this);
+    btOverride          = ResourcePolicy::createBluetoothOVerride(this);
 
     QObject::connect(mute, SIGNAL(changed(bool)), this, SLOT(handleMuteChange(bool)));
     QObject::connect(muteButton, SIGNAL(toggled(bool)), mute, SLOT(request(bool)));
@@ -55,26 +51,21 @@ MediaOverrider::MediaOverrider(int argc, char **argv, QObject *parent):
 
 }
 
-MediaOverrider::~MediaOverrider()
-{}
 
-int MediaOverrider::run()
-{
-    page->appear();
-    window->show();
+MediaOverrider::~MediaOverrider(){}
 
-    return app.exec();
-}
 
 void MediaOverrider::handleMuteChange(bool newState)
 {
     muteButton->setChecked(newState);
 }
 
+
 void MediaOverrider::handlePrivacyChange(bool newState)
 {
     privacyButton->setChecked(newState);
 }
+
 
 void MediaOverrider::handleBtChange(bool newState)
 {
