@@ -1,0 +1,17 @@
+diff --git a/libresourceqt/libresourceqt.pro b/libresourceqt/libresourceqt.pro
+index 70dd4c3..bdfe772 100644
+--- a/libresourceqt/libresourceqt.pro
++++ b/libresourceqt/libresourceqt.pro
+@@ -50,9 +50,9 @@ CONFIG  += qt link_pkgconfig dll
+ QT = core
+ PKGCONFIG += dbus-1 libresource
+ 
+-dox.commands   = doxygen Doxyfile
+-QMAKE_EXTRA_TARGETS += dox
+-PRE_TARGETDEPS += dox
++# dox.commands   = doxygen Doxyfile
++# QMAKE_EXTRA_TARGETS += dox
++# PRE_TARGETDEPS += dox
+ 
+ # Install directives
+ headers.files  = $${PUBLIC_HEADERS}
