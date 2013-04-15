@@ -50,9 +50,9 @@ CONFIG  += qt link_pkgconfig dll
 QT = core
 PKGCONFIG += dbus-1 libresource
 
-dox.commands   = doxygen Doxyfile
-QMAKE_EXTRA_TARGETS += dox
-PRE_TARGETDEPS += dox
+# dox.commands   = doxygen Doxyfile
+# QMAKE_EXTRA_TARGETS += dox
+# PRE_TARGETDEPS += dox
 
 # Install directives
 headers.files  = $${PUBLIC_HEADERS}
