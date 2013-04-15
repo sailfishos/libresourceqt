@@ -26,7 +26,6 @@ SUBDIRS = libdbus-qeventloop  \
           libresourceqt	      \
           libmediaoverridesqt \
           resourceqt-client   \
-          mediaoverrider      \
           tests
 
 dist.commands   = ./makedist.sh
