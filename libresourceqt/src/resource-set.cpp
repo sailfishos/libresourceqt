@@ -41,7 +41,7 @@ ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent,
         inAcquireMode(false), reqMutex(QMutex::Recursive), ignoreQ(false)
 {
     identifier = resourceSetId++;
-    memset(resourceSet, 0, sizeof(QPointer<Resource *>)*NumberOfTypes);
+    memset(resourceSet, 0, sizeof(Resource *)*NumberOfTypes);
     if ( NULL != getenv("DEBUG") ) printLogs = true;
 }
 
@@ -53,7 +53,7 @@ ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
         inAcquireMode(false), reqMutex(QMutex::Recursive), ignoreQ(false)
 {
     identifier = resourceSetId++;
-    memset(resourceSet, 0, sizeof(QPointer<Resource *>)*NumberOfTypes);
+    memset(resourceSet, 0, sizeof(Resource *)*NumberOfTypes);
     if ( NULL != getenv("DEBUG") ) printLogs = true;
 }
 

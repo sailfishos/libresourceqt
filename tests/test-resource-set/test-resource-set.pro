@@ -39,7 +39,7 @@ OBJECTS_DIR = build
 MOC_DIR = build
 
 QMAKE_CXXFLAGS += -Wall
-LIBS += -L$${LIBDBUSQEVENTLOOP}/build -ldbus-qeventloop
+LIBS += $${DBUSQEVENTLOOPLIB}
 
 CONFIG  += qt qtestlib debug warn_on link_pkgconfig
 QT -= gui
@@ -47,5 +47,5 @@ PKGCONFIG += dbus-1 libresource
 
 # Install directives
 INSTALLBASE    = /usr
-target.path    = $${INSTALLBASE}/lib/libresourceqt-tests/
+target.path    = $${INSTALLBASE}/lib/$${TESTSTARGETDIR}
 INSTALLS       = target

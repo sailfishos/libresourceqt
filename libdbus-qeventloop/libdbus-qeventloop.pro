@@ -20,7 +20,8 @@
 ##############################################################################
 
 include(../common.pri)
-TARGET      = dbus-qeventloop
+equals(QT_MAJOR_VERSION, 4): TARGET = dbus-qeventloop
+equals(QT_MAJOR_VERSION, 5): TARGET = dbus-qeventloop-qt5
 TEMPLATE    = lib
 DESTDIR     = build
 MOC_DIR     = .moc
@@ -41,7 +42,8 @@ headers.files  = $$HEADERS
 INSTALLBASE    = /usr
 target.path    = $$INSTALLBASE/lib
 headers.path   = $$INSTALLBASE/include
-pc.files       = libdbus-qeventloop1.pc
+equals(QT_MAJOR_VERSION, 4): pc.files       = libdbus-qeventloop1.pc
+equals(QT_MAJOR_VERSION, 5): pc.files       = libdbus-qeventloop5.pc
 pc.path        = $${INSTALLBASE}/lib/pkgconfig
 INSTALLS       = target headers pc
 

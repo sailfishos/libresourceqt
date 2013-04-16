@@ -58,7 +58,7 @@ bool CommandLineParser::parseArguments()
     ++ci;
     while (ci != args.constEnd()) {
         if ((*ci).at(0) == QChar('-')) {
-            switch ((*ci).at(1).toAscii()) {
+            switch ((*ci).at(1).toLatin1()) {
             case 'd':
                 ++ci;
             case 'm':

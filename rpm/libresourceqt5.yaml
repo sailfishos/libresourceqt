@@ -1,0 +1,106 @@
+Name: libresourceqt5
+Summary: Resource Policy Qt API
+Version: 1.26
+Release: 1
+Group: System/Resource Policy
+License: LGPLv2.1
+URL: http://meego.gitorious.org/maemo-multimedia/libresourceqt/
+Sources:
+    - maemo-multimedia-libresourceqt5-%{version}.tar.bz2
+Description: Qt library for Resource Policy.
+Requires:
+    - libdbus-qeventloop-qt5 = %{version}-%{release}
+#PkgBR:
+#    - doxygen
+PkgConfigBR:
+    - Qt5Core
+    - Qt5Test
+    - libresource
+    - dbus-1
+
+Configure: none
+Builder: qmake
+
+Files:
+    - "%{_libdir}/libresourceqt5.so.*"
+
+SubPackages:
+  - Name: devel
+    Summary: Development files for %{name}
+    Description: Development files for %{name}.
+    Files:
+        - "%{_includedir}/resource/qt5/policy/*resource*.h"
+        - "%{_libdir}/libresourceqt5.so"
+        - "%{_libdir}/pkgconfig/libresourceqt5.pc"
+        - "%doc %{_datadir}/doc/%{name}/*"
+#         - "%doc %{_mandir}/man3/ResourcePolicy*"
+#         - "%doc %{_mandir}/man3/audio-resource.h.3.gz"
+#         - "%doc %{_mandir}/man3/resource*.3.gz"
+    Group: Development/Libraries
+
+  - Name: libdbus-qeventloop-qt5
+    Summary: Library that runs the low level D-Bus inside QEventloop
+    Files:
+        - "%{_libdir}/libdbus-qeventloop-qt5.so.*"
+    Group: System/Resource Policy
+    Description: This library enables Qt applications to run the D-Bus
+        low-level api in the Qt Eventloop.
+    AsWholeName: yes
+    AutoDepend: no
+ 
+  - Name: libdbus-qeventloop-qt5-devel
+    Summary: Development files for libdbus-qeventloop-qt5
+    Description: Development files for libdbus-qeventloop-qt5.
+    Files:
+        - "%{_includedir}/dbusconnectioneventloop.h"
+        - "%{_libdir}/libdbus-qeventloop-qt5.so"
+        - "%{_libdir}/pkgconfig/libdbus-qeventloop5.pc"
+    Group: Development/Libraries
+    AsWholeName: yes
+    AutoDepend: no
+    Requires:
+        - libdbus-qeventloop-qt5 = %{version}-%{release}
+
+  - Name: libmediaoverridesqt5
+    Summary: Mediaoverridesqt5 library
+    Files:
+        - "%{_libdir}/libmediaoverridesqt5.so.*"
+    Group: System/Resource Policy
+    Description: |
+        %{summary}.
+    AsWholeName: yes
+    AutoDepend: no
+ 
+  - Name: libmediaoverridesqt5-devel
+    Summary: Development files for libmediaoverridesqt1
+    Description: |
+        %{summary}.
+    Files:
+        - "%{_includedir}/resource/qt5/policy/override.h"
+        - "%{_libdir}/libmediaoverridesqt5.so"
+        - "%{_libdir}/pkgconfig/libmediaoverridesqt5.pc"
+    Group: Development/Libraries
+    AsWholeName: yes
+    AutoDepend: no
+    Requires:
+        - libmediaoverridesqt5 = %{version}-%{release}
+
+  - Name: client
+    Summary: Test client to test %{name}
+    Description: Test client to test %{name}. 
+    Files:
+        - "%{_bindir}/resourceqt5-client"
+    Group: Development/Tools
+
+  - Name: tests
+    Summary: Unit-tests for %{name}
+    Description: Unit-tests for %{name}.
+    Files:
+        - "%{_libdir}/libresourceqt5-tests/*"
+        - "%{_datadir}/%{name}-tests/tests.xml"
+        - "%config %{_sysconfdir}/dbus-1/system.d/test-dbus-qeventloop.conf"
+    Group: System/Resource Policy
+    Requires:
+        - libdbus-qeventloop-qt5 = %{version}-%{release}
+
+

@@ -45,5 +45,5 @@ QT -= gui
 
 # Install directives
 INSTALLBASE    = /usr
-target.path    = $${INSTALLBASE}/lib/libresourceqt-tests/
+target.path    = $${INSTALLBASE}/lib/$${TESTSTARGETDIR}/
 INSTALLS       = target

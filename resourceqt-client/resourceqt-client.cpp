@@ -27,8 +27,16 @@ USA.
 
 bool verbose = false;
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+void debugOutput(QtMsgType type, const QMessageLogContext &context, const QString &message)
+#else
 void debugOutput(QtMsgType type, const char *msg)
+#endif
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    QByteArray msgData = message.toUtf8();
+    const char *msg = msgData.data();
+#endif
     switch (type) {
     case QtDebugMsg:
         if (verbose)
@@ -48,7 +56,11 @@ void debugOutput(QtMsgType type, const char *msg)
 
 int main(int argc, char *argv[])
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    qInstallMessageHandler(debugOutput);
+#else
     qInstallMsgHandler(debugOutput);
+#endif
     QCoreApplication app(argc, argv);
     CommandLineParser parser;
     Client client;

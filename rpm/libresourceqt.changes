@@ -1,0 +1,20 @@
+* Fri Aug 24 2012 Marko Saukko <marko.saukko@jollamobile.com> - 1.26
+- Added libresourceqt-fix-build-with-new-glib.patch to fix build 
+
+* Tue May 29 2012 Marko Saukko <sage@merproject.org> - 1.26
+- This version is based on commit e24e1026447293479b1d3f3e656c95e574e73607
+  in the git tree. Version number was not changed as there wasn't
+  any information what is the real version of the library atm.
+  The .pc files refers still to version 1.26
+- Dropped doxygen dependency for now as the build fails with it.
+
+* Mon Oct 17 2011 Marko Saukko <marko.saukko@cybercom.com> - 1.26
+- Updated packaging.
+
+* Wed Dec 22 2010 Markus Lehtonen <markus.lehtonen@nokia.com> - 1.26
+- Fix require-tag of libdbus-qeventloop-devel package (BMC#11657)
+- Change package group to System/Resource Policy (BMC#11618)
+
+* Fri Dec 10 2010 Wolf Bergenheim <ext-wolf.2.bergenheim@nokia.com> - 1.26
+- Initial import to MeeGo OBS (contributes to FEA BMC#6701)
+

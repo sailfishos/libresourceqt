@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include/resource/qt5
+
+Name: libresourceqt5
+Description: Maemo resource management Qt API
+Version: 1.26
+Libs: -L${libdir} -lresourceqt
+Cflags: -I${includedir}
+Requires: dbus-1 libdbus-qeventloop5 libresource

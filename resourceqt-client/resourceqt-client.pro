@@ -22,18 +22,19 @@
 include(../common.pri)
 
 TEMPLATE     = app
-TARGET       = resourceqt-client
+equals(QT_MAJOR_VERSION, 4): TARGET = resourceqt-client
+equals(QT_MAJOR_VERSION, 5): TARGET = resourceqt5-client
 MOC_DIR      = .moc
 OBJECTS_DIR  = .obj
 DEPENDPATH  += .
-QT           = core
+QT           = core dbus
 CONFIG      += console
 CONFIG      -= app_bundle
 
 INCLUDEPATH += $${LIBRESOURCEINC}
 QMAKE_CXXFLAGS += -Wall
 QMAKE_CFLAGS += -std=c99 -D_POSIX_C_SOURCE=199309L
-QMAKE_LFLAGS = -L$${LIBRESOURCEQT}/build -lresourceqt -L$${LIBDBUSQEVENTLOOP}/build -ldbus-qeventloop -lrt
+QMAKE_LFLAGS += $${DBUSQEVENTLOOPLIB} $${RESOURCEQTLIB} -lrt
 
 # Input 
 HEADERS     = client.h commandlineparser.h time-stat.h

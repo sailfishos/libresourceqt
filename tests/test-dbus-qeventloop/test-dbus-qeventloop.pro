@@ -25,19 +25,21 @@
 #
 #-------------------------------------------------
 
+include(../../common.pri)
+
 TEMPLATE = app
 TARGET = test-dbus-qeventloop
 MOC_DIR = .moc
 OBJECTS_DIR = .obj
 DEPENDPATH += .
-QT = testlib core
+QT = core testlib
 CONFIG += console link_pkgconfig
 CONFIG -= app_bundle
 PKGCONFIG += dbus-1
 
 INCLUDEPATH += ../../libdbus-qeventloop
 QMAKE_CXXFLAGS += -Wall
-LIBS += -L../../libdbus-qeventloop/build -ldbus-qeventloop
+LIBS += $${DBUSQEVENTLOOPLIB}
 
 # Input 
 SOURCES += test-dbus-qeventloop.cpp 
@@ -46,5 +48,5 @@ HEADERS = ../../libdbus-qeventloop/dbusconnectioneventloop.h
 QMAKE_DISTCLEAN += -r .moc .obj
 
 # Install options
-target.path = /usr/lib/libresourceqt-tests/
+target.path = /usr/lib/$${TESTSTARGETDIR}/
 INSTALLS    = target

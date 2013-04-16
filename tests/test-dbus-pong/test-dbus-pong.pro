@@ -19,6 +19,8 @@
 #  USA.                                                                      #
 ##############################################################################
 
+include(../../common.pri)
+
 TEMPLATE = app
 TARGET = test-dbus-pong
 MOC_DIR = .moc
@@ -37,5 +39,5 @@ HEADERS += pong.h
 QMAKE_DISTCLEAN += -r .moc .obj
 
 # Install options
-target.path = /usr/lib/libresourceqt-tests/
+target.path = /usr/lib/$${TESTSTARGETDIR}/
 INSTALLS    = target
