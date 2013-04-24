@@ -9,10 +9,10 @@ equals(QT_MAJOR_VERSION, 4) {
     TESTSTARGETDIR = libresourceqt-tests
 }
 equals(QT_MAJOR_VERSION, 5) {
-    LIBRESOURCEINC = $${LIBRESOURCEQT}/include/qt5
+    LIBRESOURCEINC = $${LIBRESOURCEQT}/include/qt4
     RESOURCEQTLIB = -L$${LIBRESOURCEQT}/build -lresourceqt5
     DBUSQEVENTLOOPLIB = -L$${LIBDBUSQEVENTLOOP}/build -ldbus-qeventloop-qt5
-    TESTSTARGETDIR = libresourceqt5-tests
+    TESTSTARGETDIR = libresourceqt-qt5-tests
 }
 
 POLICY = $${LIBRESOURCEINC}/policy
