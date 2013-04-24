@@ -1,0 +1,27 @@
+From 970a76bf2beb45e0acf6a5167a8d216098814342 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Juho=20H=C3=A4m=C3=A4l=C3=A4inen?= <juho.hamalainen@tieto.com>
+Date: Wed, 24 Apr 2013 11:27:42 +0300
+Subject: [PATCH] Don't cast Resource object's pointer to identifier.
+
+Casting object's pointer to quint32 identifier is not 64bit safe.
+Resource identifier isn't used anywhere in libresourceqt so keep
+identifier zero for all Resource objects for now.
+---
+ libresourceqt/src/resource.cpp |    1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/libresourceqt/src/resource.cpp b/libresourceqt/src/resource.cpp
+index 2673252..2706b1d 100644
+--- a/libresourceqt/src/resource.cpp
++++ b/libresourceqt/src/resource.cpp
+@@ -27,7 +27,6 @@ Resource::Resource()
+         :   optional(false),
+         identifier(0), granted(false)
+ {
+-    identifier = (quint32)this;
+ }
+ 
+ Resource::Resource(const Resource &other)
+-- 
+1.7.10.4
+

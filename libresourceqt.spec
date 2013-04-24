@@ -19,6 +19,7 @@ Source100:  libresourceqt.yaml
 Patch0:     libresourceqt-disable-documents.patch
 Patch1:     libresourceqt-disable-mediaoverrider-build.patch
 Patch2:     0001-Fix-build-with-new-glib.patch
+Patch3:     0001-Don-t-cast-Resource-object-s-pointer-to-identifier.patch
 Requires:   libdbus-qeventloop = %{version}-%{release}
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
@@ -100,6 +101,8 @@ Unit-tests for %{name}.
 %patch1 -p1
 # 0001-Fix-build-with-new-glib.patch
 %patch2 -p1
+# 0001-Don-t-cast-Resource-object-s-pointer-to-identifier.patch
+%patch3 -p1
 # >> setup
 # << setup
 

@@ -1,3 +1,6 @@
+* Wed Apr 24 2013 Juho Hämäläinen <juho.hamalainen@tieto.com> - 1.26
+- Added Don-t-cast-Resource-object-s-pointer-to-identifier.patch to fix 64bit build.
+
 * Fri Aug 24 2012 Marko Saukko <marko.saukko@jollamobile.com> - 1.26
 - Added libresourceqt-fix-build-with-new-glib.patch to fix build 
 

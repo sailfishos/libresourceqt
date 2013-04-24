@@ -11,6 +11,7 @@ Patches:
     - libresourceqt-disable-documents.patch
     - libresourceqt-disable-mediaoverrider-build.patch
     - 0001-Fix-build-with-new-glib.patch
+    - 0001-Don-t-cast-Resource-object-s-pointer-to-identifier.patch
 Description: Qt library for Resource Policy.
 Requires:
     - libdbus-qeventloop = %{version}-%{release}
