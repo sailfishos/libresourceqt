@@ -27,7 +27,6 @@ Resource::Resource()
         :   optional(false),
         identifier(0), granted(false)
 {
-    identifier = (quint32)this;
 }
 
 Resource::Resource(const Resource &other)
