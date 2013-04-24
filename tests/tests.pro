@@ -39,10 +39,10 @@ SUBDIRS = test-dbus-qeventloop              \
 
 # Install options
 equals(QT_MAJOR_VERSION, 4): testsxml.path = /usr/share/libresourceqt-tests/
-equals(QT_MAJOR_VERSION, 5): testsxml.path = /usr/share/libresourceqt5-tests/
+equals(QT_MAJOR_VERSION, 5): testsxml.path = /usr/share/libresourceqt-qt5-tests/
 testsxml.files   = tests.xml
 equals(QT_MAJOR_VERSION, 4): testrunner.path  = /usr/lib/libresourceqt-tests/
-equals(QT_MAJOR_VERSION, 5): testrunner.path  = /usr/lib/libresourceqt5-tests/
+equals(QT_MAJOR_VERSION, 5): testrunner.path  = /usr/lib/libresourceqt-qt5-tests/
 testrunner.files = test-dbus-qeventloop-runner.sh
 dbusconf.path    = /etc/dbus-1/system.d/
 dbusconf.files   = test-dbus-qeventloop.conf
