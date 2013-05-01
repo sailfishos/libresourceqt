@@ -6,7 +6,7 @@ Group: System/Resource Policy
 License: LGPLv2.1
 URL: http://meego.gitorious.org/maemo-multimedia/libresourceqt/
 Sources:
-    - maemo-multimedia-libresourceqt-e24e1026.tar.gz
+    - "%{name}-%{version}.tar.bz2"
 Description: Qt library for Resource Policy.
 Requires:
     - libdbus-qeventloop = %{version}-%{release}
