@@ -1,3 +1,6 @@
+* Thu May 02 2013 Carsten Munk <carsten.munk@jollamobile.com> - 1.26
+- Add qt5 package
+
 * Wed Apr 24 2013 Juho Hämäläinen <juho.hamalainen@tieto.com> - 1.26
 - Added Don-t-cast-Resource-object-s-pointer-to-identifier.patch to fix 64bit build.
 
