@@ -8,5 +8,5 @@ Description: Maemo overrides Qt API
 Version: 1.26
 Libs: -L${libdir}
 Cflags: -I${includedir}
-Requires: QtDbus
+Requires: Qt5DBus
 
