@@ -9,7 +9,7 @@ Name:       libresourceqt
 # << macros
 
 Summary:    Resource Policy Qt API
-Version:    1.26+masterbeda977
+Version:    1.26+master7c4a607
 Release:    1
 Group:      System/Resource Policy
 License:    LGPLv2.1
