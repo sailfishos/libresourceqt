@@ -9,12 +9,12 @@ Name:       libresourceqt-qt5
 # << macros
 
 Summary:    Resource Policy Qt API
-Version:    1.26+master7c4a607
+Version:    1.26.0.1
 Release:    1
 Group:      System/Resource Policy
 License:    LGPLv2.1
-URL:        http://meego.gitorious.org/maemo-multimedia/libresourceqt/
-Source0:    libresourceqt-%{version}.tar.bz2
+URL:        https://github.com/mer-packages/libresourceqt
+Source0:    libresourceqt-1.26+master7c4a607.tar.bz2
 Source100:  libresourceqt-qt5.yaml
 Patch0:     0001-Don-t-cast-Resource-object-s-pointer-to-identifier.patch
 Requires:   libdbus-qeventloop-qt5 = %{version}-%{release}
@@ -92,9 +92,10 @@ Requires:   libdbus-qeventloop-qt5 = %{version}-%{release}
 Unit-tests for %{name}.
 
 %prep
-%setup -q -n libresourceqt-%{version}
-%patch0 -p1
+%setup -q -n libresourceqt-1.26+master7c4a607
 
+# 0001-Don-t-cast-Resource-object-s-pointer-to-identifier.patch
+%patch0 -p1
 # >> setup
 # << setup
 

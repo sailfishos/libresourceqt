@@ -1,12 +1,12 @@
 Name: libresourceqt
 Summary: Resource Policy Qt API
-Version: 1.26
+Version: 1.26.0.1
 Release: 1
 Group: System/Resource Policy
 License: LGPLv2.1
-URL: http://meego.gitorious.org/maemo-multimedia/libresourceqt/
+URL: https://github.com/mer-packages/libresourceqt
 Sources:
-    - "%{name}-%{version}.tar.bz2"
+    - "%{name}-1.26+master7c4a607.tar.bz2"
 Patches:
     - "0001-Don-t-cast-Resource-object-s-pointer-to-identifier.patch"
 Description: Qt library for Resource Policy.
