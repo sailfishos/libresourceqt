@@ -8,4 +8,4 @@ Description: Maemo resource management Qt API
 Version: 1.26
 Libs: -L${libdir} -lresourceqt5
 Cflags: -I${includedir}
-Requires: dbus-1 libdbus-qeventloop5 libresource
+Requires: dbus-1 libdbus-qeventloop5 libresource Qt5Core
