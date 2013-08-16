@@ -26,16 +26,16 @@ USA.
 
 #include "dbusconnectioneventloop.h"
 
-DBUSConnectionEventLoop DBUSConnectionEventLoop::classInstance;
+Q_GLOBAL_STATIC(DBUSConnectionEventLoop, classInstance);
 
 bool DBUSConnectionEventLoop::addConnection(DBusConnection* conn)
 {
-    return classInstance.internalAddConnection(conn);
+    return classInstance()->internalAddConnection(conn);
 }
 
 void DBUSConnectionEventLoop::removeConnection(DBusConnection* conn)
 {
-    classInstance.internalRemoveConnection(conn);
+    classInstance()->internalRemoveConnection(conn);
 }
 
 DBUSConnectionEventLoop::DBUSConnectionEventLoop() : QObject()
