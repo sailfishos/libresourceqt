@@ -69,12 +69,10 @@ class DBUSConnectionEventLoop : public QObject
 {
     Q_OBJECT
 private:
-    static DBUSConnectionEventLoop classInstance;
-
     Q_DISABLE_COPY(DBUSConnectionEventLoop)
-    DBUSConnectionEventLoop();
 
 public:
+    DBUSConnectionEventLoop();
     virtual ~DBUSConnectionEventLoop();
 
     /**
@@ -83,10 +81,6 @@ public:
      */
     static bool addConnection(DBusConnection* conn);
     static void removeConnection(DBusConnection* conn);
-
-    static DBUSConnectionEventLoop &getInstance(void) {
-      return classInstance;
-    }
 
 private:
     bool internalAddConnection(DBusConnection* conn);
