@@ -1,0 +1,10 @@
+--- a/tests/test-dbus-qeventloop/test-dbus-qeventloop.cpp	2013-05-02 23:01:16.000000000 +0200
++++ b/tests/test-dbus-qeventloop/test-dbus-qeventloop.cpp	2013-09-22 01:30:26.555973207 +0200
+@@ -23,6 +23,7 @@
+ 
+ #include "dbusconnectioneventloop.h"
+ #include <stdint.h>
++#include <unistd.h>
+ #include <QtTest/QtTest>
+ 
+ class TestDbusQEventLoop: public QObject

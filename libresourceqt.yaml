@@ -9,6 +9,7 @@ Sources:
     - "%{name}-1.26+master7c4a607.tar.bz2"
 Patches:
     - "0001-Don-t-cast-Resource-object-s-pointer-to-identifier.patch"
+    - "gcc47_include_unistd.patch"
 Description: Qt library for Resource Policy.
 Requires:
     - libdbus-qeventloop = %{version}-%{release}

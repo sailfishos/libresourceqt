@@ -17,6 +17,7 @@ URL:        https://github.com/mer-packages/libresourceqt
 Source0:    %{name}-1.26+master7c4a607.tar.bz2
 Source100:  libresourceqt.yaml
 Patch0:     0001-Don-t-cast-Resource-object-s-pointer-to-identifier.patch
+Patch1:     gcc47_include_unistd.patch
 Requires:   libdbus-qeventloop = %{version}-%{release}
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
@@ -93,6 +94,8 @@ Unit-tests for %{name}.
 
 # 0001-Don-t-cast-Resource-object-s-pointer-to-identifier.patch
 %patch0 -p1
+# gcc47_include_unistd.patch
+%patch1 -p1
 # >> setup
 # << setup
 

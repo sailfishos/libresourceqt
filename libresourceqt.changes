@@ -1,3 +1,7 @@
+* Sun Sep 22 2013 Davide Bettio <davide.bettio@ispirata.com> - 1.26.0.1
+- Added a patch to include unistd.h where needed:
+  since gcc 4.7 libstdc++ doesn't include anymore unistd.
+
 * Fri May 10 2013 Marko Saukko <marko.saukko@jollamobile.com> - 1.26.0.1
 - Update to unofficial version numbering as previous updates with sha1 comparison
   broke the version updates.
