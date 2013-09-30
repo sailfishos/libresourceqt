@@ -38,12 +38,24 @@ SUBDIRS = test-dbus-qeventloop              \
           test-released-by-manager
 
 # Install options
-equals(QT_MAJOR_VERSION, 4): testsxml.path = /usr/share/libresourceqt-tests/
-equals(QT_MAJOR_VERSION, 5): testsxml.path = /usr/share/libresourceqt-qt5-tests/
-testsxml.files   = tests.xml
-equals(QT_MAJOR_VERSION, 4): testrunner.path  = /usr/lib/libresourceqt-tests/
-equals(QT_MAJOR_VERSION, 5): testrunner.path  = /usr/lib/libresourceqt-qt5-tests/
-testrunner.files = test-dbus-qeventloop-runner.sh
+include(../common.pri)
+unix{
+    equals(QT_MAJOR_VERSION, 4): testsxml.path = /usr/share/libresourceqt-tests/
+    equals(QT_MAJOR_VERSION, 5): testsxml.path = /usr/share/libresourceqt-qt5-tests/
+    testsxml.files    = tests.xml
+    testsxml.target   = tests.xml
+    testsxml.CONFIG   = no_check_exist
+    testsxml.commands = sed \'s%@PATH@%/usr/lib/$${TESTSTARGETDIR}%\' $$PWD/tests.xml.in > $$PWD/tests.xml
+
+    equals(QT_MAJOR_VERSION, 4): testrunner.path  = /usr/lib/libresourceqt-tests/
+    equals(QT_MAJOR_VERSION, 5): testrunner.path  = /usr/lib/libresourceqt-qt5-tests/
+    testrunner.files    = test-dbus-qeventloop-runner.sh
+    testrunner.target   = test-dbus-qeventloop-runner.sh
+    testrunner.CONFIG   = no_check_exist
+    testrunner.commands = sed \'s%@PATH@%/usr/lib/$${TESTSTARGETDIR}%\' $$PWD/test-dbus-qeventloop-runner.sh.in > $$PWD/test-dbus-qeventloop-runner.sh
+
+    QMAKE_DISTCLEAN += tests.xml test-dbus-qeventloop-runner.sh
+}
 dbusconf.path    = /etc/dbus-1/system.d/
 dbusconf.files   = test-dbus-qeventloop.conf
 INSTALLS         = testsxml testrunner dbusconf
