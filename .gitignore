@@ -3,3 +3,8 @@
 Makefile
 moc/
 build/
+resourceqt-client/resourceqt5-client
+tests/test-dbus-pong/test-dbus-pong
+tests/test-dbus-qeventloop-runner.sh
+tests/test-dbus-qeventloop/test-dbus-qeventloop
+tests/tests.xml
