@@ -95,6 +95,7 @@ SubPackages:
     Summary: Unit-tests for %{name}
     Description: Unit-tests for %{name}.
     Files:
+        - "%attr(0755, root, root) %{_libdir}/libresourceqt-tests/test-dbus-qeventloop-runner.sh"
         - "%{_libdir}/libresourceqt-tests/*"
         - "%{_datadir}/%{name}-tests/tests.xml"
         - "%config %{_sysconfdir}/dbus-1/system.d/test-dbus-qeventloop.conf"
