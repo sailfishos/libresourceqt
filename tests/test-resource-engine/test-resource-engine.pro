@@ -46,7 +46,8 @@ MOC_DIR = build/moc
 QMAKE_CXXFLAGS += -Wall
 LIBS += -L$${LIBDBUSQEVENTLOOP}/build -ldbus-qeventloop
 
-CONFIG  += qt qtestlib debug warn_on link_pkgconfig
+CONFIG  += qt debug warn_on link_pkgconfig
+QT += testlib
 QT -= gui
 PKGCONFIG += dbus-1
 

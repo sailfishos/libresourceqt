@@ -41,7 +41,8 @@ MOC_DIR = build
 QMAKE_CXXFLAGS += -Wall
 LIBS += $${DBUSQEVENTLOOPLIB} -lrt
 
-CONFIG  += qt qtestlib debug warn_on link_pkgconfig
+CONFIG  += qt debug warn_on link_pkgconfig
+QT += testlib
 QT -= gui
 PKGCONFIG += dbus-1 libresource
 
