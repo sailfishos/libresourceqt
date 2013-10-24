@@ -40,7 +40,8 @@ MOC_DIR = build
 
 QMAKE_CXXFLAGS += -Wall
 
-CONFIG  += qt qtestlib debug warn_on
+CONFIG  += qt debug warn_on
+QT += testlib
 QT -= gui
 
 # Install directives

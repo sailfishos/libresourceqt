@@ -19,7 +19,6 @@
 #  USA.                                                                      #
 ##############################################################################
 
-CONFIG += ordered
 TEMPLATE = subdirs
 
 SUBDIRS = libdbus-qeventloop  \
