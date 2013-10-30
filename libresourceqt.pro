@@ -27,6 +27,10 @@ SUBDIRS = libdbus-qeventloop  \
           resourceqt-client   \
           tests
 
+tests.depends = libdbus-qeventloop libresourceqt
+resourceqt-client.depends = libdbus-qeventloop libresourceqt
+
+
 dist.commands   = ./makedist.sh
 FORCE.commands = $(CHK_DIR_EXISTS) libresourceqt/docs/man || mkdir -p libresourceqt/docs/man ;\
                  $(CHK_DIR_EXISTS) libresourceqt/docs/xml || mkdir -p libresourceqt/docs/xml ;\
