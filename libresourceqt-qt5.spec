@@ -98,7 +98,7 @@ Unit-tests for %{name}.
 # 0001-Don-t-cast-Resource-object-s-pointer-to-identifier.patch
 %patch0 -p1
 # gcc47_include_unistd.patch
-%patch1 -p1
+%patch1 -p2
 # >> setup
 # << setup
 

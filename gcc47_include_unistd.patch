@@ -1,5 +1,17 @@
---- a/tests/test-dbus-qeventloop/test-dbus-qeventloop.cpp	2013-05-02 23:01:16.000000000 +0200
-+++ b/tests/test-dbus-qeventloop/test-dbus-qeventloop.cpp	2013-09-22 01:30:26.555973207 +0200
+diff -Naur a/libresourceqt-1.26+master7c4a607/tests/test-dbus-pong/test-dbus-pong.cpp b/libresourceqt-1.26+master7c4a607/tests/test-dbus-pong/test-dbus-pong.cpp
+--- a/libresourceqt-1.26+master7c4a607/tests/test-dbus-pong/test-dbus-pong.cpp	2013-05-02 23:01:16.000000000 +0200
++++ b/libresourceqt-1.26+master7c4a607/tests/test-dbus-pong/test-dbus-pong.cpp	2013-12-12 16:01:20.756487506 +0100
+@@ -23,6 +23,7 @@
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
++#include <unistd.h>
+ 
+ #include <QtCore/QCoreApplication>
+ #include <QtCore/QTimer>
+diff -Naur a/libresourceqt-1.26+master7c4a607/tests/test-dbus-qeventloop/test-dbus-qeventloop.cpp b/libresourceqt-1.26+master7c4a607/tests/test-dbus-qeventloop/test-dbus-qeventloop.cpp
+--- a/libresourceqt-1.26+master7c4a607/tests/test-dbus-qeventloop/test-dbus-qeventloop.cpp	2013-05-02 23:01:16.000000000 +0200
++++ b/libresourceqt-1.26+master7c4a607/tests/test-dbus-qeventloop/test-dbus-qeventloop.cpp	2013-12-12 16:01:53.908651905 +0100
 @@ -23,6 +23,7 @@
  
  #include "dbusconnectioneventloop.h"
