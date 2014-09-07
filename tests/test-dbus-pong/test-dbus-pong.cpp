@@ -28,7 +28,7 @@ USA.
 #include <QtCore/QTimer>
 #include <QtDBus/QtDBus>
 #include <QtCore/QtDebug>
-
+#include <unistd.h>
 #include "pong.h"
 
 QString Pong::ping(const QString &arg)

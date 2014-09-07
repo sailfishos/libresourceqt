@@ -24,6 +24,7 @@ USA.
 #include "dbusconnectioneventloop.h"
 #include <stdint.h>
 #include <QtTest/QtTest>
+#include <unistd.h>
 
 class TestDbusQEventLoop: public QObject
 {
