@@ -819,14 +819,14 @@ void TestReleasedByManager::testLostAlwaysReplyBothPlayer()
     // Acquire the resource for the second client
     bool acquireOk2 = resourceSet2.acquire();
     QVERIFY(acquireOk2);
-    // Wait for released-by-manager -signal for first client
-    waitForSignal(&resourceSet, SIGNAL(resourcesReleasedByManager()));
-    QCOMPARE(stateSpyResourcesReleased.count(), 1);
+    // Wait for resources lost signal for first client
+    waitForSignal(&resourceSet, SIGNAL(lostResources()));
+    QCOMPARE(stateSpyLost.count(), 1);
     // Wait for the granted-signal for the second client
     waitForSignal(&resourceSet2, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
     QCOMPARE(stateSpyGranted2.count(), 1);
-    // No Lost-signal
-    QCOMPARE(stateSpyLost.count(), 0);
+    // No resources released by manager signal
+    QCOMPARE(stateSpyResourcesReleased.count(), 0);
 
     // Release the resource from the second client
     bool releaseOk2 = resourceSet2.release();
@@ -835,13 +835,23 @@ void TestReleasedByManager::testLostAlwaysReplyBothPlayer()
     waitForSignal(&resourceSet2, SIGNAL(resourcesReleased()));
     QCOMPARE(stateSpyReleased2.count(), 1);
 
+    // When second client releases the resources first client is re-granted the resources
+    waitForSignal(&resourceSet, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
+    QCOMPARE(stateSpyGranted.count(), 2);
+
+    // Release the resource from the first client
+    bool releaseOk = resourceSet.release();
+    QVERIFY(releaseOk);
+    waitForSignal(&resourceSet, SIGNAL(resourcesReleased()));
+    QCOMPARE(stateSpyReleased.count(), 1);
+
     // Check all the signals
-    QCOMPARE(stateSpyGranted.count(), 1);
-    QCOMPARE(stateSpyLost.count(), 0);
+    QCOMPARE(stateSpyGranted.count(), 2);
+    QCOMPARE(stateSpyLost.count(), 1);
     QCOMPARE(stateSpyReleased.count(), 1);
     QCOMPARE(stateSpyDenied.count(), 0);
     QCOMPARE(stateSpyUpdateOK.count(), 0);
-    QCOMPARE(stateSpyResourcesReleased.count(), 1);
+    QCOMPARE(stateSpyResourcesReleased.count(), 0);
     QCOMPARE(stateSpyBecameAvailable.count(), 1);
 
     QCOMPARE(stateSpyGranted2.count(), 1);
