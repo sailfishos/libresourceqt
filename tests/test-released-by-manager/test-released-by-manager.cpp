@@ -1194,9 +1194,9 @@ void TestReleasedByManager::testLostAutoReleaseBothPlayer()
     // Acquire the resource for the second client
     bool acquireOk2 = resourceSet2.acquire();
     QVERIFY(acquireOk2);
-    // Wait for the manager released-signal for the first client
-    waitForSignal(&resourceSet, SIGNAL(resourcesReleasedByManager()));
-    QCOMPARE(stateSpyResourcesReleased.count(), 1);
+    // Wait for the resources lost signal for the first client
+    waitForSignal(&resourceSet, SIGNAL(resourcesLost()));
+    QCOMPARE(stateSpyLost.count(), 1);
     // Wait for the granted-signal for the second client
     waitForSignal(&resourceSet2, SIGNAL(resourcesGranted(const QList<ResourcePolicy::ResourceType> &)));
     QCOMPARE(stateSpyGranted2.count(), 1);
@@ -1210,11 +1210,11 @@ void TestReleasedByManager::testLostAutoReleaseBothPlayer()
 
     // Check all the signals
     QCOMPARE(stateSpyGranted.count(), 1);
-    QCOMPARE(stateSpyLost.count(), 0);
+    QCOMPARE(stateSpyLost.count(), 1);
     QCOMPARE(stateSpyReleased.count(), 0);
     QCOMPARE(stateSpyDenied.count(), 0);
     QCOMPARE(stateSpyUpdateOK.count(), 0);
-    QCOMPARE(stateSpyResourcesReleased.count(), 1);
+    QCOMPARE(stateSpyResourcesReleased.count(), 0);
     QCOMPARE(stateSpyBecameAvailable.count(), 1);
 
     QCOMPARE(stateSpyGranted2.count(), 1);
