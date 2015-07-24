@@ -51,6 +51,7 @@ private slots:
     void testLostAutoReleaseFirstPlayer();
     void testLostAutoReleaseSecondPlayer();
     void testLostAutoReleaseBothPlayer();
+    void testMultipleAcquireBothPlayer();
 };
 
 #endif
