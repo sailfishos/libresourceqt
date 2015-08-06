@@ -3,47 +3,47 @@
   <suite name="libresourceqt-tests" domain="Multimedia Middleware">
     <set name="libresourceqt-tests" feature="Resource policy">
 
-      <case name="test-init-and-connect" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
+      <case name="test-init-and-connect" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="60">
         <step expected_result="0">@PATH@/test-init-and-connect</step>
       </case>
 
-      <case name="test-resource" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
+      <case name="test-resource" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="60">
         <step expected_result="0">@PATH@/test-resource</step>
       </case>
 
-      <case name="test-audio-resource" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
+      <case name="test-audio-resource" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="60">
         <step expected_result="0">@PATH@/test-audio-resource</step>
       </case>
 
-      <case name="test-resource-set" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
+      <case name="test-resource-set" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="60">
         <step expected_result="0">@PATH@/test-resource-set</step>
       </case>
 
-      <case name="test-acquire" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
+      <case name="test-acquire" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="60">
         <step expected_result="0">@PATH@/test-acquire</step>
       </case>
 
-      <case name="test-update" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
+      <case name="test-update" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="60">
         <step expected_result="0">@PATH@/test-update</step>
       </case>
 
-      <case name="test-auto-release" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
+      <case name="test-auto-release" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="60">
         <step expected_result="0">@PATH@/test-auto-release</step>
       </case>
 
-      <case name="test-video-resource" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
+      <case name="test-video-resource" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="60">
         <step expected_result="0">@PATH@/test-video-resource</step>
       </case>
 
-      <case name="test-always-reply" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
+      <case name="test-always-reply" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="60">
         <step expected_result="0">@PATH@/test-always-reply</step>
       </case>
 
-      <case name="test-released-by-manager" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
+      <case name="test-released-by-manager" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="60">
         <step expected_result="0">@PATH@/test-released-by-manager</step>
       </case>
 
-      <case name="test-looping" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="15">
+      <case name="test-looping" type="Functional" level="Component" subfeature="libresource Qt API" description="Unit tests for libresourceqt" timeout="60">
         <step expected_result="0">@PATH@/test-looping</step>
       </case>
 
@@ -58,7 +58,7 @@
   <suite name="libdbus-qeventloop-tests" domain="Multimedia Middleware">
     <set name="libdbus-qeventloop-tests" feature="Resource policy">
 
-      <case name="DBusQEventLoop functional test" type="Functional" level="Component" subfeature="libresource Qt API" description="Functional tests for libdbus-qeventloop" timeout="25">
+      <case name="DBusQEventLoop functional test" type="Functional" level="Component" subfeature="libresource Qt API" description="Functional tests for libdbus-qeventloop" timeout="60">
         <step expected_result="0">@PATH@/test-dbus-qeventloop-runner.sh</step>
       </case>
 
