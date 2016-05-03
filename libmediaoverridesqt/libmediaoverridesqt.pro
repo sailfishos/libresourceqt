@@ -1,7 +1,6 @@
 include(../common.pri)
 TEMPLATE = lib
-equals(QT_MAJOR_VERSION, 4): TARGET = mediaoverridesqt
-equals(QT_MAJOR_VERSION, 5): TARGET = mediaoverridesqt5
+TARGET = mediaoverridesqt5
 DESTDIR = build
 DEPENDPATH += .
 INCLUDEPATH += .
@@ -29,10 +28,8 @@ QMAKE_DISTCLEAN += -r moc build
 headers.files  = $${PUBLIC_HEADERS}
 INSTALLBASE    = /usr
 target.path    = $${INSTALLBASE}/lib
-equals(QT_MAJOR_VERSION, 4): headers.path   = $${INSTALLBASE}/include/resource/qt4/policy
-equals(QT_MAJOR_VERSION, 5): headers.path   = $${INSTALLBASE}/include/resource/qt5/policy
-equals(QT_MAJOR_VERSION, 4): pc.files       = libmediaoverridesqt1.pc
-equals(QT_MAJOR_VERSION, 5): pc.files       = libmediaoverridesqt5.pc
+headers.path   = $${INSTALLBASE}/include/resource/qt5/policy
+pc.files       = libmediaoverridesqt5.pc
 pc.path        = $${INSTALLBASE}/lib/pkgconfig
 
 INSTALLS       = target headers pc
