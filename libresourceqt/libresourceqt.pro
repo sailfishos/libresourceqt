@@ -41,7 +41,7 @@ SOURCES += src/resource.cpp \
            src/audio-resource.cpp
 
 QMAKE_CXXFLAGS += -Wall
-LIBS += $$(DBUSQEVENTLOOPLIB)
+LIBS += $${DBUSQEVENTLOOPLIB}
 
 OBJECTS_DIR = build
 MOC_DIR = moc
