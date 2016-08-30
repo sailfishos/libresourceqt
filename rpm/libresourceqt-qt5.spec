@@ -1,6 +1,6 @@
 Name:       libresourceqt-qt5
 Summary:    Resource Policy Qt API
-Version:    1.26
+Version:    1.29
 Release:    1
 Group:      System/Resource Policy
 License:    LGPLv2.1
