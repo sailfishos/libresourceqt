@@ -5,7 +5,7 @@ includedir=${prefix}/include/resource/qt5
 
 Name: libresourceqt5
 Description: Maemo resource management Qt API
-Version: 1.26
+Version: 1.29
 Libs: -L${libdir} -lresourceqt5
 Cflags: -I${includedir}
 Requires: dbus-1 libdbus-qeventloop5 libresource Qt5Core
