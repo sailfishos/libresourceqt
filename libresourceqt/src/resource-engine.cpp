@@ -398,6 +398,8 @@ quint32 ResourcePolicy::resourceTypeToLibresourceType(ResourceType type)
         return RESMSG_LENS_COVER;
     case HeadsetButtonsType:
         return RESMSG_HEADSET_BUTTONS;
+    case RearFlashlightType:
+        return RESMSG_REAR_FLASHLIGHT;
     default:
         LOG_DEBUG("Unknown resource Type %d", quint32(type));
         return 0xffff;

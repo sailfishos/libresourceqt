@@ -211,6 +211,9 @@ bool ResourceSet::addResource(ResourceType type)
         case HeadsetButtonsType:
             resource = new HeadsetButtonsResource;
             break;
+        case RearFlashlightType:
+            resource = new RearFlashlightResource;
+            break;
         default:
             return false;
     }

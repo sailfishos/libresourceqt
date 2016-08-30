@@ -257,3 +257,21 @@ ResourceType HeadsetButtonsResource::type() const
     return HeadsetButtonsType;
 }
 
+RearFlashlightResource::RearFlashlightResource()
+        :   Resource()
+{
+}
+
+RearFlashlightResource::RearFlashlightResource(const RearFlashlightResource &other)
+        :   Resource(other)
+{
+}
+
+RearFlashlightResource::~RearFlashlightResource()
+{
+}
+
+ResourceType RearFlashlightResource::type() const
+{
+    return RearFlashlightType;
+}
