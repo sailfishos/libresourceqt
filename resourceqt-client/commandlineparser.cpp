@@ -44,6 +44,7 @@ CommandLineParser::CommandLineParser():
     resourceValues["SnapButton"] = ResourcePolicy::SnapButtonType;
     resourceValues["LensCover"] = ResourcePolicy::LensCoverType;
     resourceValues["HeadsetButtons"] = ResourcePolicy::HeadsetButtonsType;
+    resourceValues["RearFlashlight"] = ResourcePolicy::RearFlashlightType;
 }
 
 CommandLineParser::~CommandLineParser()

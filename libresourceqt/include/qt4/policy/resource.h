@@ -73,6 +73,7 @@ enum ResourceType {
 	SnapButtonType,			///< Use this if you are a camera application
 	LensCoverType,
 	HeadsetButtonsType,		///< Use this to reserve the headset buttons
+	RearFlashlightType,		///< Use this for reserving the rear flashlight
 	NumberOfTypes
 };
 

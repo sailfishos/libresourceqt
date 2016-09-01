@@ -253,6 +253,8 @@ const char * resourceTypeToString(ResourceType type)
         return "LensCover";
     case HeadsetButtonsType:
         return "HeadsetButtons";
+    case RearFlashlightType:
+        return "RearFlashlight";
     default:
         return "Unknown/Invalid Resource";
     }

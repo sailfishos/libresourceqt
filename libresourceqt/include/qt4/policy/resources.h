@@ -32,6 +32,7 @@ USA.
 * ResourcePolicy::SystemButtonResource
 * ResourcePolicy::LensCoverResource
 * ResourcePolicy::HeadsetButtonsResource
+* ResourcePolicy::RearFlashlightResource
 *
 * \copyright Copyright (C) 2011 Nokia Corporation.
 * \author Wolf Bergenheim and Robert Löfman
@@ -413,6 +414,35 @@ public:
 	* The destructor
 	*/
 	virtual ~HeadsetButtonsResource();
+
+	/**
+	* \return the resource type
+	*/
+	virtual ResourceType type() const;
+};
+
+/**
+* Resource to be used when the application wants to control the
+* rear flashlight.
+*/
+class RearFlashlightResource: public Resource
+{
+public:
+	/**
+	* The constructor
+	*/
+	RearFlashlightResource();
+
+	/**
+	* The copy constructor
+	* \param other The resource to copy from
+	*/
+	RearFlashlightResource(const RearFlashlightResource &other);
+
+	/**
+	* The destructor
+	*/
+	virtual ~RearFlashlightResource();
 
 	/**
 	* \return the resource type
