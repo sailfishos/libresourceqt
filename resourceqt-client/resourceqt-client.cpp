@@ -29,10 +29,13 @@ bool verbose = false;
 
 void debugOutput(QtMsgType type, const QMessageLogContext &context, const QString &message)
 {
+    Q_UNUSED(context)
+
     QByteArray msgData = message.toUtf8();
     const char *msg = msgData.data();
     switch (type) {
     case QtDebugMsg:
+    case QtInfoMsg:
         if (verbose)
             fprintf(stderr, "Debug: %s\n", msg);
         break;
