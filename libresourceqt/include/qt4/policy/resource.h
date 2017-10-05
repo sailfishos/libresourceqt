@@ -115,9 +115,6 @@ public:
 	*/
 	virtual ResourceType type() const = 0;
 
-	/**
-	* The destructor
-	*/
 	virtual ~Resource();
 protected:
 	Resource();

@@ -24,12 +24,12 @@ USA.
 using namespace ResourcePolicy;
 
 AudioRecorderResource::AudioRecorderResource()
-        :   Resource()
+    : Resource()
 {
 }
 
 AudioRecorderResource::AudioRecorderResource(const AudioRecorderResource &other)
-        :   Resource(other)
+    : Resource(other)
 {
 }
 
@@ -43,12 +43,12 @@ ResourceType AudioRecorderResource::type() const
 }
 
 VideoResource::VideoResource(quint32 inPid)
-        :   Resource(), pid(inPid)
+    : Resource(), pid(inPid)
 {
 }
 
 VideoResource::VideoResource(const VideoResource &other)
-        :    Resource(other)
+    : Resource(other)
 {
 }
 
@@ -68,12 +68,12 @@ void VideoResource::setProcessID(quint32 newPID)
 }
 
 VideoRecorderResource::VideoRecorderResource()
-        :   Resource()
+    : Resource()
 {
 }
 
 VideoRecorderResource::VideoRecorderResource(const VideoRecorderResource &other)
-        :    Resource(other)
+    : Resource(other)
 {
 }
 
@@ -87,12 +87,12 @@ ResourceType VideoRecorderResource::type() const
 }
 
 VibraResource::VibraResource()
-        :   Resource()
+    : Resource()
 {
 }
 
 VibraResource::VibraResource(const VibraResource &other)
-        :    Resource(other)
+    : Resource(other)
 {
 }
 
@@ -106,12 +106,12 @@ ResourceType VibraResource::type() const
 }
 
 LedsResource::LedsResource()
-        :   Resource()
+    : Resource()
 {
 }
 
 LedsResource::LedsResource(const LedsResource &other)
-        :    Resource(other)
+    : Resource(other)
 {
 }
 
@@ -125,12 +125,12 @@ ResourceType LedsResource::type() const
 }
 
 BacklightResource::BacklightResource()
-        :   Resource()
+    : Resource()
 {
 }
 
 BacklightResource::BacklightResource(const BacklightResource &other)
-        :    Resource(other)
+    : Resource(other)
 {
 }
 
@@ -144,12 +144,12 @@ ResourceType BacklightResource::type() const
 }
 
 SystemButtonResource::SystemButtonResource()
-        :   Resource()
+    : Resource()
 {
 }
 
 SystemButtonResource::SystemButtonResource(const SystemButtonResource &other)
-        :    Resource(other)
+    : Resource(other)
 {
 }
 
@@ -163,12 +163,12 @@ ResourceType SystemButtonResource::type() const
 }
 
 LockButtonResource::LockButtonResource()
-        :   Resource()
+    : Resource()
 {
 }
 
 LockButtonResource::LockButtonResource(const LockButtonResource &other)
-        :    Resource(other)
+    : Resource(other)
 {
 }
 
@@ -182,12 +182,12 @@ ResourceType LockButtonResource::type() const
 }
 
 ScaleButtonResource::ScaleButtonResource()
-        :   Resource()
+    : Resource()
 {
 }
 
 ScaleButtonResource::ScaleButtonResource(const ScaleButtonResource &other)
-        :    Resource(other)
+    : Resource(other)
 {
 }
 
@@ -201,12 +201,12 @@ ResourceType ScaleButtonResource::type() const
 }
 
 SnapButtonResource::SnapButtonResource()
-        :   Resource()
+    : Resource()
 {
 }
 
 SnapButtonResource::SnapButtonResource(const SnapButtonResource &other)
-        :    Resource(other)
+    : Resource(other)
 {
 }
 
@@ -220,12 +220,12 @@ ResourceType SnapButtonResource::type() const
 }
 
 LensCoverResource::LensCoverResource()
-        :   Resource()
+    : Resource()
 {
 }
 
 LensCoverResource::LensCoverResource(const LensCoverResource &other)
-        :    Resource(other)
+    : Resource(other)
 {
 }
 
@@ -239,12 +239,12 @@ ResourceType LensCoverResource::type() const
 }
 
 HeadsetButtonsResource::HeadsetButtonsResource()
-        :   Resource()
+    : Resource()
 {
 }
 
 HeadsetButtonsResource::HeadsetButtonsResource(const HeadsetButtonsResource &other)
-        :    Resource(other)
+    : Resource(other)
 {
 }
 
@@ -258,12 +258,12 @@ ResourceType HeadsetButtonsResource::type() const
 }
 
 RearFlashlightResource::RearFlashlightResource()
-        :   Resource()
+    : Resource()
 {
 }
 
 RearFlashlightResource::RearFlashlightResource(const RearFlashlightResource &other)
-        :   Resource(other)
+    : Resource(other)
 {
 }
 
