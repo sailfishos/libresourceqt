@@ -2,7 +2,7 @@ include(../common.pri)
 
 LIBS += $$RESOURCEQTLIB
 
-INCLUDEPATH += $$LIBRESOURCEINC
+INCLUDEPATH += $$PUBLIC_INCLUDE
 
 TESTSTARGETDIR = libresourceqt-qt5-tests
 

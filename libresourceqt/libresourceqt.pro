@@ -24,13 +24,10 @@ TEMPLATE = lib
 TARGET = resourceqt5
 DESTDIR = build
 DEPENDPATH += $${POLICY} src
-INCLUDEPATH += $${LIBRESOURCEINC} $${LIBDBUSQEVENTLOOP} src
+INCLUDEPATH += $${PUBLIC_INCLUDE} $${LIBDBUSQEVENTLOOP} src
 
 # Input
-PUBLIC_HEADERS = $${POLICY}/resource.h \
-                 $${POLICY}/resource-set.h \
-                 $${POLICY}/resources.h \
-                 $${POLICY}/audio-resource.h
+PUBLIC_HEADERS = $${PUBLIC_INCLUDE}/policy/*.h
 
 HEADERS += $${PUBLIC_HEADERS} src/resource-engine.h
 
