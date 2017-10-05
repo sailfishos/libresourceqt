@@ -599,11 +599,9 @@ bool ResourceEngine::registerAudioProperties(const QString &audioGroup, quint32 
         LOG_DEBUG("ResourceEngine(%d) - audio pid %u", identifier, pid);
     }
     if (!audioGroup.isEmpty() && !audioGroup.isNull()) {
-        resmsg_audio_t    *audio;
         groupBa = audioGroup.toLatin1();
         message.audio.group = groupBa.data();
         LOG_DEBUG("ResourceEngine(%d) - audio group: %s", identifier, message.audio.group);
-        audio    = &message.audio;
     }
     if (!name.isEmpty() && !name.isNull() && !value.isEmpty() && !value.isNull()) {
         nameBa = name.toLatin1();
