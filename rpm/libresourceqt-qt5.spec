@@ -139,7 +139,5 @@ rm -rf %{buildroot}
 
 %files tests
 %defattr(-,root,root,-)
-%attr(0755, root, root) %{_libdir}/libresourceqt-qt5-tests/test-dbus-qeventloop-runner.sh
 %{_libdir}/libresourceqt-qt5-tests/*
 %{_datadir}/%{name}-tests/tests.xml
-%config %{_sysconfdir}/dbus-1/system.d/test-dbus-qeventloop.conf

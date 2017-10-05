@@ -21,9 +21,7 @@
 
 TEMPLATE = subdirs
 
-SUBDIRS = test-dbus-qeventloop              \
-          test-dbus-pong                    \
-          test-audio-resource               \
+SUBDIRS = test-audio-resource               \
           test-video-resource               \
           test-resource                     \
           test-resource-set                 \
@@ -45,14 +43,7 @@ unix{
     testsxml.CONFIG   = no_check_exist
     testsxml.commands = sed \'s%@PATH@%/usr/lib/$${TESTSTARGETDIR}%\' $$PWD/tests.xml.in > $$PWD/tests.xml
 
-    testrunner.path  = /usr/lib/libresourceqt-qt5-tests/
-    testrunner.files    = test-dbus-qeventloop-runner.sh
-    testrunner.target   = test-dbus-qeventloop-runner.sh
-    testrunner.CONFIG   = no_check_exist
-    testrunner.commands = sed \'s%@PATH@%/usr/lib/$${TESTSTARGETDIR}%\' $$PWD/test-dbus-qeventloop-runner.sh.in > $$PWD/test-dbus-qeventloop-runner.sh
-
-    QMAKE_DISTCLEAN += tests.xml test-dbus-qeventloop-runner.sh
+    QMAKE_DISTCLEAN += tests.xml
 }
-dbusconf.path    = /etc/dbus-1/system.d/
-dbusconf.files   = test-dbus-qeventloop.conf
-INSTALLS         = testsxml testrunner dbusconf
+
+INSTALLS         = testsxml
