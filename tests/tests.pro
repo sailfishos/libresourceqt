@@ -35,7 +35,7 @@ SUBDIRS = test-audio-resource               \
           test-released-by-manager
 
 # Install options
-include(../common.pri)
+include(test_common.pri)
 unix{
     testsxml.path = /usr/share/libresourceqt-qt5-tests/
     testsxml.files    = tests.xml
@@ -46,4 +46,4 @@ unix{
     QMAKE_DISTCLEAN += tests.xml
 }
 
-INSTALLS         = testsxml
+INSTALLS = testsxml
