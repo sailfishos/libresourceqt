@@ -1,6 +1,7 @@
 include(../common.pri)
 
 LIBS += $$RESOURCEQTLIB
+LIBS += $$DBUSQEVENTLOOPLIB
 
 INCLUDEPATH += $$PUBLIC_INCLUDE
 
