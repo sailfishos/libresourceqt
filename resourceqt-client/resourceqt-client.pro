@@ -30,9 +30,9 @@ QT           = core dbus
 CONFIG      += console
 CONFIG      -= app_bundle
 
-INCLUDEPATH += $${LIBRESOURCEINC}
 QMAKE_CXXFLAGS += -Wall
 QMAKE_CFLAGS += -std=c99 -D_POSIX_C_SOURCE=199309L
+INCLUDEPATH += $${PUBLIC_INCLUDE}
 LIBS += $${DBUSQEVENTLOOPLIB} $${RESOURCEQTLIB} -lrt
 
 # Input 

@@ -55,18 +55,4 @@
     </set>
   </suite>
 
-  <suite name="libdbus-qeventloop-tests" domain="Multimedia Middleware">
-    <set name="libdbus-qeventloop-tests" feature="Resource policy">
-
-      <case name="DBusQEventLoop functional test" type="Functional" level="Component" subfeature="libresource Qt API" description="Functional tests for libdbus-qeventloop" timeout="60">
-        <step expected_result="0">@PATH@/test-dbus-qeventloop-runner.sh</step>
-      </case>
-
-      <environments>
-        <scratchbox>false</scratchbox>
-        <hardware>true</hardware>
-      </environments>
-
-    </set>
-  </suite>
 </testdefinition>

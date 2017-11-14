@@ -24,14 +24,14 @@ USA.
 using namespace ResourcePolicy;
 
 AudioResource::AudioResource(const QString &audioGroup)
-        :   QObject(), Resource(), group(audioGroup), pid(0),
-        streamName(QString()), streamValue(QString())
+    : QObject(), Resource(), group(audioGroup), pid(0),
+      streamName(QString()), streamValue(QString())
 {
 }
 
 AudioResource::AudioResource(const AudioResource &other)
-        :   QObject(), Resource(other), group(other.group), pid(other.pid),
-        streamName(other.streamName), streamValue(other.streamValue)
+    : QObject(), Resource(other), group(other.group), pid(other.pid),
+      streamName(other.streamName), streamValue(other.streamValue)
 {
 }
 

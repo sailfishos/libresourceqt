@@ -19,29 +19,17 @@
 #  USA.                                                                      #
 ##############################################################################
 
-include(../../common.pri)
+include(../test_common.pri)
 TEMPLATE = app
 TARGET = benchmark-resource-set
 DESTDIR = build
-DEPENDPATH += $${POLICY} $${BASE}/src .
-INCLUDEPATH += $${LIBRESOURCEQT}/src $${LIBRESOURCEINC} $${LIBDBUSQEVENTLOOP}
 
 # Silence qDebug
 DEFINES += QT_NO_DEBUG_OUTPUT
 
-# Input
-HEADERS +=  $${POLICY}/resources.h \
-            $${POLICY}/resource-set.h \
-            $${POLICY}/audio-resource.h \
-            $${LIBRESOURCEQT}/src/resource-engine.h \
-            benchmark-resource-set.h
+HEADERS += benchmark-resource-set.h
 
-SOURCES +=  $${LIBRESOURCEQT}/src/resource.cpp \
-            $${LIBRESOURCEQT}/src/resources.cpp \
-            $${LIBRESOURCEQT}/src/resource-engine.cpp \
-            $${LIBRESOURCEQT}/src/audio-resource.cpp \
-            $${LIBRESOURCEQT}/src/resource-set.cpp \
-            benchmark-resource-set.cpp
+SOURCES += benchmark-resource-set.cpp
 
 OBJECTS_DIR = build
 MOC_DIR = build
@@ -54,7 +42,5 @@ QT -= gui
 QT += testlib
 PKGCONFIG += dbus-1 libresource
 
-# Install directives
-INSTALLBASE    = /usr
 target.path = $${INSTALLBASE}/lib/$${TESTSTARGETDIR}/
 INSTALLS       = target

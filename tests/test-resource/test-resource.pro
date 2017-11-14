@@ -19,19 +19,13 @@
 #  USA.                                                                      #
 ##############################################################################
 
-include(../../common.pri)
+include(../test_common.pri)
 TEMPLATE = app
 TARGET = test-resource
 DESTDIR = build
-DEPENDPATH += $${POLICY} $${LIBRESOURCEQT}/src .
-INCLUDEPATH += $${LIBRESOURCEQT}/src $${LIBRESOURCEINC}
 
-# Input
-HEADERS +=  $${POLICY}/resource.h $${POLICY}/resources.h $${POLICY}/audio-resource.h test-resource.h
-SOURCES +=  $${LIBRESOURCEQT}/src/resource.cpp \
-            $${LIBRESOURCEQT}/src/resources.cpp \
-            $${LIBRESOURCEQT}/src/audio-resource.cpp \
-            test-resource.cpp
+HEADERS += test-resource.h
+SOURCES += test-resource.cpp
 
 OBJECTS_DIR = build
 MOC_DIR = build
@@ -42,7 +36,5 @@ CONFIG  += qt debug warn_on
 QT += testlib
 QT -= gui
 
-# Install directives
-INSTALLBASE    = /usr
 target.path    = $${INSTALLBASE}/lib/$${TESTSTARGETDIR}/
 INSTALLS       = target

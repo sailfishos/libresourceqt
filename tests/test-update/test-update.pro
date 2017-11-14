@@ -19,26 +19,14 @@
 #  USA.                                                                      #
 ##############################################################################
 
-include(../../common.pri)
+include(../test_common.pri)
 TEMPLATE = app
 TARGET = test-update
 DESTDIR = build
-DEPENDPATH += $${POLICY} $${BASE}/src .
-INCLUDEPATH += $${LIBRESOURCEQT}/src $${LIBRESOURCEINC} $${LIBDBUSQEVENTLOOP}
 
-# Input
-HEADERS +=  $${POLICY}/resources.h \
-            $${POLICY}/resource-set.h \
-            test-update.h \
-            $${POLICY}/audio-resource.h \
-            $${LIBRESOURCEQT}/src/resource-engine.h
+HEADERS += test-update.h
 
-SOURCES +=  $${LIBRESOURCEQT}/src/resource.cpp \
-            $${LIBRESOURCEQT}/src/resources.cpp \
-            $${LIBRESOURCEQT}/src/resource-engine.cpp \
-            $${LIBRESOURCEQT}/src/audio-resource.cpp \
-            $${LIBRESOURCEQT}/src/resource-set.cpp \
-            test-update.cpp
+SOURCES += test-update.cpp
 
 OBJECTS_DIR = build
 MOC_DIR = build
@@ -51,7 +39,5 @@ QT += testlib
 QT -= gui
 PKGCONFIG += dbus-1 libresource
 
-# Install directives
-INSTALLBASE    = /usr
 target.path    = $${INSTALLBASE}/lib/$${TESTSTARGETDIR}/
 INSTALLS       = target

@@ -19,21 +19,14 @@
 #  USA.                                                                      #
 ##############################################################################
 
-include(../../common.pri)
+include(../test_common.pri)
 TEMPLATE = app
 TARGET = test-video-resource
 DESTDIR = build
-DEPENDPATH += $${POLICY} $${LIBRESOURCEQT}/src .
-INCLUDEPATH += $${LIBRESOURCEQT}/src $${LIBRESOURCEINC}
 
-# Input
-HEADERS +=  $${POLICY}/resource.h \
-            $${POLICY}/resources.h \
-            test-video-resource.h
+HEADERS += test-video-resource.h
 
-SOURCES +=  $${LIBRESOURCEQT}/src/resource.cpp \
-            $${LIBRESOURCEQT}/src/resources.cpp \
-            test-video-resource.cpp
+SOURCES += test-video-resource.cpp
 
 OBJECTS_DIR = build
 MOC_DIR = build
@@ -44,7 +37,5 @@ CONFIG  += qt debug warn_on
 QT += testlib
 QT -= gui
 
-# Install directives
-INSTALLBASE    = /usr
 target.path    = $${INSTALLBASE}/lib/$${TESTSTARGETDIR}/
 INSTALLS       = target

@@ -24,14 +24,14 @@ USA.
 using namespace ResourcePolicy;
 
 Resource::Resource()
-        :   optional(false),
-        identifier(0), granted(false)
+    : optional(false),
+      identifier(0), granted(false)
 {
 }
 
 Resource::Resource(const Resource &other)
-        :   optional(other.optional),
-        identifier(other.identifier), granted(other.granted)
+    : optional(other.optional),
+      identifier(other.identifier), granted(other.granted)
 {
 }
 
