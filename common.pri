@@ -7,5 +7,3 @@ DBUSQEVENTLOOPLIB = -L$${LIBDBUSQEVENTLOOP}/build -ldbus-qeventloop-qt5
 
 PUBLIC_INCLUDE = $${LIBRESOURCEQT}/include/
 
-VERSION = 1.0.0
-

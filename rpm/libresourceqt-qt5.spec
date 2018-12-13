@@ -84,7 +84,7 @@ Unit-tests for %{name}.
 %setup -q -n %{name}-%{version}
 
 %build
-%qmake5 
+%qmake5 "VERSION=%{version}"
 make %{?_smp_mflags}
 
 %install

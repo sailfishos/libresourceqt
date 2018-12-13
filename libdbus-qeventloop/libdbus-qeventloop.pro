@@ -32,7 +32,7 @@ SOURCES    += dbusconnectioneventloop.cpp
 HEADERS    += dbusconnectioneventloop.h
 
 QT          = core
-CONFIG     += qt link_pkgconfig dll
+CONFIG     += qt link_pkgconfig dll create_pc create_prl no_install_prl
 PKGCONFIG  += dbus-1
 DEFINES    += QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT QT_NO_DEBUG_STREAM
 
@@ -41,7 +41,15 @@ headers.files  = $$HEADERS
 INSTALLBASE    = /usr
 target.path    = $$INSTALLBASE/lib
 headers.path   = $$INSTALLBASE/include
-pc.files       = libdbus-qeventloop5.pc
-pc.path        = $${INSTALLBASE}/lib/pkgconfig
-INSTALLS       = target headers pc
+
+QMAKE_PKGCONFIG_NAME = libdbus-qeventloop5
+QMAKE_PKGCONFIG_DESCRIPTION = D-Bus - QEventloop binding
+QMAKE_PKGCONFIG_LIBDIR = $$target.path
+QMAKE_PKGCONFIG_INCDIR = $$headers.path
+QMAKE_PKGCONFIG_DESTDIR = pkgconfig
+QMAKE_PKGCONFIG_REQUIRES = dbus-1
+QMAKE_PKGCONFIG_VERSION = $$VERSION
+QMAKE_PKGCONFIG_FILE = libdbus-qeventloop5
+
+INSTALLS       = target headers
 

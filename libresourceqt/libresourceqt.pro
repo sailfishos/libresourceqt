@@ -43,7 +43,7 @@ LIBS += $${DBUSQEVENTLOOPLIB}
 OBJECTS_DIR = build
 MOC_DIR = moc
 
-CONFIG  += qt link_pkgconfig dll
+CONFIG  += qt link_pkgconfig dll create_pc create_prl no_install_prl
 QT = core dbus
 PKGCONFIG += dbus-1 libresource
 
@@ -56,8 +56,6 @@ headers.files  = $${PUBLIC_HEADERS}
 INSTALLBASE    = /usr
 target.path    = $${INSTALLBASE}/lib
 headers.path   = $${INSTALLBASE}/include/resource/qt5/policy
-pc.files       = libresourceqt5.pc
-pc.path        = $${INSTALLBASE}/lib/pkgconfig
 
 man.files      = docs/man
 man.path       = $${INSTALLBASE}/share
@@ -66,5 +64,14 @@ htmldoc.path   = $${INSTALLBASE}/share/doc/libresourceqt5
 xmldoc.files    = docs/xml
 xmldoc.path    = $${INSTALLBASE}/share/doc/libresourceqt5
 
-INSTALLS       = target headers pc man htmldoc xmldoc
+QMAKE_PKGCONFIG_NAME = libresourceqt5
+QMAKE_PKGCONFIG_DESCRIPTION = Maemo resource management Qt API
+QMAKE_PKGCONFIG_LIBDIR = $$target.path
+QMAKE_PKGCONFIG_INCDIR = $${INSTALLBASE}/include/resource/qt5
+QMAKE_PKGCONFIG_DESTDIR = pkgconfig
+QMAKE_PKGCONFIG_REQUIRES = dbus-1 libdbus-qeventloop5 libresource Qt5Core
+QMAKE_PKGCONFIG_VERSION = $$VERSION
+QMAKE_PKGCONFIG_FILE = libresourceqt5
+
+INSTALLS       = target headers man htmldoc xmldoc
 
