@@ -3,8 +3,8 @@ Summary:    Resource Policy Qt API
 Version:    1.29
 Release:    1
 Group:      System/Resource Policy
-License:    LGPLv2.1
-URL:        http://meego.gitorious.org/maemo-multimedia/libresourceqt/
+License:    LGPLv2
+URL:        https://git.sailfishos.org/mer-core/libresourceqt
 Source0:    %{name}-%{version}.tar.bz2
 Requires:   libdbus-qeventloop-qt5 = %{version}-%{release}
 Requires(post): /sbin/ldconfig
@@ -29,7 +29,6 @@ Development files for %{name}.
 
 %package -n libdbus-qeventloop-qt5
 Summary:    Library that runs the low level D-Bus inside QEventloop
-Group:      System/Resource Policy
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
@@ -46,7 +45,6 @@ Development files for libdbus-qeventloop-qt5.
 
 %package -n libmediaoverridesqt5
 Summary:    Mediaoverridesqt5 library
-Group:      System/Resource Policy
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 
@@ -73,7 +71,6 @@ Test client to test %{name}.
 
 %package tests
 Summary:    Unit-tests for %{name}
-Group:      System/Resource Policy
 Requires:   %{name} = %{version}-%{release}
 Requires:   libdbus-qeventloop-qt5 = %{version}-%{release}
 
@@ -106,6 +103,7 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root,-)
 %{_libdir}/libresourceqt5.so.*
+%license COPYING
 
 %files devel
 %defattr(-,root,root,-)
@@ -139,5 +137,5 @@ rm -rf %{buildroot}
 
 %files tests
 %defattr(-,root,root,-)
-%{_libdir}/libresourceqt-qt5-tests/*
+%{_libdir}/libresourceqt-qt5-tests/
 %{_datadir}/%{name}-tests/tests.xml
