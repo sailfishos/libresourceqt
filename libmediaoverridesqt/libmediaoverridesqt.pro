@@ -26,8 +26,8 @@ QMAKE_DISTCLEAN += -r moc build
 
 # Install directives
 headers.files  = $${PUBLIC_HEADERS}
-INSTALLBASE    = /usr
-target.path    = $${INSTALLBASE}/lib
+INSTALLBASE    = $$[QT_INSTALL_PREFIX]
+target.path    = $$[QT_INSTALL_LIBS]
 headers.path   = $${INSTALLBASE}/include/resource/qt5/policy
 
 QMAKE_PKGCONFIG_NAME = libmediaoverridesqt5

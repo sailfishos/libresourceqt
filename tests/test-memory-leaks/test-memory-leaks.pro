@@ -40,6 +40,5 @@ QT -= gui
 PKGCONFIG += dbus-1 libresource
 
 # Install directives
-INSTALLBASE    = /usr
-target.path    = $${INSTALLBASE}/lib/libresourceqt-tests/
+target.path    = $$[QT_INSTALL_LIBS]/$${TESTSTARGETDIR}/
 INSTALLS       = target
