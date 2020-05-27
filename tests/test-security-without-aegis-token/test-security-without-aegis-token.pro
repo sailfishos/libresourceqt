@@ -33,9 +33,7 @@ SOURCES += test-security.cpp
 LIBS += -L$${LIBDBUSQEVENTLOOP}/build -L$${LIBRESOURCEQT}/build -ldbus-qeventloop -lresourceqt
 
 # Install options
-# Install options
-target.path   = /usr/lib/libresourceqt-tests/
-#target.files  = test-security-without-aegis-token 
+target.path   = $$[QT_INSTALL_LIBS]/$${TESTSTARGETDIR}/
 
 INSTALLS      = target
 

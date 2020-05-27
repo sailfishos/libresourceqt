@@ -52,10 +52,8 @@ QT -= gui
 PKGCONFIG += dbus-1
 
 # Install directives
-INSTALLBASE    = /usr
-target.path    = $${INSTALLBASE}/lib/libresourceqt-tests/
-
-wrapper.path  = $${INSTALLBASE}/lib/libresourceqt-tests/
+target.path    = $$[QT_INSTALL_LIBS]/$${TESTSTARGETDIR}/
+wrapper.path  = $$[QT_INSTALL_LIBS]/$${TESTSTARGETDIR}/
 wrapper.files = test-resource-engine-wrapper
 
 INSTALLS       = target wrapper

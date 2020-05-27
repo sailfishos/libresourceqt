@@ -36,5 +36,5 @@ CONFIG  += qt debug warn_on
 QT += testlib
 QT -= gui
 
-target.path    = $${INSTALLBASE}/lib/$${TESTSTARGETDIR}/
+target.path    = $$[QT_INSTALL_LIBS]/$${TESTSTARGETDIR}/
 INSTALLS       = target

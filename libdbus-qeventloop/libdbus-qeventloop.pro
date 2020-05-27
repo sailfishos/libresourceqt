@@ -38,8 +38,8 @@ DEFINES    += QT_NO_DEBUG_OUTPUT QT_NO_WARNING_OUTPUT QT_NO_DEBUG_STREAM
 
 # Install directives
 headers.files  = $$HEADERS
-INSTALLBASE    = /usr
-target.path    = $$INSTALLBASE/lib
+INSTALLBASE    = $$[QT_INSTALL_PREFIX]
+target.path    = $$[QT_INSTALL_LIBS]
 headers.path   = $$INSTALLBASE/include
 
 QMAKE_PKGCONFIG_NAME = libdbus-qeventloop5

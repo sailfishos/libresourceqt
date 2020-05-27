@@ -42,5 +42,5 @@ QT -= gui
 QT += testlib
 PKGCONFIG += dbus-1 libresource
 
-target.path = $${INSTALLBASE}/lib/$${TESTSTARGETDIR}/
+target.path = $$[QT_INSTALL_LIBS]/$${TESTSTARGETDIR}/
 INSTALLS       = target

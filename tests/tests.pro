@@ -41,7 +41,7 @@ unix{
     testsxml.files    = tests.xml
     testsxml.target   = tests.xml
     testsxml.CONFIG   = no_check_exist
-    testsxml.commands = sed \'s%@PATH@%/usr/lib/$${TESTSTARGETDIR}%\' $$PWD/tests.xml.in > $$PWD/tests.xml
+    testsxml.commands = sed \'s%@PATH@%$$[QT_INSTALL_LIBS]/$${TESTSTARGETDIR}%\' $$PWD/tests.xml.in > $$PWD/tests.xml
 
     QMAKE_DISTCLEAN += tests.xml
 }
