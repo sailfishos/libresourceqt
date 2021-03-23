@@ -2,7 +2,6 @@ Name:       libresourceqt-qt5
 Summary:    Resource Policy Qt API
 Version:    1.29
 Release:    1
-Group:      System/Resource Policy
 License:    LGPLv2
 URL:        https://git.sailfishos.org/mer-core/libresourceqt
 Source0:    %{name}-%{version}.tar.bz2
@@ -21,7 +20,6 @@ Qt library for Resource Policy.
 
 %package devel
 Summary:    Development files for %{name}
-Group:      Development/Libraries
 Requires:   %{name} = %{version}-%{release}
 
 %description devel
@@ -37,7 +35,6 @@ This library enables Qt applications to run the D-Bus low-level api in the Qt Ev
 
 %package -n libdbus-qeventloop-qt5-devel
 Summary:    Development files for libdbus-qeventloop-qt5
-Group:      Development/Libraries
 Requires:   libdbus-qeventloop-qt5 = %{version}-%{release}
 
 %description -n libdbus-qeventloop-qt5-devel
@@ -54,7 +51,6 @@ Requires(postun): /sbin/ldconfig
 
 %package -n libmediaoverridesqt5-devel
 Summary:    Development files for libmediaoverridesqt1
-Group:      Development/Libraries
 Requires:   libmediaoverridesqt5 = %{version}-%{release}
 
 %description -n libmediaoverridesqt5-devel
@@ -63,7 +59,6 @@ Requires:   libmediaoverridesqt5 = %{version}-%{release}
 
 %package client
 Summary:    Test client to test %{name}
-Group:      Development/Tools
 Requires:   %{name} = %{version}-%{release}
 
 %description client
