@@ -63,7 +63,7 @@ public:
     bool updateResources();
 
     bool registerAudioProperties(const QString &audioGroup, quint32 pid,
-                                  const QString &name, const QString &value);
+                                 const QString &name, const QString &value);
 
     bool registerVideoProperties(quint32 pid);
 

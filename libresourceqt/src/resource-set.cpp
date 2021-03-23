@@ -74,9 +74,7 @@ ResourceSet::~ResourceSet()
 bool ResourceSet::initialize()
 {
     resourceEngine = new ResourceEngine(this);
-    if (resourceEngine == NULL) {
-        return false;
-    }
+
     QObject::connect(resourceEngine, SIGNAL(connectedToManager()),
                      this, SLOT(connectedHandler()));
     QObject::connect(resourceEngine, SIGNAL(resourcesGranted(quint32)),
@@ -334,8 +332,7 @@ void ResourceSet::executeNextRequest()
 {
     LOG_DEBUG("ResourceSet::%s().", __FUNCTION__);
 
-    if ( requestQ.isEmpty() )
-    {
+    if (requestQ.isEmpty()) {
         LOG_DEBUG("ResourceSet::%s()...the completed request is not present.",
                __FUNCTION__);
         return;
@@ -343,8 +340,7 @@ void ResourceSet::executeNextRequest()
 
     requestQ.removeFirst(); //Remove completed request.
 
-    if ( requestQ.isEmpty() )
-    {
+    if (requestQ.isEmpty()) {
         LOG_DEBUG("ResourceSet::%s()...last request acknowledged and removed.", __FUNCTION__);
         return;
     }
@@ -673,7 +669,7 @@ void ResourceSet::handleResourcesBecameAvailable(quint32 availableResources)
 }
 
 void ResourceSet::handleAudioPropertiesChanged(const QString &, quint32,
-                                                const QString &, const QString &)
+                                               const QString &, const QString &)
 {
     registerAudioProperties();
 }
@@ -698,8 +694,7 @@ void ResourceSet::handleUpdateOK(bool resend)
     pendingUpdate = false;
     LOG_DEBUG("ResourceSet::%s().... %d", __FUNCTION__, __LINE__);
 
-    if ( resend ) {
-
+    if (resend) {
         /*QList<ResourceType> optionalResources;
 
         for (int i=0; i < NumberOfTypes; i++) {

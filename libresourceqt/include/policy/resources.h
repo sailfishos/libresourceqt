@@ -73,15 +73,12 @@ namespace ResourcePolicy
 class AudioRecorderResource: public Resource
 {
 public:
-	AudioRecorderResource();
-	AudioRecorderResource(const AudioRecorderResource &other);
+    AudioRecorderResource();
+    AudioRecorderResource(const AudioRecorderResource &other);
 
-	virtual ~AudioRecorderResource();
+    virtual ~AudioRecorderResource();
 
-	/**
-	* \return The resource type
-	*/
-	virtual ResourceType type() const;
+    virtual ResourceType type() const;
 };
 
 /**
@@ -91,15 +88,12 @@ public:
 class BacklightResource: public Resource
 {
 public:
-	BacklightResource();
-	BacklightResource(const BacklightResource &other);
+    BacklightResource();
+    BacklightResource(const BacklightResource &other);
 
-	virtual ~BacklightResource();
+    virtual ~BacklightResource();
 
-	/**
-	* \return The resource type
-	*/
-	virtual ResourceType type() const;
+    virtual ResourceType type() const;
 };
 
 /**
@@ -108,15 +102,12 @@ public:
 class LedsResource: public Resource
 {
 public:
-	LedsResource();
-	LedsResource(const LedsResource &other);
+    LedsResource();
+    LedsResource(const LedsResource &other);
 
-	virtual ~LedsResource();
+    virtual ~LedsResource();
 
-	/**
-	* \return the resource type
-	*/
-	virtual ResourceType type() const;
+    virtual ResourceType type() const;
 };
 
 /**
@@ -125,15 +116,12 @@ public:
 class VibraResource: public Resource
 {
 public:
-	VibraResource();
-	VibraResource(const VibraResource &other);
+    VibraResource();
+    VibraResource(const VibraResource &other);
 
-	virtual ~VibraResource();
+    virtual ~VibraResource();
 
-	/**
-	* \return The resource type
-	*/
-	virtual ResourceType type() const;
+    virtual ResourceType type() const;
 };
 
 /**
@@ -142,15 +130,12 @@ public:
 class VideoRecorderResource: public Resource
 {
 public:
-	VideoRecorderResource();
-	VideoRecorderResource(const VideoRecorderResource &other);
+    VideoRecorderResource();
+    VideoRecorderResource(const VideoRecorderResource &other);
 
-	virtual ~VideoRecorderResource();
+    virtual ~VideoRecorderResource();
 
-	/**
-	* \return The resource type
-	*/
-	virtual ResourceType type() const;
+    virtual ResourceType type() const;
 };
 
 /**
@@ -168,26 +153,25 @@ public:
     {
     }
 
-	VideoResource(const VideoResource &other);
+    VideoResource(const VideoResource &other);
+    virtual ~VideoResource();
 
-	virtual ~VideoResource();
+    /**
+      * \return the resource type
+      */
+    virtual ResourceType type() const;
 
-	/**
-	* \return the resource type
-	*/
-	virtual ResourceType type() const;
+    quint32 processID() const { return pid; }
 
-	quint32 processID() const { return pid; }
-
-	/**
-	* Set the process ID of the video resource.
-	*/
-	void setProcessID(quint32 newPID);
+    /**
+      * Set the process ID of the video resource.
+      */
+    void setProcessID(quint32 newPID);
 
 signals:
-	void videoPropertiesChanged(quint32 pid);
+    void videoPropertiesChanged(quint32 pid);
 private:
-	quint32 pid;
+    quint32 pid;
 
 };
 
@@ -197,15 +181,12 @@ private:
 class SystemButtonResource: public Resource
 {
 public:
-	SystemButtonResource();
-	SystemButtonResource(const SystemButtonResource &other);
+    SystemButtonResource();
+    SystemButtonResource(const SystemButtonResource &other);
 
     virtual ~SystemButtonResource();
 
-	/**
-	* \return The resource type
-	*/
-	virtual ResourceType type() const;
+    virtual ResourceType type() const;
 };
 
 /**
@@ -214,15 +195,12 @@ public:
 class LockButtonResource: public Resource
 {
 public:
-	LockButtonResource();
-	LockButtonResource(const LockButtonResource &other);
+    LockButtonResource();
+    LockButtonResource(const LockButtonResource &other);
 
-	virtual ~LockButtonResource();
+    virtual ~LockButtonResource();
 
-	/**
-	* \return The resource type
-	*/
-	virtual ResourceType type() const;
+    virtual ResourceType type() const;
 };
 
 /**
@@ -232,15 +210,11 @@ public:
 class ScaleButtonResource: public Resource
 {
 public:
-	ScaleButtonResource();
-	ScaleButtonResource(const ScaleButtonResource &other);
+    ScaleButtonResource();
+    ScaleButtonResource(const ScaleButtonResource &other);
 
-	virtual ~ScaleButtonResource();
-
-	/**
-	* \return The resource type
-	*/
-	virtual ResourceType type() const;
+    virtual ~ScaleButtonResource();
+    virtual ResourceType type() const;
 };
 
 /**
@@ -249,29 +223,23 @@ public:
 class SnapButtonResource: public Resource
 {
 public:
-	SnapButtonResource();
-	SnapButtonResource(const SnapButtonResource &other);
+    SnapButtonResource();
+    SnapButtonResource(const SnapButtonResource &other);
 
-	virtual ~SnapButtonResource();
+    virtual ~SnapButtonResource();
 
-	/**
-	* \return The resource type
-	*/
-	virtual ResourceType type() const;
+    virtual ResourceType type() const;
 };
 
 class LensCoverResource: public Resource
 {
 public:
-	LensCoverResource();
-	LensCoverResource(const LensCoverResource &other);
+    LensCoverResource();
+    LensCoverResource(const LensCoverResource &other);
 
-	virtual ~LensCoverResource();
+    virtual ~LensCoverResource();
 
-	/**
-	* \return The resource type
-	*/
-	virtual ResourceType type() const;
+    virtual ResourceType type() const;
 };
 
 /**
@@ -281,15 +249,12 @@ public:
 class HeadsetButtonsResource: public Resource
 {
 public:
-	HeadsetButtonsResource();
-	HeadsetButtonsResource(const HeadsetButtonsResource &other);
+    HeadsetButtonsResource();
+    HeadsetButtonsResource(const HeadsetButtonsResource &other);
 
-	virtual ~HeadsetButtonsResource();
+    virtual ~HeadsetButtonsResource();
 
-	/**
-	* \return the resource type
-	*/
-	virtual ResourceType type() const;
+    virtual ResourceType type() const;
 };
 
 /**
@@ -299,26 +264,11 @@ public:
 class RearFlashlightResource: public Resource
 {
 public:
-	/**
-	* The constructor
-	*/
-	RearFlashlightResource();
+    RearFlashlightResource();
+    RearFlashlightResource(const RearFlashlightResource &other);
+    virtual ~RearFlashlightResource();
 
-	/**
-	* The copy constructor
-	* \param other The resource to copy from
-	*/
-	RearFlashlightResource(const RearFlashlightResource &other);
-
-	/**
-	* The destructor
-	*/
-	virtual ~RearFlashlightResource();
-
-	/**
-	* \return the resource type
-	*/
-	virtual ResourceType type() const;
+    virtual ResourceType type() const;
 };
 
 }
