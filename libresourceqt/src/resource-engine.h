@@ -25,6 +25,8 @@ USA.
 #include <QObject>
 #include <QMap>
 #include <QString>
+#include <QLoggingCategory>
+
 #include <dbus/dbus.h>
 #include <res-conn.h>
 #include <policy/resource-set.h>
@@ -33,7 +35,7 @@ USA.
 #include <stdarg.h>
 #include <stdio.h>
 
-#define LOG_DEBUG(...) do { if (printLogs) qDebug(__VA_ARGS__);  } while(0)
+Q_DECLARE_LOGGING_CATEGORY(lcResourceQt)
 
 namespace ResourcePolicy {
 
