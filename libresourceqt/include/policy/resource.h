@@ -85,65 +85,65 @@ class ResourceSet;
 
 class Resource
 {
-	friend class ResourceSet;
+    friend class ResourceSet;
 public:
-	/**
-	* Whether or not this resource is optional, in that it does not need to
-	* be available for the set to be acquired.
-	* \return true when this resource is optional
-	*/
-	bool isOptional() const;
+    /**
+      * Whether or not this resource is optional, in that it does not need to
+      * be available for the set to be acquired.
+      * \return true when this resource is optional
+      */
+    bool isOptional() const;
 
-	/**
-	* Sets the resource to be optional or mandatory.
-	* \param resourceIsOptional This optional parameter is true by default.
-	* The default, true, results in the resource becoming optional. When it
-	* is set to false the resource becomes mandatory.
-	*/
-	void setOptional(bool resourceIsOptional = true);
+    /**
+      * Sets the resource to be optional or mandatory.
+      * \param resourceIsOptional This optional parameter is true by default.
+      * The default, true, results in the resource becoming optional. When it
+      * is set to false the resource becomes mandatory.
+      */
+    void setOptional(bool resourceIsOptional = true);
 
-	/**
-	* Whether or not the resource to be shared. If it is shared then other
-	* programs are allowed to share this resource.
-	* \return true when this resource is shared
-	*/
-	bool isGranted() const;
+    /**
+      * Whether or not the resource to be shared. If it is shared then other
+      * programs are allowed to share this resource.
+      * \return true when this resource is shared
+      */
+    bool isGranted() const;
 
-	/**
-	* Checks the type of Resource
-	* \return The ResourceType associated to this resource
-	*/
-	virtual ResourceType type() const = 0;
+    /**
+      * Checks the type of Resource
+      * \return The ResourceType associated to this resource
+      */
+    virtual ResourceType type() const = 0;
 
-	virtual ~Resource();
+    virtual ~Resource();
+
 protected:
-	Resource();
-	Resource(const Resource &other);
+    Resource();
+    Resource(const Resource &other);
 
-	/**
-	* \internal
-	* This holds the type of the resource.
-	*/
-	ResourceType resourceType;
+    /**
+      * \internal
+      * This holds the type of the resource.
+      */
+    ResourceType resourceType;
 
-	/**
-	* \internal
-	* This is true when this resource is optional.
-	* \sa isOptional
-	* \sa setOptional
-	*/
-	bool optional;
+    /**
+      * \internal
+      * This is true when this resource is optional.
+      * \sa isOptional
+      * \sa setOptional
+      */
+    bool optional;
 
-	/**
-	* \internal
-	* This is just a unique identifier for the resource.
-	*/
-	quint32 identifier;
+    /**
+      * \internal
+      * This is just a unique identifier for the resource.
+      */
+    quint32 identifier;
 private:
-	void setGranted();
-	void unsetGranted();
-	bool granted;
-
+    void setGranted();
+    void unsetGranted();
+    bool granted;
 };
 }
 

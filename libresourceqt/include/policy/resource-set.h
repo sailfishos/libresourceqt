@@ -167,7 +167,7 @@ public:
     * \param alwaysReply see setAlwaysReply()
     * \param autoRelease see setAutoRelease()
     */
-    ResourceSet(const QString &applicationClass, QObject*parent, bool alwaysReply, bool autoRelease);
+    ResourceSet(const QString &applicationClass, QObject *parent, bool alwaysReply, bool autoRelease);
 
     /**
     * Alternative backwards-compatible constructor.
@@ -176,7 +176,7 @@ public:
     * application.
     * \param parent The optional parent of of this class.
     */
-    ResourceSet(const QString &applicationClass, QObject*parent = NULL);
+    ResourceSet(const QString &applicationClass, QObject *parent = NULL);
 
     ~ResourceSet();
 
@@ -322,7 +322,6 @@ public:
     */
     bool hasResourcesGranted() { return inAcquireMode; }
 
-
 signals:
     /**
         * This signal is emitted when the Resource Policy Manager notifies that the given
@@ -421,7 +420,7 @@ private:
     bool initialize();
     void registerAudioProperties();
     void registerVideoProperties();
-    bool proceedIfImFirst( requestType theRequest );
+    bool proceedIfImFirst(requestType theRequest);
     void executeNextRequest();
 
 private slots:
