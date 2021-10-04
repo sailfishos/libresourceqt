@@ -21,6 +21,7 @@ USA.
 
 #include "resource-engine.h"
 #include <dbus/dbus.h>
+#include <res-msg.h>
 
 Q_LOGGING_CATEGORY(lcResourceQt, "resourceQt", QtWarningMsg)
 
@@ -305,6 +306,7 @@ bool ResourceEngine::connectToManager()
     resourceMessage.record.rset.mask = 0;
 
     QByteArray ba = resourceSet->applicationClass().toLatin1();
+    resourceMessage.record.app_id = resmsg_generate_app_id(QCoreApplication::applicationPid());
     resourceMessage.record.klass = ba.data();
 
     resourceMessage.record.mode = connectionMode;
@@ -595,8 +597,8 @@ bool ResourceEngine::registerAudioProperties(const QString &audioGroup, quint32 
     QByteArray groupBa, nameBa, valueBa;
 
     if (pid != 0) {
-        message.audio.pid = pid;
-        qCDebug(lcResourceQt, "ResourceEngine(%d) - audio pid %u", identifier, pid);
+        message.audio.app_id = resmsg_generate_app_id(pid);
+        qCDebug(lcResourceQt, "ResourceEngine(%d) - audio app_id %s", identifier, message.audio.app_id);
     }
     if (!audioGroup.isEmpty() && !audioGroup.isNull()) {
         groupBa = audioGroup.toLatin1();
