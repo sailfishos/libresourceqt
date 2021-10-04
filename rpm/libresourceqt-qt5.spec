@@ -1,6 +1,6 @@
 Name:       libresourceqt-qt5
 Summary:    Resource Policy Qt API
-Version:    1.29
+Version:    1.31.0
 Release:    1
 License:    LGPLv2
 URL:        https://git.sailfishos.org/mer-core/libresourceqt
