@@ -56,7 +56,10 @@ Resource * TestResource::resourceFromType(ResourceType type)
         return lensCoverResource;
     case HeadsetButtonsType:
         return headsetButtonsResource;
+    case RearFlashlightType:
+        return rearFlashlightResource;
     default:
+        qWarning() << "Unhandled resource type mapping" << type;
         return NULL;
     }
 }
@@ -90,6 +93,8 @@ const char * TestResource::stringFromType(ResourceType type)
         return "LensCoverType";
     case HeadsetButtonsType:
         return "HeadsetButtonsType";
+    case RearFlashlightType:
+        return "RearFlashlightType";
     default:
         qDebug("Unknown Type 0x%02x requested", type);
         return NULL;
@@ -110,6 +115,7 @@ TestResource::TestResource()
     , snapButtonResource(NULL)
     , lensCoverResource(NULL)
     , headsetButtonsResource(NULL)
+    , rearFlashlightResource(NULL)
 {
 }
 
@@ -132,6 +138,7 @@ void TestResource::init()
     snapButtonResource = new SnapButtonResource;
     lensCoverResource = new LensCoverResource;
     headsetButtonsResource = new HeadsetButtonsResource;
+    rearFlashlightResource = new RearFlashlightResource;
 }
 
 void TestResource::cleanup()
@@ -149,6 +156,7 @@ void TestResource::cleanup()
     delete snapButtonResource;
     delete lensCoverResource;
     delete headsetButtonsResource;
+    delete rearFlashlightResource;
 }
 
 void TestResource::testDefaults()
@@ -157,6 +165,7 @@ void TestResource::testDefaults()
         ResourceType expected = (ResourceType)type;
         Resource *resource = resourceFromType(expected);
 
+        QVERIFY(resource);
         QVERIFY(!resource->isGranted());
         QVERIFY(!resource->isOptional());
     }
@@ -167,6 +176,7 @@ void TestResource::testType()
     for (quint32 type = AudioPlaybackType; type < NumberOfTypes; type++) {
         ResourceType expected = (ResourceType)type;
         Resource *resource = resourceFromType(expected);
+        QVERIFY(resource);
         if (resource->type() != expected) {
             qDebug("expected ResourceType = %s, got %s",
                    stringFromType(expected), stringFromType(resource->type()));
@@ -216,6 +226,7 @@ void TestResource::testOptional()
     QFETCH(bool, expected);
 
     Resource *resource = resourceFromType(type);
+    QVERIFY(resource);
 
     resource->setOptional(optional);
     bool result = resource->isOptional();

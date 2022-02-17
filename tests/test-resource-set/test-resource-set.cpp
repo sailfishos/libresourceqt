@@ -56,7 +56,10 @@ Resource * TestResourceSet::resourceFromType(ResourceType type)
         return new LensCoverResource;
     case HeadsetButtonsType:
         return new HeadsetButtonsResource;
+    case RearFlashlightType:
+        return new RearFlashlightResource;
     default:
+        qWarning() << "Unhandled resource type mapping" << type;
         return NULL;
     }
 }
@@ -64,19 +67,6 @@ Resource * TestResourceSet::resourceFromType(ResourceType type)
 using namespace ResourcePolicy;
 
 TestResourceSet::TestResourceSet()
-    : audioResource(NULL)
-    , audioRecorderResource(NULL)
-    , videoResource(NULL)
-    , videoRecorderResource(NULL)
-    , vibraResource(NULL)
-    , ledsResource(NULL)
-    , backlightResource(NULL)
-    , systemButtonResource(NULL)
-    , lockButtonResource(NULL)
-    , scaleButtonResource(NULL)
-    , snapButtonResource(NULL)
-    , lensCoverResource(NULL)
-    , headsetButtonsResource(NULL)
 {
 }
 
