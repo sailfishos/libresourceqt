@@ -31,21 +31,6 @@ class TestResourceSet: public QObject
 {
     Q_OBJECT
 private:
-
-    ResourcePolicy::AudioResource *audioResource;
-    ResourcePolicy::AudioRecorderResource *audioRecorderResource;
-    ResourcePolicy::Resource *videoResource;
-    ResourcePolicy::Resource *videoRecorderResource;
-    ResourcePolicy::Resource *vibraResource;
-    ResourcePolicy::Resource *ledsResource;
-    ResourcePolicy::Resource *backlightResource;
-    ResourcePolicy::Resource *systemButtonResource;
-    ResourcePolicy::Resource *lockButtonResource;
-    ResourcePolicy::Resource *scaleButtonResource;
-    ResourcePolicy::Resource *snapButtonResource;
-    ResourcePolicy::Resource *lensCoverResource;
-    ResourcePolicy::Resource *headsetButtonsResource;
-
     ResourcePolicy::Resource * resourceFromType(ResourcePolicy::ResourceType type);
 
     void waitForSignal(const QObject *sender, const char *signal, quint32 timeout = 1000);

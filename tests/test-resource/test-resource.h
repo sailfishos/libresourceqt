@@ -51,6 +51,7 @@ private:
     Resource *snapButtonResource;
     Resource *lensCoverResource;
     Resource *headsetButtonsResource;
+    Resource *rearFlashlightResource;
 
     Resource * resourceFromType(ResourceType type);
     const char * stringFromType(ResourceType type);
