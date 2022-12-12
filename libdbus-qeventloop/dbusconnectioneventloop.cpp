@@ -149,7 +149,7 @@ dbus_bool_t DBUSConnectionEventLoop::addWatch(DBusWatch *watch, void *data)
         loop->connect(watcher.write, SIGNAL(activated(int)), SLOT(writeSocket(int)));
     }
 
-    loop->watchers.insertMulti(fd, watcher);
+    loop->watchers.insert(fd, watcher);
 
     return true;
 }

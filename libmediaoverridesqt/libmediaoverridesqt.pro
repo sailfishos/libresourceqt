@@ -1,6 +1,6 @@
 include(../common.pri)
 TEMPLATE = lib
-TARGET = mediaoverridesqt5
+TARGET = mediaoverridesqt$${QT_MAJOR_VERSION}
 DESTDIR = build
 DEPENDPATH += .
 INCLUDEPATH += .
@@ -28,16 +28,16 @@ QMAKE_DISTCLEAN += -r moc build
 headers.files  = $${PUBLIC_HEADERS}
 INSTALLBASE    = $$[QT_INSTALL_PREFIX]
 target.path    = $$[QT_INSTALL_LIBS]
-headers.path   = $${INSTALLBASE}/include/resource/qt5/policy
+headers.path   = $${INSTALLBASE}/include/resource/qt$${QT_MAJOR_VERSION}/policy
 
-QMAKE_PKGCONFIG_NAME = libmediaoverridesqt5
+QMAKE_PKGCONFIG_NAME = libmediaoverridesqt$${QT_MAJOR_VERSION}
 QMAKE_PKGCONFIG_DESCRIPTION = Maemo playback manager Qt API
 QMAKE_PKGCONFIG_LIBDIR = $$target.path
-QMAKE_PKGCONFIG_INCDIR = $${INSTALLBASE}/include/resource/qt5
+QMAKE_PKGCONFIG_INCDIR = $${INSTALLBASE}/include/resource/qt$${QT_MAJOR_VERSION}
 QMAKE_PKGCONFIG_DESTDIR = pkgconfig
-QMAKE_PKGCONFIG_REQUIRES = Qt5DBus
+QMAKE_PKGCONFIG_REQUIRES = Qt$${QT_MAJOR_VERSION}DBus
 QMAKE_PKGCONFIG_VERSION = $$VERSION
-QMAKE_PKGCONFIG_FILE = libmediaoverridesqt5
+QMAKE_PKGCONFIG_FILE = libmediaoverridesqt$${QT_MAJOR_VERSION}
 
 INSTALLS       = target headers
 

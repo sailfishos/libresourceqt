@@ -21,7 +21,7 @@
 
 include(../common.pri)
 TEMPLATE = lib
-TARGET = resourceqt5
+TARGET = resourceqt$${QT_MAJOR_VERSION}
 DESTDIR = build
 DEPENDPATH += $${POLICY} src
 INCLUDEPATH += $${PUBLIC_INCLUDE} $${LIBDBUSQEVENTLOOP} src
@@ -55,23 +55,23 @@ PKGCONFIG += dbus-1 libresource
 headers.files  = $${PUBLIC_HEADERS}
 INSTALLBASE    = $$[QT_INSTALL_PREFIX]
 target.path    = $$[QT_INSTALL_LIBS]
-headers.path   = $${INSTALLBASE}/include/resource/qt5/policy
+headers.path   = $${INSTALLBASE}/include/resource/qt$${QT_MAJOR_VERSION}/policy
 
 man.files      = docs/man
 man.path       = $${INSTALLBASE}/share
 htmldoc.files   = docs/html
-htmldoc.path   = $${INSTALLBASE}/share/doc/libresourceqt5
+htmldoc.path   = $${INSTALLBASE}/share/doc/libresourceqt$${QT_MAJOR_VERSION}
 xmldoc.files    = docs/xml
-xmldoc.path    = $${INSTALLBASE}/share/doc/libresourceqt5
+xmldoc.path    = $${INSTALLBASE}/share/doc/libresourceqt$${QT_MAJOR_VERSION}
 
-QMAKE_PKGCONFIG_NAME = libresourceqt5
+QMAKE_PKGCONFIG_NAME = libresourceqt$${QT_MAJOR_VERSION}
 QMAKE_PKGCONFIG_DESCRIPTION = Maemo resource management Qt API
 QMAKE_PKGCONFIG_LIBDIR = $$target.path
-QMAKE_PKGCONFIG_INCDIR = $${INSTALLBASE}/include/resource/qt5
+QMAKE_PKGCONFIG_INCDIR = $${INSTALLBASE}/include/resource/qt$${QT_MAJOR_VERSION}
 QMAKE_PKGCONFIG_DESTDIR = pkgconfig
-QMAKE_PKGCONFIG_REQUIRES = dbus-1 libdbus-qeventloop5 libresource Qt5Core
+QMAKE_PKGCONFIG_REQUIRES = dbus-1 libdbus-qeventloop$${QT_MAJOR_VERSION} libresource Qt$${QT_MAJOR_VERSION}Core
 QMAKE_PKGCONFIG_VERSION = $$VERSION
-QMAKE_PKGCONFIG_FILE = libresourceqt5
+QMAKE_PKGCONFIG_FILE = libresourceqt$${QT_MAJOR_VERSION}
 
 INSTALLS       = target headers man htmldoc xmldoc
 

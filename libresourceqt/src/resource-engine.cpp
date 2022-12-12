@@ -32,7 +32,13 @@ static QMultiMap<resconn_t *, ResourceEngine *> engineMap;
 resconn_t *ResourceEngine::libresourceConnection = NULL;
 quint32 ResourceEngine::libresourceUsers = 0;
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
+#include <QRecursiveMutex>
+
+static QRecursiveMutex mutex;
+#else
 static QMutex mutex(QMutex::Recursive);
+#endif
 
 static inline quint32 allResourcesToBitmask(const ResourceSet *resourceSet);
 static inline quint32 optionalResourcesToBitmask(const ResourceSet *resourceSet);
