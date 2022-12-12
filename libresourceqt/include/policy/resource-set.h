@@ -59,6 +59,10 @@ USA.
 #include <stdarg.h>
 #include <stdio.h>
 
+#if (QT_VERSION > QT_VERSION_CHECK(6,0,0))
+#include <QRecursiveMutex>
+#endif
+
 class ResourceSetPrivate;
 
 
@@ -414,7 +418,11 @@ private:
     bool haveAudioProperties;
     bool inAcquireMode;
     QList<requestType> requestQ;
+#if (QT_VERSION > QT_VERSION_CHECK(6,0,0))
+    QRecursiveMutex reqMutex;
+#else
     QMutex reqMutex;
+#endif
     bool ignoreQ;
     ResourceSetPrivate* d;
     bool initialize();

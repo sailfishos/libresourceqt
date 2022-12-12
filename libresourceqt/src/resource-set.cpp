@@ -35,7 +35,11 @@ ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent,
       audioResource(NULL), autoRelease(initialAutoRelease),
       alwaysReply(initialAlwaysReply), initialized(false), pendingAcquire(false),
       pendingUpdate(false), pendingAudioProperties(false), pendingVideoProperties(false),
-      inAcquireMode(false), reqMutex(QMutex::Recursive), ignoreQ(false)
+      inAcquireMode(false),
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
+      reqMutex(QMutex::Recursive),
+#endif
+      ignoreQ(false)
 {
     identifier = resourceSetId++;
     memset(resourceSet, 0, sizeof(Resource *)*NumberOfTypes);
@@ -46,7 +50,11 @@ ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
       audioResource(NULL), autoRelease(false),
       alwaysReply(false), initialized(false), pendingAcquire(false),
       pendingUpdate(false), pendingAudioProperties(false), pendingVideoProperties(false),
-      inAcquireMode(false), reqMutex(QMutex::Recursive), ignoreQ(false)
+      inAcquireMode(false),
+#if (QT_VERSION < QT_VERSION_CHECK(5,14,0))
+      reqMutex(QMutex::Recursive),
+#endif
+      ignoreQ(false)
 {
     identifier = resourceSetId++;
     memset(resourceSet, 0, sizeof(Resource *)*NumberOfTypes);

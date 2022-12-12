@@ -23,6 +23,10 @@ USA.
 #include <dbus/dbus.h>
 #include <res-msg.h>
 
+#if (QT_VERSION > QT_VERSION_CHECK(6,0,0))
+#include <QRecursiveMutex>
+#endif
+
 Q_LOGGING_CATEGORY(lcResourceQt, "resourceQt", QtWarningMsg)
 
 using namespace ResourcePolicy;
@@ -32,7 +36,11 @@ static QMultiMap<resconn_t *, ResourceEngine *> engineMap;
 resconn_t *ResourceEngine::libresourceConnection = NULL;
 quint32 ResourceEngine::libresourceUsers = 0;
 
+#if (QT_VERSION > QT_VERSION_CHECK(6,0,0))
+static QRecursiveMutex mutex;
+#else
 static QMutex mutex(QMutex::Recursive);
+#endif
 
 static inline quint32 allResourcesToBitmask(const ResourceSet *resourceSet);
 static inline quint32 optionalResourcesToBitmask(const ResourceSet *resourceSet);
@@ -556,7 +564,11 @@ bool ResourceEngine::releaseResources()
 bool ResourceEngine::updateResources()
 {
     qCDebug(lcResourceQt, "ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
     resmsg_t message;
     memset(&message, 0, sizeof(resmsg_t));
     message.record.type = RESMSG_UPDATE;
@@ -591,7 +603,11 @@ bool ResourceEngine::registerAudioProperties(const QString &audioGroup, quint32 
                                              const QString &name, const QString &value)
 {
     qCDebug(lcResourceQt, "ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
     resmsg_t message;
     memset(&message, 0, sizeof(resmsg_t));
     QByteArray groupBa, nameBa, valueBa;
@@ -633,7 +649,11 @@ bool ResourceEngine::registerAudioProperties(const QString &audioGroup, quint32 
 bool ResourceEngine::registerVideoProperties(quint32 pid)
 {
     qCDebug(lcResourceQt, "ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
     resmsg_t message;
     memset(&message, 0, sizeof(resmsg_t));
 
@@ -660,7 +680,11 @@ bool ResourceEngine::registerVideoProperties(quint32 pid)
 static void connectionIsUp(resconn_t *connection)
 {
     qCDebug(lcResourceQt, "**************** %s() - locking....", __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
 
     qCDebug(lcResourceQt) << QString("connection is up");
 

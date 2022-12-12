@@ -22,7 +22,7 @@
 include(../common.pri)
 
 TEMPLATE     = app
-TARGET = resourceqt5-client
+TARGET = resourceqt$${QT_MAJOR_VERSION}-client
 MOC_DIR      = .moc
 OBJECTS_DIR  = .obj
 DEPENDPATH  += .

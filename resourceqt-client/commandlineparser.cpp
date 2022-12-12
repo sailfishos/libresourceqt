@@ -22,6 +22,14 @@ USA.
 #include <QDebug>
 #include "commandlineparser.h"
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
+#define ENDL endl
+#define SKIPEP QString::SkipEmptyParts
+#else
+#define ENDL Qt::endl
+#define SKIPEP Qt::SkipEmptyParts
+#endif
+
 extern bool verbose;
 
 QHash<QString, ResourcePolicy::ResourceType> CommandLineParser::resourceValues;
@@ -76,7 +84,7 @@ bool CommandLineParser::parseArguments()
                 break;
             case 'o':
                 if (!parseResourceList(*(++ci), optResources)) {
-                    output << "Failed to parse resources: " << *ci << endl;
+                    output << "Failed to parse resources: " << *ci << ENDL;
                     return false;
                 }
                 break;
@@ -113,13 +121,13 @@ bool CommandLineParser::parseArguments()
         ++ci;
         if (ci != args.constEnd()) {
             if (!parseResourceList(*ci, allResources)) {
-                output << "Error while parsing resource list" << endl;
+                output << "Error while parsing resource list" << ENDL;
             }
         }
     }
 
     if (!allResources.contains(optResources)) {
-        output << "optional resources are not subset of all resources" << endl;
+        output << "optional resources are not subset of all resources" << ENDL;
         return false;
     }
     return true;
@@ -163,7 +171,7 @@ bool CommandLineParser::parseResourceList(const QString &resourceListStr,
         return false;
     }
     else {
-        QStringList resList = resourceListStr.split(",", QString::SkipEmptyParts);
+        QStringList resList = resourceListStr.split(",", SKIPEP);
 
         foreach(QString res, resList) {
             if (resourceValues.contains(res)) {
@@ -181,7 +189,7 @@ bool CommandLineParser::parseModeValues(const QString &modeListStr)
         return false;
     }
 
-    QStringList modeList = modeListStr.split(",", QString::SkipEmptyParts);
+    QStringList modeList = modeListStr.split(",", SKIPEP);
 
     foreach(QString mode, modeList) {
         if (mode == "AutoRelease") {
@@ -191,7 +199,7 @@ bool CommandLineParser::parseModeValues(const QString &modeListStr)
             alwaysReply = true;
         }
         else {
-            output << "Ignoring unknown mode '" << mode << "'!" << endl;
+            output << "Ignoring unknown mode '" << mode << "'!" << ENDL;
         }
     }
     return true;
@@ -201,40 +209,40 @@ void CommandLineParser::usage()
 {
     output << "usage: resourceqt-client [-h] [-f mode-values]" <<
     "[-o optional-resources] [-i] [-v] [-p prefix] " <<
-    "class all-resources" << endl;
-    output << "\toptions:" << endl;
-    output << "\t  h\tprint this help message and exit" << endl;
-    output << "\t i\tshow timings of requests" << endl;
-    output << "\t v\tshow debug of libresourceqt" << endl;
-    output << "\t p\tPrefix all output with the given prefix" << endl;
+    "class all-resources" << ENDL;
+    output << "\toptions:" << ENDL;
+    output << "\t  h\tprint this help message and exit" << ENDL;
+    output << "\t i\tshow timings of requests" << ENDL;
+    output << "\t v\tshow debug of libresourceqt" << ENDL;
+    output << "\t p\tPrefix all output with the given prefix" << ENDL;
     output << "\t  f\tmode values. See 'modes' below for the "
-    "\n\t\tsyntax of <mode-values>" << endl;
+    "\n\t\tsyntax of <mode-values>" << ENDL;
     output << "\t  o\toptional resources. See 'resources' below for the "
-    "syntax of\n\t\t<optional-resources>" << endl;
-    output << "\tclass:" << endl;
-    output << "\t\tcall\t  - for native or 3rd party telephony" << endl;
-    output << "\t\tcamera\t  - for photo applications" << endl;
-    output << "\t\tringtone  - for ringtones" << endl;
-    output << "\t\talarm\t  - for alarm clock" << endl;
-    output << "\t\tnavigator - for mapping applications" << endl;
-    output << "\t\tgame\t  - for gaming" << endl;
-    output << "\t\tplayer\t  - for media playback/recording" << endl;
-    output << "\t\tevent\t  - for messaging and other event notifications" << endl;
-    output << "\t\tbackground - for thumbnailing etc" << endl;
-    output << "\t\tvideoeditor\t  - for video editing/MMS" << endl;
-    output << "\tresources:" << endl;
-    output << "\t  comma separated list of the following resources" << endl;
+    "syntax of\n\t\t<optional-resources>" << ENDL;
+    output << "\tclass:" << ENDL;
+    output << "\t\tcall\t  - for native or 3rd party telephony" << ENDL;
+    output << "\t\tcamera\t  - for photo applications" << ENDL;
+    output << "\t\tringtone  - for ringtones" << ENDL;
+    output << "\t\talarm\t  - for alarm clock" << ENDL;
+    output << "\t\tnavigator - for mapping applications" << ENDL;
+    output << "\t\tgame\t  - for gaming" << ENDL;
+    output << "\t\tplayer\t  - for media playback/recording" << ENDL;
+    output << "\t\tevent\t  - for messaging and other event notifications" << ENDL;
+    output << "\t\tbackground - for thumbnailing etc" << ENDL;
+    output << "\t\tvideoeditor\t  - for video editing/MMS" << ENDL;
+    output << "\tresources:" << ENDL;
+    output << "\t  comma separated list of the following resources" << ENDL;
 
     QHash<QString, ResourcePolicy::ResourceType>::const_iterator ci = resourceValues.constBegin();
     while (ci != resourceValues.constEnd()) {
-        output << "\t\t" << ci.key() << endl;
+        output << "\t\t" << ci.key() << ENDL;
         ++ci;
     }
-    output << "\t  no whitespace allowed in the resource list." << endl;
-    output << "\tmodes:" << endl;
-    output << "\t  comma separated list of the following modes" << endl;
-    output << "\t\tAutoRelease" << endl;
-    output << "\t\tAlwaysReply" << endl;
+    output << "\t  no whitespace allowed in the resource list." << ENDL;
+    output << "\tmodes:" << ENDL;
+    output << "\t  comma separated list of the following modes" << ENDL;
+    output << "\t\tAutoRelease" << ENDL;
+    output << "\t\tAlwaysReply" << ENDL;
 }
 
 const QSet<ResourcePolicy::ResourceType>& CommandLineParser::resources() const
