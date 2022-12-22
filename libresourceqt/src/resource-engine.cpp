@@ -23,6 +23,10 @@ USA.
 #include <dbus/dbus.h>
 #include <res-msg.h>
 
+#if (QT_VERSION > QT_VERSION_CHECK(6,0,0))
+#include <QRecursiveMutex>
+#endif
+
 Q_LOGGING_CATEGORY(lcResourceQt, "resourceQt", QtWarningMsg)
 
 using namespace ResourcePolicy;
@@ -32,7 +36,11 @@ static QMultiMap<resconn_t *, ResourceEngine *> engineMap;
 resconn_t *ResourceEngine::libresourceConnection = NULL;
 quint32 ResourceEngine::libresourceUsers = 0;
 
+#if (QT_VERSION > QT_VERSION_CHECK(6,0,0))
+static QRecursiveMutex mutex;
+#else
 static QMutex mutex(QMutex::Recursive);
+#endif
 
 static inline quint32 allResourcesToBitmask(const ResourceSet *resourceSet);
 static inline quint32 optionalResourcesToBitmask(const ResourceSet *resourceSet);
@@ -61,7 +69,11 @@ ResourceEngine::ResourceEngine(ResourceSet *resourceSet)
 ResourceEngine::~ResourceEngine()
 {
     qCDebug(lcResourceQt, "ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.unlock();
+#endif
     qCDebug(lcResourceQt, "ResourceEngine::~ResourceEngine(%d) - starting destruction", identifier);
     libresourceUsers--;
 
@@ -83,7 +95,11 @@ ResourceEngine::~ResourceEngine()
 bool ResourceEngine::initialize()
 {
     qCDebug(lcResourceQt, "ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
     DBusError dbusError;
     DBusConnection *dbusConnection;
 
@@ -124,7 +140,11 @@ bool ResourceEngine::initialize()
 static void handleUnregisterMessage(resmsg_t *message, resset_t *libresourceSet, void *)
 {
     qCDebug(lcResourceQt, "**************** %s() - locking....", __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
     if (NULL == libresourceSet->userdata) {
         qCDebug(lcResourceQt) << QString("IGNORING unregister, no context");
         return;
@@ -151,7 +171,11 @@ void ResourceEngine::disconnected()
 static void handleGrantMessage(resmsg_t *message, resset_t *libresourceSet, void *)
 {
     qCDebug(lcResourceQt, "**************** %s() - locking....", __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
     if (NULL == libresourceSet->userdata) {
         qCDebug(lcResourceQt, "IGNORING grant, no context: type=0x%04x, id=0x%04x, reqno=0x%04x, resc=0x%04x",
                 message->notify.type, message->notify.id, message->notify.reqno, message->notify.resrc);
@@ -224,7 +248,11 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
 static void handleReleaseMessage(resmsg_t *message, resset_t *rs, void *)
 {
     qCDebug(lcResourceQt, "**************** %s() - locking....", __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
     if (NULL == rs->userdata) {
         qCDebug(lcResourceQt) << QString("IGNORING release, no context");
         return;
@@ -253,7 +281,11 @@ void ResourceEngine::receivedRelease(resmsg_notify_t *message)
 static void handleAdviceMessage(resmsg_t *message, resset_t *libresourceSet, void *)
 {
     qCDebug(lcResourceQt, "**************** %s() - locking....", __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
     if (NULL == libresourceSet->userdata) {
         qCDebug(lcResourceQt) << QString("IGNORING advice, no context");
         return;
@@ -282,7 +314,11 @@ void ResourceEngine::receivedAdvice(resmsg_notify_t *message)
 bool ResourceEngine::connectToManager()
 {
     qCDebug(lcResourceQt, "ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
     if (isConnecting) {
         qCDebug(lcResourceQt, "ResourceEngine::%s().... allready connecting, ignoring request", __FUNCTION__);
         return true;
@@ -327,7 +363,11 @@ bool ResourceEngine::connectToManager()
 bool ResourceEngine::disconnectFromManager()
 {
     qCDebug(lcResourceQt, "ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
     resmsg_t resourceMessage;
     memset(&resourceMessage, 0, sizeof(resmsg_t));
 
@@ -419,7 +459,11 @@ static inline quint32 optionalResourcesToBitmask(const ResourceSet *resourceSet)
 static void statusCallbackHandler(resset_t *libresourceSet, resmsg_t *message)
 {
     qCDebug(lcResourceQt, "**************** %s().... %d", __FUNCTION__, __LINE__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
     if (NULL == libresourceSet->userdata) {
         qCDebug(lcResourceQt, "IGNORING status message, no context: type=0x%04x, id=0x%04x, reqno=0x%04x, errcod=%d",
                 message->status.type, message->status.id, message->status.reqno, message->status.errcod);
@@ -519,7 +563,11 @@ bool ResourceEngine::isConnectingToManager()
 bool ResourceEngine::acquireResources()
 {
     qCDebug(lcResourceQt, "ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
     resmsg_t message;
     memset(&message, 0, sizeof(resmsg_t));
 
@@ -538,7 +586,11 @@ bool ResourceEngine::acquireResources()
 bool ResourceEngine::releaseResources()
 {
     qCDebug(lcResourceQt, "ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
     resmsg_t message;
     memset(&message, 0, sizeof(resmsg_t));
 
@@ -556,7 +608,11 @@ bool ResourceEngine::releaseResources()
 bool ResourceEngine::updateResources()
 {
     qCDebug(lcResourceQt, "ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
     resmsg_t message;
     memset(&message, 0, sizeof(resmsg_t));
     message.record.type = RESMSG_UPDATE;
@@ -591,7 +647,11 @@ bool ResourceEngine::registerAudioProperties(const QString &audioGroup, quint32 
                                              const QString &name, const QString &value)
 {
     qCDebug(lcResourceQt, "ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
     resmsg_t message;
     memset(&message, 0, sizeof(resmsg_t));
     QByteArray groupBa, nameBa, valueBa;
@@ -633,7 +693,11 @@ bool ResourceEngine::registerAudioProperties(const QString &audioGroup, quint32 
 bool ResourceEngine::registerVideoProperties(quint32 pid)
 {
     qCDebug(lcResourceQt, "ResourceEngine(%d)::%s() - **************** locking....", identifier, __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
     resmsg_t message;
     memset(&message, 0, sizeof(resmsg_t));
 
@@ -660,7 +724,11 @@ bool ResourceEngine::registerVideoProperties(quint32 pid)
 static void connectionIsUp(resconn_t *connection)
 {
     qCDebug(lcResourceQt, "**************** %s() - locking....", __FUNCTION__);
+#if (QT_VERSION < QT_VERSION_CHECK(6,0,0))
     QMutexLocker locker(&mutex);
+#else
+    mutex.lock();
+#endif
 
     qCDebug(lcResourceQt) << QString("connection is up");
 

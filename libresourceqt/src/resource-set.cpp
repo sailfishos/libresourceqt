@@ -20,6 +20,7 @@ USA.
 *************************************************************************/
 #include <policy/resource-set.h>
 #include "resource-engine.h"
+
 using namespace ResourcePolicy;
 
 static quint32 resourceSetId=1;
@@ -35,7 +36,11 @@ ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent,
       audioResource(NULL), autoRelease(initialAutoRelease),
       alwaysReply(initialAlwaysReply), initialized(false), pendingAcquire(false),
       pendingUpdate(false), pendingAudioProperties(false), pendingVideoProperties(false),
+#if (QT_VERSION > QT_VERSION_CHECK(6,0,0))
+      inAcquireMode(false), reqMutex(QRecursiveMutex()), ignoreQ(false)
+#else
       inAcquireMode(false), reqMutex(QMutex::Recursive), ignoreQ(false)
+#endif
 {
     identifier = resourceSetId++;
     memset(resourceSet, 0, sizeof(Resource *)*NumberOfTypes);
@@ -46,7 +51,11 @@ ResourceSet::ResourceSet(const QString &applicationClass, QObject * parent)
       audioResource(NULL), autoRelease(false),
       alwaysReply(false), initialized(false), pendingAcquire(false),
       pendingUpdate(false), pendingAudioProperties(false), pendingVideoProperties(false),
+#if (QT_VERSION > QT_VERSION_CHECK(6,0,0))
+      inAcquireMode(false), reqMutex(QRecursiveMutex()), ignoreQ(false)
+#else
       inAcquireMode(false), reqMutex(QMutex::Recursive), ignoreQ(false)
+#endif
 {
     identifier = resourceSetId++;
     memset(resourceSet, 0, sizeof(Resource *)*NumberOfTypes);
