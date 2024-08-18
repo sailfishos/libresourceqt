@@ -29,6 +29,12 @@ USA.
 
 #include "client.h"
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
+#define ENDL endl
+#else
+#define ENDL Qt::endl
+#endif
+
 #define OUTPUT output << prefix
 #define outputln output << "\n" << prefix
 
@@ -75,7 +81,11 @@ Client::~Client()
 
 void Client::showPrompt()
 {
+#if (QT_VERSION > QT_VERSION_CHECK(5,14,0))
+    OUTPUT << "resource-Qt> " << Qt::flush;
+#else
     OUTPUT << "resource-Qt> " << flush;
+#endif
 }
 
 bool Client::initialize(const CommandLineParser &parser)
@@ -86,11 +96,11 @@ bool Client::initialize(const CommandLineParser &parser)
     prefix = parser.getPrefix();
 
     if (parser.shouldAlwaysReply()) {
-        OUTPUT << "client: AlwaysReply" << endl;
+        OUTPUT << "client: AlwaysReply" << ENDL;
     }
 
     if (parser.shouldAutoRelease()) {
-        OUTPUT << "client: AutoRelease" << endl;
+        OUTPUT << "client: AutoRelease" << ENDL;
     }
     showTimings = parser.showTimings();
 
@@ -146,7 +156,7 @@ bool Client::initialize(const CommandLineParser &parser)
 
     startTimer();
     resourceSet->initAndConnect();
-    OUTPUT << "accepting input" << endl;
+    OUTPUT << "accepting input" << ENDL;
     showPrompt();
     return true;
 }
@@ -264,7 +274,7 @@ void Client::showResources(const QList<ResourceType> &resList)
 {
     outputln << "Resource Set:\n";
     foreach(ResourceType resource, resList) {
-        output << "\t" << resourceTypeToString(resource) << endl;
+        output << "\t" << resourceTypeToString(resource) << ENDL;
     }
 }
 
@@ -277,7 +287,7 @@ void Client::showResources(const QList<Resource*> &resList)
             output << " (optional)";
         if (resource->isGranted())
             output << " (granted)";
-        output << endl;
+        output << ENDL;
     }
 }
 
@@ -301,7 +311,7 @@ void Client::resourceAcquiredHandler(const QList<ResourceType>&)
                 grantedResources << resource->type();
             }
         }
-        OUTPUT << "granted:" << grantedResources << endl;
+        OUTPUT << "granted:" << grantedResources << ENDL;
     }
     showPrompt();
 }
@@ -310,7 +320,7 @@ void Client::resourceDeniedHandler()
 {
     stopTimer();
     QList<Resource*> allResources = resourceSet->resources();
-    OUTPUT << "denied:" << allResources << endl;
+    OUTPUT << "denied:" << allResources << ENDL;
     showPrompt();
 }
 
@@ -319,7 +329,7 @@ void Client::resourceLostHandler()
     stopTimer();
 
     QList<Resource*> allResources = resourceSet->resources();
-    outputln << "lost:" << allResources << endl;
+    outputln << "lost:" << allResources << ENDL;
     showPrompt();
 }
 
@@ -328,7 +338,7 @@ void Client::resourceReleasedHandler()
     stopTimer();
 
     QList<Resource*> allResources = resourceSet->resources();
-    outputln << "released:"<< allResources << endl;
+    outputln << "released:"<< allResources << ENDL;
     showPrompt();
 }
 
@@ -337,7 +347,7 @@ void Client::resourceReleasedByManagerHandler()
     stopTimer();
 
     QList<Resource*> allResources = resourceSet->resources();
-    outputln << "mgr-released:"<< allResources << endl;
+    outputln << "mgr-released:"<< allResources << ENDL;
     showPrompt();
 }
 
@@ -347,7 +357,7 @@ void Client::resourcesBecameAvailableHandler(const QList<ResourcePolicy::Resourc
         pendingAddAudio = false;
         stopTimer();
     }
-    outputln << "advice:" << availableResources << endl;
+    outputln << "advice:" << availableResources << ENDL;
     showPrompt();
 }
 
@@ -375,10 +385,10 @@ void Client::readLine(int)
         QMap<QString, CommandListArgs>::const_iterator i =
             commandList.constBegin();
         while (i != commandList.constEnd()) {
-            OUTPUT << qSetFieldWidth(10) << right << i.key()
+            OUTPUT << qSetFieldWidth(10) << Qt::right << i.key()
             << qSetFieldWidth(1) << " "
-            << qSetFieldWidth(55) << left << i.value().args
-            << qSetFieldWidth(0) << i.value().help << endl;
+            << qSetFieldWidth(55) << Qt::left << i.value().args
+            << qSetFieldWidth(0) << i.value().help << ENDL;
             ++i;
         }
     }
@@ -390,7 +400,7 @@ void Client::readLine(int)
             QList<Resource*> list = resourceSet->resources();
             if (!list.count()) {
                 OUTPUT << "Resource set is empty, use add command to add some."
-                << endl;
+                << ENDL;
             }
             else {
                 showResources(list);
@@ -438,14 +448,14 @@ void Client::readLine(int)
         input >> what;
 
         if (what.isEmpty() || what.isNull()) {
-            OUTPUT << "Not enough parameters! See help" << endl;
+            OUTPUT << "Not enough parameters! See help" << ENDL;
         }
         else {
             Resource *resource = resourceSet->resource(AudioPlaybackType);
             AudioResource *audioResource = static_cast<AudioResource*>(resource);
             qDebug("resource = %p audioResource = %p", resource, audioResource);
             if (audioResource == NULL) {
-                OUTPUT << "No AudioResource available in set!" << endl;
+                OUTPUT << "No AudioResource available in set!" << ENDL;
             }
             else {
                 if (what == "group") {
@@ -459,7 +469,7 @@ void Client::readLine(int)
                         audioResource->setProcessID(pid);
                     }
                     else {
-                        OUTPUT << "Bad pid parameter!" << endl;
+                        OUTPUT << "Bad pid parameter!" << ENDL;
                     }
                 }
                 else if (what == "tag") {
@@ -467,7 +477,7 @@ void Client::readLine(int)
                     if (tagName.isEmpty() || tagName.isNull() ||
                             tagValue.isEmpty() || tagValue.isNull()) {
                         OUTPUT << "tag requires 2 parameters name and value. See help"
-                        << endl;
+                        << ENDL;
                     }
                     else {
                         audioResource->setStreamTag(tagValue, tagName);
@@ -485,12 +495,12 @@ void Client::readLine(int)
         input >> group >> pid >> tagName >> tagValue;
 
         if (group.isEmpty() || (pid == 0) || tagName.isEmpty() || tagValue.isEmpty()) {
-            OUTPUT << "Invalid parameters! See help!" << endl;
+            OUTPUT << "Invalid parameters! See help!" << ENDL;
         }
         else {
             AudioResource *audioResource = new AudioResource(group);
             if (audioResource == NULL) {
-                OUTPUT << "Failed to create an AudioResource object!" << endl;
+                OUTPUT << "Failed to create an AudioResource object!" << ENDL;
             }
             else {
                 audioResource->setProcessID(pid);
@@ -507,7 +517,7 @@ void Client::readLine(int)
         input >> what;
 
         if (what.isEmpty() || what.isNull()) {
-            OUTPUT << "Not enough parameters! See help" << endl;
+            OUTPUT << "Not enough parameters! See help" << ENDL;
         }
         else {
             Resource *resource = resourceSet->resource(VideoPlaybackType);
@@ -515,7 +525,7 @@ void Client::readLine(int)
             qDebug("resource = %p videoResource = %p", resource, videoResource);
 
             if (videoResource == NULL) {
-                OUTPUT << "No VideoResource available in set!" << endl;
+                OUTPUT << "No VideoResource available in set!" << ENDL;
             }
             else {
                 if (what == "pid") {
@@ -525,7 +535,7 @@ void Client::readLine(int)
                         videoResource->setProcessID(pid);
                     }
                     else {
-                        OUTPUT << "Bad pid parameter!" << endl;
+                        OUTPUT << "Bad pid parameter!" << ENDL;
                     }
                 }
                 else {
@@ -539,13 +549,13 @@ void Client::readLine(int)
         input >> pid ;
 
         if (  pid == 0  ) {
-            OUTPUT << "Invalid process ID! See help!" << endl;
+            OUTPUT << "Invalid process ID! See help!" << ENDL;
         }
         else {
             VideoResource *videoResource = new VideoResource();
 
             if (videoResource == NULL) {
-                OUTPUT << "Failed to create an VideoResource object!" << endl;
+                OUTPUT << "Failed to create an VideoResource object!" << ENDL;
             }
             else {
                 videoResource->setProcessID(pid);
@@ -560,7 +570,7 @@ void Client::readLine(int)
         resourceSet = new ResourceSet(applicationClass);
     }
     else {
-        OUTPUT << "unknown command '" << command << "'" << endl;
+        OUTPUT << "unknown command '" << command << "'" << ENDL;
     }
 
     showPrompt();
@@ -600,7 +610,7 @@ void Client::stopTimer()
     if (showTimings) {
         long int ms = stop_timer();
         if (ms > 0) {
-            outputln << "Operation took " << ms << " ms" << endl;
+            outputln << "Operation took " << ms << " ms" << ENDL;
         }
     }
 }

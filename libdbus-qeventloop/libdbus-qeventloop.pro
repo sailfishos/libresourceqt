@@ -20,7 +20,7 @@
 ##############################################################################
 
 include(../common.pri)
-TARGET = dbus-qeventloop-qt5
+TARGET = dbus-qeventloop-qt$${QT_MAJOR_VERSION}
 TEMPLATE    = lib
 DESTDIR     = build
 MOC_DIR     = .moc
@@ -42,14 +42,14 @@ INSTALLBASE    = $$[QT_INSTALL_PREFIX]
 target.path    = $$[QT_INSTALL_LIBS]
 headers.path   = $$INSTALLBASE/include
 
-QMAKE_PKGCONFIG_NAME = libdbus-qeventloop5
+QMAKE_PKGCONFIG_NAME = libdbus-qeventloop$${QT_MAJOR_VERSION}
 QMAKE_PKGCONFIG_DESCRIPTION = D-Bus - QEventloop binding
 QMAKE_PKGCONFIG_LIBDIR = $$target.path
 QMAKE_PKGCONFIG_INCDIR = $$headers.path
 QMAKE_PKGCONFIG_DESTDIR = pkgconfig
 QMAKE_PKGCONFIG_REQUIRES = dbus-1
 QMAKE_PKGCONFIG_VERSION = $$VERSION
-QMAKE_PKGCONFIG_FILE = libdbus-qeventloop5
+QMAKE_PKGCONFIG_FILE = libdbus-qeventloop$${QT_MAJOR_VERSION}
 
 INSTALLS       = target headers
 
