@@ -57,13 +57,10 @@ bool CommandLineParser::parseArguments()
     QStringList::const_iterator ci = args.constBegin();
     // skip the first arg, which is program name
     ++ci;
+
     while (ci != args.constEnd()) {
-        if ((*ci).at(0) == QChar('-')) {
+        if ((*ci).length() > 1 && (*ci).at(0) == QChar('-')) {
             switch ((*ci).at(1).toLatin1()) {
-            case 'd':
-                ++ci;
-            case 'm':
-            case 's':
             case 'i':
                 timings = true;
                 break;
@@ -75,7 +72,9 @@ bool CommandLineParser::parseArguments()
                 }
                 break;
             case 'o':
-                if (!parseResourceList(*(++ci), optResources)) {
+                if (++ci == args.constEnd())
+                    return false;
+                if (!parseResourceList(*ci, optResources)) {
                     output << "Failed to parse resources: " << *ci << endl;
                     return false;
                 }
@@ -87,15 +86,16 @@ bool CommandLineParser::parseArguments()
                 verbose = true;
                 break;
             case 'p':
-                parsePrefix(*(++ci));
+                if (++ci != args.constEnd()) {
+                    parsePrefix(*(ci));
+                }
                 break;
             case 'h':
             default:
                 usage();
                 return false;
             }
-        }
-        else {
+        } else {
             //assume there are no more args
             break;
         }
@@ -159,7 +159,7 @@ QString CommandLineParser::getPrefix() const
 bool CommandLineParser::parseResourceList(const QString &resourceListStr,
         QSet<ResourcePolicy::ResourceType> &resources)
 {
-    if (resourceListStr.isEmpty() || resourceListStr.isNull()) {
+    if (resourceListStr.isEmpty()) {
         return false;
     }
     else {
@@ -177,7 +177,7 @@ bool CommandLineParser::parseResourceList(const QString &resourceListStr,
 
 bool CommandLineParser::parseModeValues(const QString &modeListStr)
 {
-    if (modeListStr.isEmpty() || modeListStr.isNull()) {
+    if (modeListStr.isEmpty()) {
         return false;
     }
 
@@ -203,13 +203,13 @@ void CommandLineParser::usage()
     "[-o optional-resources] [-i] [-v] [-p prefix] " <<
     "class all-resources" << endl;
     output << "\toptions:" << endl;
-    output << "\t  h\tprint this help message and exit" << endl;
-    output << "\t i\tshow timings of requests" << endl;
-    output << "\t v\tshow debug of libresourceqt" << endl;
-    output << "\t p\tPrefix all output with the given prefix" << endl;
-    output << "\t  f\tmode values. See 'modes' below for the "
+    output << "\t -h\tprint this help message and exit" << endl;
+    output << "\t -i\tshow timings of requests" << endl;
+    output << "\t -v\tshow debug of libresourceqt" << endl;
+    output << "\t -p\tPrefix all output with the given prefix" << endl;
+    output << "\t -f\tmode values. See 'modes' below for the "
     "\n\t\tsyntax of <mode-values>" << endl;
-    output << "\t  o\toptional resources. See 'resources' below for the "
+    output << "\t -o\toptional resources. See 'resources' below for the "
     "syntax of\n\t\t<optional-resources>" << endl;
     output << "\tclass:" << endl;
     output << "\t\tcall\t  - for native or 3rd party telephony" << endl;
