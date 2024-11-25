@@ -1,9 +1,9 @@
 Name:       libresourceqt-qt5
 Summary:    Resource Policy Qt API
-Version:    1.31.0
+Version:    1.32.1
 Release:    1
 License:    LGPLv2
-URL:        https://git.sailfishos.org/mer-core/libresourceqt
+URL:        https://github.com/sailfishos/libresourceqt/
 Source0:    %{name}-%{version}.tar.bz2
 Requires:   libdbus-qeventloop-qt5 = %{version}-%{release}
 Requires(post): /sbin/ldconfig
@@ -77,10 +77,9 @@ Unit-tests for %{name}.
 
 %build
 %qmake5 "VERSION=%{version}"
-make %{?_smp_mflags}
+%make_build
 
 %install
-rm -rf %{buildroot}
 %qmake5_install
 
 %post -p /sbin/ldconfig
@@ -96,41 +95,33 @@ rm -rf %{buildroot}
 %postun -n libmediaoverridesqt5 -p /sbin/ldconfig
 
 %files
-%defattr(-,root,root,-)
 %{_libdir}/libresourceqt5.so.*
 %license COPYING
 
 %files devel
-%defattr(-,root,root,-)
 %{_includedir}/resource/qt5/policy/*resource*.h
 %{_libdir}/libresourceqt5.so
 %{_libdir}/pkgconfig/libresourceqt5.pc
 
 %files -n libdbus-qeventloop-qt5
-%defattr(-,root,root,-)
 %{_libdir}/libdbus-qeventloop-qt5.so.*
 
 %files -n libdbus-qeventloop-qt5-devel
-%defattr(-,root,root,-)
 %{_includedir}/dbusconnectioneventloop.h
 %{_libdir}/libdbus-qeventloop-qt5.so
 %{_libdir}/pkgconfig/libdbus-qeventloop5.pc
 
 %files -n libmediaoverridesqt5
-%defattr(-,root,root,-)
 %{_libdir}/libmediaoverridesqt5.so.*
 
 %files -n libmediaoverridesqt5-devel
-%defattr(-,root,root,-)
 %{_includedir}/resource/qt5/policy/override.h
 %{_libdir}/libmediaoverridesqt5.so
 %{_libdir}/pkgconfig/libmediaoverridesqt5.pc
 
 %files client
-%defattr(-,root,root,-)
 %{_bindir}/resourceqt5-client
 
 %files tests
-%defattr(-,root,root,-)
 %{_libdir}/libresourceqt-qt5-tests/
 %{_datadir}/%{name}-tests/tests.xml
