@@ -23,30 +23,56 @@ USA.
 
 using namespace ResourcePolicy;
 
+class AudioResourcePrivate
+{
+public:
+    AudioResourcePrivate(const QString &audioGroup)
+        : group(audioGroup)
+        , pid(0)
+    {
+    }
+
+    AudioResourcePrivate(const AudioResourcePrivate &other)
+        : group(other.group)
+        , pid(other.pid)
+        , streamName(other.streamName)
+        , streamValue(other.streamValue)
+    {
+    }
+
+    QString group;
+    quint32 pid;
+    QString streamName;
+    QString streamValue;
+};
+
 AudioResource::AudioResource(const QString &audioGroup)
-    : QObject(), Resource(), group(audioGroup), pid(0),
-      streamName(QString()), streamValue(QString())
+    : QObject()
+    , Resource()
+    , d(new AudioResourcePrivate(audioGroup))
 {
 }
 
 AudioResource::AudioResource(const AudioResource &other)
-    : QObject(), Resource(other), group(other.group), pid(other.pid),
-      streamName(other.streamName), streamValue(other.streamValue)
+    : QObject()
+    , Resource(other)
+    , d(new AudioResourcePrivate(*other.d))
 {
 }
 
 AudioResource::~AudioResource()
 {
+    delete d;
 }
 
 QString AudioResource::audioGroup() const
 {
-    return group;
+    return d->group;
 }
 
 bool AudioResource::audioGroupIsSet() const
 {
-    if (group.isEmpty() || group.isNull()) {
+    if (d->group.isEmpty() || d->group.isNull()) {
         return false;
     }
     return true;
@@ -54,35 +80,35 @@ bool AudioResource::audioGroupIsSet() const
 
 void AudioResource::setAudioGroup(const QString &newGroup)
 {
-    group = newGroup;
-    emit audioPropertiesChanged(group, pid, streamName, streamValue);
+    d->group = newGroup;
+    emit audioPropertiesChanged(d->group, d->pid, d->streamName, d->streamValue);
 }
 
 quint32 AudioResource::processID() const
 {
-    return pid;
+    return d->pid;
 }
 
 void AudioResource::setProcessID(quint32 newPID)
 {
-    pid = newPID;
-    emit audioPropertiesChanged(group, pid, streamName, streamValue);
+    d->pid = newPID;
+    emit audioPropertiesChanged(d->group, d->pid, d->streamName, d->streamValue);
 }
 
 QString AudioResource::streamTagName() const
 {
-    return streamName;
+    return d->streamName;
 }
 
 QString AudioResource::streamTagValue() const
 {
-    return streamValue;
+    return d->streamValue;
 }
 
 bool AudioResource::streamTagIsSet() const
 {
-    if (streamName.isEmpty() || streamName.isNull() ||
-        streamValue.isEmpty() || streamValue.isNull()) {
+    if (d->streamName.isEmpty() || d->streamName.isNull()
+        || d->streamValue.isEmpty() || d->streamValue.isNull()) {
         return false;
     }
     return true;
@@ -90,9 +116,9 @@ bool AudioResource::streamTagIsSet() const
 
 void AudioResource::setStreamTag(const QString &name, const QString &value)
 {
-    streamName = name;
-    streamValue = value;
-    emit audioPropertiesChanged(group, pid, name, value);
+    d->streamName = name;
+    d->streamValue = value;
+    emit audioPropertiesChanged(d->group, d->pid, name, value);
 }
 
 ResourceType AudioResource::type() const

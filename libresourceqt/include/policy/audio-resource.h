@@ -53,6 +53,8 @@ USA.
 #include <QString>
 #include <policy/resource.h>
 
+class AudioResourcePrivate;
+
 namespace ResourcePolicy
 {
 
@@ -131,10 +133,7 @@ public:
     virtual ResourceType type() const;
 
 private:
-    QString group;
-    quint32 pid;
-    QString streamName;
-    QString streamValue;
+    AudioResourcePrivate *d;
 
 signals:
     /**
