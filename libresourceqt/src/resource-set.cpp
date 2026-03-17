@@ -78,24 +78,24 @@ bool ResourceSet::initialize()
 {
     resourceEngine = new ResourceEngine(this);
 
-    QObject::connect(resourceEngine, SIGNAL(connectedToManager()),
-                     this, SLOT(connectedHandler()));
-    QObject::connect(resourceEngine, SIGNAL(resourcesGranted(quint32)),
-                     this, SLOT(handleGranted(quint32)));
-    QObject::connect(resourceEngine, SIGNAL(resourcesDenied()),
-                     this, SLOT(handleDeny()));
-    QObject::connect(resourceEngine, SIGNAL(resourcesReleased()),
-                     this, SLOT(handleReleased()));
-    QObject::connect(resourceEngine, SIGNAL(resourcesLost(quint32)),
-                     this, SLOT(handleResourcesLost(quint32)));
-    QObject::connect(resourceEngine, SIGNAL(resourcesBecameAvailable(quint32)),
-                     this, SLOT(handleResourcesBecameAvailable(quint32)));
-    QObject::connect(resourceEngine, SIGNAL(errorCallback(quint32, const char*)),
-                     this, SIGNAL(errorCallback(quint32, const char*)));
-    QObject::connect(resourceEngine, SIGNAL(resourcesReleasedByManager()),
-                     this, SLOT(handleReleasedByManager()));
-    QObject::connect(resourceEngine, SIGNAL(updateOK(bool)),
-                     this, SLOT(handleUpdateOK(bool)));
+    QObject::connect(resourceEngine, &ResourceEngine::connectedToManager,
+                     this, &ResourceSet::connectedHandler);
+    QObject::connect(resourceEngine, &ResourceEngine::resourcesGranted,
+                     this, &ResourceSet::handleGranted);
+    QObject::connect(resourceEngine, &ResourceEngine::resourcesDenied,
+                     this, &ResourceSet::handleDeny);
+    QObject::connect(resourceEngine, &ResourceEngine::resourcesReleased,
+                     this, &ResourceSet::handleReleased);
+    QObject::connect(resourceEngine, &ResourceEngine::resourcesLost,
+                     this, &ResourceSet::handleResourcesLost);
+    QObject::connect(resourceEngine, &ResourceEngine::resourcesBecameAvailable,
+                     this, &ResourceSet::handleResourcesBecameAvailable);
+    QObject::connect(resourceEngine, &ResourceEngine::errorCallback,
+                     this, &ResourceSet::errorCallback);
+    QObject::connect(resourceEngine, &ResourceEngine::resourcesReleasedByManager,
+                     this, &ResourceSet::handleReleasedByManager);
+    QObject::connect(resourceEngine, &ResourceEngine::updateOK,
+                     this, &ResourceSet::handleUpdateOK);
 
     qCDebug(lcResourceQt) << QString("initializing resource engine...");
     if (!resourceEngine->initialize()) {
@@ -124,12 +124,8 @@ void ResourceSet::addResourceObject(Resource *resource)
 
         qCDebug(lcResourceQt, "**************** ResourceSet::%s(%d).... %d", __FUNCTION__, this->id(), __LINE__);
         audioResource = static_cast<AudioResource *>(resource);
-        QObject::connect(audioResource,
-                          SIGNAL(audioPropertiesChanged(const QString &, quint32,
-                                                         const QString &, const QString &)),
-                          this,
-                          SLOT(handleAudioPropertiesChanged(const QString &, quint32,
-                                                             const QString &, const QString &)));
+        QObject::connect(audioResource, &AudioResource::audioPropertiesChanged,
+                         this, &ResourceSet::handleAudioPropertiesChanged);
         if (!audioResource->audioGroupIsSet())
             audioResource->setAudioGroup(resourceClass);
 
@@ -145,10 +141,8 @@ void ResourceSet::addResourceObject(Resource *resource)
         qCDebug(lcResourceQt, "**************** ResourceSet::%s(%d).... %d", __FUNCTION__, this->id(), __LINE__);
         videoResource = static_cast<VideoResource *>(resource);
 
-        QObject::connect(videoResource,
-                          SIGNAL(videoPropertiesChanged(quint32)),
-                          this,
-                          SLOT(handleVideoPropertiesChanged(quint32)));
+        QObject::connect(videoResource, &VideoResource::videoPropertiesChanged,
+                         this, &ResourceSet::handleVideoPropertiesChanged);
         if (videoResource->processID() > 0) {
             qCDebug(lcResourceQt) << QString("registering video properties");
             registerVideoProperties();
