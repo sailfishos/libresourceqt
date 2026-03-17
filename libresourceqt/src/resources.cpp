@@ -48,7 +48,8 @@ VideoResource::VideoResource(quint32 inPid)
 }
 
 VideoResource::VideoResource(const VideoResource &other)
-    : Resource(other)
+    : QObject()
+    , Resource(other)
 {
 }
 
