@@ -30,8 +30,8 @@ USA.
 class BenchmarkResourceSet: public QObject
 {
     Q_OBJECT
-private:
 
+private:
     ResourcePolicy::AudioResource *audioResource;
     ResourcePolicy::AudioRecorderResource *audioRecorderResource;
     ResourcePolicy::Resource *videoResource;
@@ -55,7 +55,6 @@ public:
     ~BenchmarkResourceSet();
 
 private slots:
-
     void benchmarkConnectEngine();
 
     void benchmarkAcquireSend();

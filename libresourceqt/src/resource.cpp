@@ -63,5 +63,3 @@ void Resource::unsetGranted()
 {
     granted = false;
 }
-
-

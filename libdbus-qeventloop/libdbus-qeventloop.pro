@@ -52,4 +52,3 @@ QMAKE_PKGCONFIG_VERSION = $$VERSION
 QMAKE_PKGCONFIG_FILE = libdbus-qeventloop$${QT_MAJOR_VERSION}
 
 INSTALLS       = target headers
-

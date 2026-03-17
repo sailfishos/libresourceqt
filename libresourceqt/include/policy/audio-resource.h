@@ -103,7 +103,6 @@ public:
     * \param newPID Set this to the PID of the process which will render the audio.
     * \param newPID Sets this to the PID of the process which will render the audio.
     */
-
     void setProcessID(quint32 newPID);
 
     /**

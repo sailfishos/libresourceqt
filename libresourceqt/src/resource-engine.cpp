@@ -29,7 +29,7 @@ using namespace ResourcePolicy;
 
 static QMultiMap<resconn_t *, ResourceEngine *> engineMap;
 
-resconn_t *ResourceEngine::libresourceConnection = NULL;
+resconn_t *ResourceEngine::libresourceConnection = nullptr;
 quint32 ResourceEngine::libresourceUsers = 0;
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
@@ -71,8 +71,8 @@ ResourceEngine::~ResourceEngine()
     qCDebug(lcResourceQt, "ResourceEngine::~ResourceEngine(%d) - starting destruction", identifier);
     libresourceUsers--;
 
-    if (libresourceSet != NULL) {
-        libresourceSet->userdata = NULL;
+    if (libresourceSet != nullptr) {
+        libresourceSet->userdata = nullptr;
         qCDebug(lcResourceQt, "ResourceEngine::~ResourceEngine(%d) - unset userdata", identifier);
     }
     if (libresourceUsers == 0) {
@@ -93,7 +93,7 @@ bool ResourceEngine::initialize()
     DBusError dbusError;
     DBusConnection *dbusConnection;
 
-    if (ResourceEngine::libresourceConnection == NULL) {
+    if (ResourceEngine::libresourceConnection == nullptr) {
         dbus_error_init(&dbusError);
         dbusConnection = dbus_bus_get_private(DBUS_BUS_SYSTEM, &dbusError);
         if (dbus_error_is_set(&dbusError)) {
@@ -105,8 +105,8 @@ bool ResourceEngine::initialize()
         DBUSConnectionEventLoop::addConnection(dbusConnection);
 
         ResourceEngine::libresourceConnection = resproto_init(RESPROTO_ROLE_CLIENT, RESPROTO_TRANSPORT_DBUS,
-                                              connectionIsUp, dbusConnection);
-        if (ResourceEngine::libresourceConnection == NULL) {
+                                                              connectionIsUp, dbusConnection);
+        if (ResourceEngine::libresourceConnection == nullptr) {
             qCDebug(lcResourceQt) << QString("resproto_init failed!");
             return false;
         }
@@ -200,7 +200,7 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
                 qCDebug(lcResourceQt, "ResourceEngine(%d) -- emitting signal resourcesLost() for update", identifier);
                 emit resourcesLost(allResourcesToBitmask(resourceSet));
             } else {
-                if ( resourceSet->alwaysGetReply() ) {
+                if (resourceSet->alwaysGetReply()) {
                     //If alwaysReply is on and we didn't have resources at update() then we come from here to updateOK()
                     qCDebug(lcResourceQt, "ResourceEngine(%d) -- emitting signal updateOK() via receivedGrant.", identifier);
                     emit updateOK(true);
@@ -209,7 +209,7 @@ void ResourceEngine::receivedGrant(resmsg_notify_t *notifyMessage)
                 }
             }
 
-        } else if (originalMessageType == RESMSG_ACQUIRE && resourceSet->alwaysGetReply() ) {
+        } else if (originalMessageType == RESMSG_ACQUIRE && resourceSet->alwaysGetReply()) {
             qCDebug(lcResourceQt, "ResourceEngine(%d) -- request DENIED!", identifier);
             emit resourcesDenied();
         } else if (originalMessageType == RESMSG_RELEASE) {
@@ -293,6 +293,7 @@ bool ResourceEngine::connectToManager()
         qCDebug(lcResourceQt, "ResourceEngine::%s().... allready connecting, ignoring request", __FUNCTION__);
         return true;
     }
+
     isConnecting = true;
     resmsg_t resourceMessage;
     memset(&resourceMessage, 0, sizeof(resmsg_t));
@@ -322,8 +323,9 @@ bool ResourceEngine::connectToManager()
             resourceMessage.record.rset.all);
     libresourceSet = resconn_connect(ResourceEngine::libresourceConnection, &resourceMessage,
                                      statusCallbackHandler);
-    if (libresourceSet == NULL)
+    if (libresourceSet == nullptr)
         return false;
+
     libresourceSet->userdata = this; //save our context
     //locker.unlock();
     qCDebug(lcResourceQt, "ResourceEngine(%d)::%s() - **************** unlocked! returning true", identifier, __FUNCTION__);
@@ -349,7 +351,7 @@ bool ResourceEngine::disconnectFromManager()
 //    messageMap.insert(requestId, RESMSG_UNREGISTER);
 
     bool ret = true;
-    if (libresourceSet != NULL) {
+    if (libresourceSet != nullptr) {
         ret = resconn_disconnect(libresourceSet, &resourceMessage, statusCallbackHandler)?true:false;
     }
     return ret;
@@ -585,7 +587,7 @@ bool ResourceEngine::updateResources()
 
     bool hasGranted = resourceSet->resources().size() ? true : false;
 
-    wasInAcquireMode.insert(requestId, hasGranted /*hasResourcesGranted()*/ );
+    wasInAcquireMode.insert(requestId, hasGranted /*hasResourcesGranted()*/);
 
     qCDebug(lcResourceQt, "ResourceEngine(%d) - update %u:%u", identifier, resourceSet->id(), requestId);
     int success = resproto_send_message(libresourceSet, &message, statusCallbackHandler);

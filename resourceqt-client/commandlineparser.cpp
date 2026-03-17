@@ -113,8 +113,7 @@ bool CommandLineParser::parseArguments()
     if (ci == args.constEnd()) {
         usage();
         return false;
-    }
-    else {
+    } else {
         if (!parseClassString(*ci)) {
             return false;
         }
@@ -130,22 +129,23 @@ bool CommandLineParser::parseArguments()
         output << "optional resources are not subset of all resources" << ENDL;
         return false;
     }
+
     return true;
 }
 
 bool CommandLineParser::parseClassString(const QString &str)
 {
-    if (!allowUnkownResourceClass &&
-            (str != "call") &&
-            (str != "camera") &&
-            (str != "ringtone") &&
-            (str != "alarm") &&
-            (str != "navigator") &&
-            (str != "game") &&
-            (str != "player") &&
-            (str != "event") &&
-            (str != "background") &&
-            (str != "videoeditor")) {
+    if (!allowUnkownResourceClass
+        && (str != "call")
+        && (str != "camera")
+        && (str != "ringtone")
+        && (str != "alarm")
+        && (str != "navigator")
+        && (str != "game")
+        && (str != "player")
+        && (str != "event")
+        && (str != "background")
+        && (str != "videoeditor")) {
         output << "invalid class " << str;
         return false;
     }
@@ -169,8 +169,7 @@ bool CommandLineParser::parseResourceList(const QString &resourceListStr,
 {
     if (resourceListStr.isEmpty()) {
         return false;
-    }
-    else {
+    } else {
         QStringList resList = resourceListStr.split(",", SKIPEP);
 
         foreach(QString res, resList) {
@@ -194,11 +193,9 @@ bool CommandLineParser::parseModeValues(const QString &modeListStr)
     foreach(QString mode, modeList) {
         if (mode == "AutoRelease") {
             autoRelease = true;
-        }
-        else if (mode == "AlwaysReply") {
+        } else if (mode == "AlwaysReply") {
             alwaysReply = true;
-        }
-        else {
+        } else {
             output << "Ignoring unknown mode '" << mode << "'!" << ENDL;
         }
     }
@@ -207,18 +204,16 @@ bool CommandLineParser::parseModeValues(const QString &modeListStr)
 
 void CommandLineParser::usage()
 {
-    output << "usage: resourceqt-client [-h] [-f mode-values]" <<
-    "[-o optional-resources] [-i] [-v] [-p prefix] " <<
-    "class all-resources" << ENDL;
+    output << "usage: resourceqt-client [-h] [-f mode-values]"
+           << "[-o optional-resources] [-i] [-v] [-p prefix] "
+           << "class all-resources" << ENDL;
     output << "\toptions:" << ENDL;
     output << "\t  h\tprint this help message and exit" << ENDL;
     output << "\t i\tshow timings of requests" << ENDL;
     output << "\t v\tshow debug of libresourceqt" << ENDL;
     output << "\t p\tPrefix all output with the given prefix" << ENDL;
-    output << "\t  f\tmode values. See 'modes' below for the "
-    "\n\t\tsyntax of <mode-values>" << ENDL;
-    output << "\t  o\toptional resources. See 'resources' below for the "
-    "syntax of\n\t\t<optional-resources>" << ENDL;
+    output << "\t  f\tmode values. See 'modes' below for the \n\t\tsyntax of <mode-values>" << ENDL;
+    output << "\t  o\toptional resources. See 'resources' below for the syntax of\n\t\t<optional-resources>" << ENDL;
     output << "\tclass:" << ENDL;
     output << "\t\tcall\t  - for native or 3rd party telephony" << ENDL;
     output << "\t\tcamera\t  - for photo applications" << ENDL;

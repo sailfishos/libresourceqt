@@ -20,6 +20,7 @@
 ##############################################################################
 
 include(../common.pri)
+
 TEMPLATE = lib
 TARGET = resourceqt$${QT_MAJOR_VERSION}
 DESTDIR = build
@@ -74,4 +75,3 @@ QMAKE_PKGCONFIG_VERSION = $$VERSION
 QMAKE_PKGCONFIG_FILE = libresourceqt$${QT_MAJOR_VERSION}
 
 INSTALLS       = target headers man htmldoc xmldoc
-

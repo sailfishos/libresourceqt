@@ -69,7 +69,6 @@ public:
 
     bool registerVideoProperties(quint32 pid);
 
-
     void handleConnectionIsUp(resconn_t *connection);
 
     void disconnected();
@@ -91,11 +90,14 @@ signals:
     void resourcesLost(quint32 bitmaskOfGrantedResources);
     void connectedToManager();
     void disconnectedFromManager();
-    void errorCallback(quint32 code, const char* );
+    void errorCallback(quint32 code, const char*);
     void resourcesReleasedByManager();
     void updateOK(bool);
 
 private:
+    static quint32 libresourceUsers;
+    static resconn_t *libresourceConnection;
+
     bool connected;
     ResourceSet *resourceSet;
     DBusConnection *dbusConnection;
@@ -104,8 +106,6 @@ private:
     QMap<quint32, resmsg_type_t> messageMap;
     QMap<quint32, bool> wasInAcquireMode;
     quint32 connectionMode;
-    static quint32 libresourceUsers;
-    static resconn_t *libresourceConnection;
     quint32 identifier;
     bool aboutToBeDeleted;
     bool isConnecting;
@@ -114,4 +114,3 @@ private:
 }
 
 #endif
-

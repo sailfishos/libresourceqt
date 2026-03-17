@@ -26,7 +26,7 @@ USA.
 
 #include "dbusconnectioneventloop.h"
 
-Q_GLOBAL_STATIC(DBUSConnectionEventLoop, classInstance);
+Q_GLOBAL_STATIC(DBUSConnectionEventLoop, classInstance)
 
 bool DBUSConnectionEventLoop::addConnection(DBusConnection* conn)
 {

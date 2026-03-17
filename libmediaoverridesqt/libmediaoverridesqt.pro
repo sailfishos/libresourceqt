@@ -1,4 +1,5 @@
 include(../common.pri)
+
 TEMPLATE = lib
 TARGET = mediaoverridesqt$${QT_MAJOR_VERSION}
 DESTDIR = build
@@ -40,4 +41,3 @@ QMAKE_PKGCONFIG_VERSION = $$VERSION
 QMAKE_PKGCONFIG_FILE = libmediaoverridesqt$${QT_MAJOR_VERSION}
 
 INSTALLS       = target headers
-

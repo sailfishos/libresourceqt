@@ -18,23 +18,21 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301
 USA.
 *************************************************************************/
+
 #include "test-init.h"
 #include <time.h>
-
 
 using namespace ResourcePolicy;
 
 static struct timespec startTime;
 
-long int stop_timer(void);
-int      start_timer(void);
-
+long int stop_timer();
+int      start_timer();
 
 void TestInitAndConnect::init()
 {
      theCase.init();
 }
-
 
 void Case::init()
 {
@@ -47,12 +45,10 @@ void Case::init()
     resSetWithoutInit->addResourceObject(videoResourceWithoutInit);
 }
 
-
 void TestInitAndConnect::testTheCase()
 {
     theCase.initAndConnect();
 }
-
 
 void Case::initAndConnect()
 {
@@ -61,7 +57,6 @@ void Case::initAndConnect()
     loop.exec();
     connectedWithInitHandler();
 }
-
 
 void Case::connectedWithInitHandler()
 {
@@ -74,7 +69,6 @@ void Case::connectedWithInitHandler()
     grantedWithInitHandler();
 }
 
-
 void Case::grantedWithInitHandler()
 {
     QVERIFY( videoResourceWithInit->isGranted() == true );
@@ -84,7 +78,6 @@ void Case::grantedWithInitHandler()
     loop.exec();
     releasedWithInitHandler();
 }
-
 
 void Case::releasedWithInitHandler()
 {
@@ -97,7 +90,6 @@ void Case::releasedWithInitHandler()
     loop.exec();
     grantedWithoutInitHandler();
 }
-
 
 void Case::grantedWithoutInitHandler()
 {
@@ -113,35 +105,29 @@ void Case::grantedWithoutInitHandler()
     releasedWithoutInitHandler();
 }
 
-
 void Case::releasedWithoutInitHandler()
 {
     QVERIFY( videoResourceWithoutInit->isGranted() == false );
     resSetWithoutInit->disconnect();
 }
 
-
 void Case::startTimer(void) const
 {
     start_timer();
 }
 
-
 long int Case::stopTimer(const std::string& op) const
 {
-        long int ms = stop_timer();
-        if (ms > 0)
-        {
-            qDebug("Operation: %s %ld ms", op.c_str(), ms) ;
-        }
-        return ms;
+    long int ms = stop_timer();
+    if (ms > 0) {
+        qDebug("Operation: %s %ld ms", op.c_str(), ms);
+    }
+    return ms;
 }
 
-
-int start_timer(void)
+int start_timer()
 {
-    int r;
-    r = clock_gettime(CLOCK_REALTIME, &startTime);
+    int r = clock_gettime(CLOCK_REALTIME, &startTime);
 
     if (r == 0)
         return 1;
@@ -150,30 +136,24 @@ int start_timer(void)
 }
 
 
-long int stop_timer(void)
+long int stop_timer()
 {
     struct timespec end_time;
-    int             r;
-    long int        milliseconds = 0L;
-    r = clock_gettime(CLOCK_REALTIME, &end_time);
+    long int milliseconds = 0L;
+    int r = clock_gettime(CLOCK_REALTIME, &end_time);
 
-    if (r == 0)
-    {
+    if (r == 0) {
         struct timespec temp;
-        if (end_time.tv_nsec < startTime.tv_nsec)
-        {
+        if (end_time.tv_nsec < startTime.tv_nsec) {
             temp.tv_sec  = end_time.tv_sec - startTime.tv_sec - 1;
             temp.tv_nsec = 1000000000 + end_time.tv_nsec - startTime.tv_nsec;
-        }
-        else
-        {
+        } else {
             temp.tv_sec  = end_time.tv_sec  - startTime.tv_sec;
             temp.tv_nsec = end_time.tv_nsec - startTime.tv_nsec;
         }
         milliseconds = (1000 * temp.tv_sec) + (temp.tv_nsec / 1000000);
 
-        if (temp.tv_nsec % 1000000 > 500000)
-        {
+        if (temp.tv_nsec % 1000000 > 500000) {
             ++milliseconds;
         }
     }
@@ -182,8 +162,6 @@ long int stop_timer(void)
 
     return milliseconds;
 }
-
-
 
 int main(int argc, char *argv[])
 {

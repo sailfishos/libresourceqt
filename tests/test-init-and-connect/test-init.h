@@ -29,7 +29,6 @@ USA.
 
 using namespace ResourcePolicy;
 
-
 class myEvtLoop: public QEventLoop
 {
     Q_OBJECT
@@ -41,16 +40,18 @@ public slots:
     }
 };
 
-
 class Case
 {
 public:
-    Case(): acquireTimeWithInit(0), acquireTimeWithoutInit(0){}
+    Case()
+        : acquireTimeWithInit(0), acquireTimeWithoutInit(0) {}
 
-    ~Case(){
+    ~Case()
+    {
         delete resSetWithInit;
         delete resSetWithoutInit;
     }
+
     void init();
     void initAndConnect();
 
@@ -68,8 +69,8 @@ private:
 
     void        startTimer(void) const;
     long int    stopTimer(const std::string& op) const;
-    //Wrap these "would be" slots so that they don't get
-    //called by the QT's test framework.
+    // Wrap these "would be" slots so that they don't get
+    // called by the QT's test framework.
     void        connectedWithInitHandler();
     void        grantedWithInitHandler();
     void        releasedWithInitHandler();
@@ -77,20 +78,16 @@ private:
     void        releasedWithoutInitHandler();
 };
 
-
 class TestInitAndConnect: public QObject
 {
     Q_OBJECT
 
 private:
     Case theCase;
+
 private slots:
     void init();
     void testTheCase();
 };
 
-
-
-
 #endif
-
