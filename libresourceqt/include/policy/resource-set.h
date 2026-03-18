@@ -53,15 +53,12 @@ USA.
 #include <QObject>
 #include <QVector>
 #include <QList>
+
 #include <policy/resources.h>
 #include <policy/audio-resource.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-#include <QRecursiveMutex>
-#endif
 
 class ResourceSetPrivate;
 
@@ -324,7 +321,7 @@ public:
     /**
     * ref\ hasResourcesGranted() returns true if this set has any granted resources.
     */
-    bool hasResourcesGranted() { return inAcquireMode; }
+    bool hasResourcesGranted();
 
 signals:
     /**
@@ -403,36 +400,11 @@ signals:
     void managerIsUp();
 
 private:
-    enum requestType { Acquire, Update, Release };
-
-    quint32 identifier;
-    const QString resourceClass;
-    Resource* resourceSet[NumberOfTypes];
-    ResourceEngine* resourceEngine;
-    AudioResource* audioResource;
-    VideoResource* videoResource;
-    bool autoRelease;
-    bool alwaysReply;
-    bool initialized;
-    bool pendingAcquire;
-    bool pendingUpdate;
-    bool pendingAudioProperties;
-    bool pendingVideoProperties;
-    bool haveAudioProperties;
-    bool inAcquireMode;
-    QList<requestType> requestQ;
-#if (QT_VERSION >= QT_VERSION_CHECK(5,14,0))
-    QRecursiveMutex reqMutex;
-#else
-    QMutex reqMutex;
-#endif
-    bool ignoreQ;
     ResourceSetPrivate* d;
 
     bool initialize();
     void registerAudioProperties();
     void registerVideoProperties();
-    bool proceedIfImFirst(requestType theRequest);
     void executeNextRequest();
 
 private slots:
