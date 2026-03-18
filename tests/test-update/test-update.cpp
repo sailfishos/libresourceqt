@@ -27,8 +27,13 @@ USA.
 
 using namespace ResourcePolicy;
 
+Q_DECLARE_METATYPE(ResourcePolicy::ResourceType)
+Q_DECLARE_METATYPE(QList<ResourcePolicy::ResourceType>)
+
 TestUpdate::TestUpdate()
 {
+    qRegisterMetaType<ResourceType>();
+    qRegisterMetaType<QList<ResourceType> >();
 }
 
 TestUpdate::~TestUpdate()
