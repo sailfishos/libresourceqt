@@ -21,8 +21,8 @@ Override * ResourcePolicy::createBluetoothOVerride(QObject *parent)
     return new Override("BluetoothOverride", parent);
 }
 
-Override::Override(QString overrideType, QObject *parent):
-    QObject(parent), dBusConnection(QDBusConnection::sessionBus()), type(overrideType)
+Override::Override(QString overrideType, QObject *parent)
+    : QObject(parent), dBusConnection(QDBusConnection::sessionBus()), type(overrideType)
 {
     dBusConnection.connect(MANAGER_SERVICE, MANAGER_PATH, MANAGER_INTERFACE,
                            type, this, SLOT(handleChange(bool)));
@@ -60,4 +60,3 @@ void Override::handleChange(bool newState)
 {
     emit changed(newState);
 }
-

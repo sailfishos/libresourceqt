@@ -53,6 +53,8 @@ USA.
 #include <QString>
 #include <policy/resource.h>
 
+class AudioResourcePrivate;
+
 namespace ResourcePolicy
 {
 
@@ -103,7 +105,6 @@ public:
     * \param newPID Set this to the PID of the process which will render the audio.
     * \param newPID Sets this to the PID of the process which will render the audio.
     */
-
     void setProcessID(quint32 newPID);
 
     /**
@@ -132,10 +133,7 @@ public:
     virtual ResourceType type() const;
 
 private:
-    QString group;
-    quint32 pid;
-    QString streamName;
-    QString streamValue;
+    AudioResourcePrivate *d;
 
 signals:
     /**

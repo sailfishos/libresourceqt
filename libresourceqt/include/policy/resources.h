@@ -170,9 +170,9 @@ public:
 
 signals:
     void videoPropertiesChanged(quint32 pid);
+
 private:
     quint32 pid;
-
 };
 
 /**
@@ -273,4 +273,3 @@ public:
 
 }
 #endif
-

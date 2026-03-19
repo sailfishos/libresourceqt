@@ -66,8 +66,13 @@ Resource * TestResourceSet::resourceFromType(ResourceType type)
 
 using namespace ResourcePolicy;
 
+Q_DECLARE_METATYPE(ResourcePolicy::ResourceType)
+Q_DECLARE_METATYPE(QList<ResourcePolicy::ResourceType>)
+
 TestResourceSet::TestResourceSet()
 {
+    qRegisterMetaType<ResourceType>();
+    qRegisterMetaType<QList<ResourceType> >();
 }
 
 TestResourceSet::~TestResourceSet()

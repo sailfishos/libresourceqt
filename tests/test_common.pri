@@ -5,4 +5,4 @@ LIBS += $$DBUSQEVENTLOOPLIB
 
 INCLUDEPATH += $$PUBLIC_INCLUDE
 
-TESTSTARGETDIR = libresourceqt-qt5-tests
+TESTSTARGETDIR = libresourceqt-qt$${QT_MAJOR_VERSION}-tests

@@ -36,8 +36,8 @@ SUBDIRS = test-audio-resource               \
 
 # Install options
 include(test_common.pri)
-unix{
-    testsxml.path = /usr/share/libresourceqt-qt5-tests/
+unix {
+    testsxml.path = /usr/share/libresourceqt-qt$${QT_MAJOR_VERSION}-tests/
     testsxml.files    = tests.xml
     testsxml.target   = tests.xml
     testsxml.CONFIG   = no_check_exist

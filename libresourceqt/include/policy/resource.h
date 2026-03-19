@@ -140,12 +140,13 @@ protected:
       * This is just a unique identifier for the resource.
       */
     quint32 identifier;
+
 private:
     void setGranted();
     void unsetGranted();
+
     bool granted;
 };
 }
 
 #endif
-

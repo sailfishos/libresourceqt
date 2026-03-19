@@ -53,6 +53,7 @@ USA.
 #include <QObject>
 #include <QVector>
 #include <QList>
+
 #include <policy/resources.h>
 #include <policy/audio-resource.h>
 #include <stdlib.h>
@@ -60,7 +61,6 @@ USA.
 #include <stdio.h>
 
 class ResourceSetPrivate;
-
 
 /**
 * \mainpage The Meego Resource Policy Qt API: Libresourceqt
@@ -118,7 +118,8 @@ class ResourceSetPrivate;
 * and delete the object. Then when you want to acquire the modified ResourcePolicy::ResourceSet
 * you simply use the ResourcePolicy::ResourceSet::acquire() method, like this:
 * \code
-* QObject::connect(mySet, SIGNAL(resourcesGranted(QList<ResourcePolicy::ResourceType>)), this, SLOT(acquireOkHandler(QList<ResourcePolicy::Resource>)));
+* QObject::connect(mySet, SIGNAL(resourcesGranted(QList<ResourcePolicy::ResourceType>)),
+*                  this, SLOT(acquireOkHandler(QList<ResourcePolicy::Resource>)));
 * QObject::connect(mySet, SIGNAL(resourcesDenied()), this, SLOT(acquireDeniedHandler()));
 * mySet->acquire();
 * \endcode
@@ -183,24 +184,24 @@ public:
     /**
     * This method adds a resource to the set. A set contains only a single
     * instance of a given resource. If the ResourceSet already contains a
-        * resource of the given type it will be replaced.
+    * resource of the given type it will be replaced.
     * \param resourceType The resource to add to the set. A copy of this object
-        * is stored in the ResourceSet.
+    * is stored in the ResourceSet.
     */
     bool addResource(ResourceType resourceType);
 
     /**
     * This method adds a resource to the set. A set contains only a single
     * instance of a given resource. If the ResourceSet already contains a
-        * resource of the given type it will be replaced.
-        * \param resource The resource to be added to the set.
+    * resource of the given type it will be replaced.
+    * \param resource The resource to be added to the set.
     * The ResourcePolicy::ResourseSet takes ownership of the pointer. Do NOT free!
     */
     void addResourceObject(Resource*resource);
 
     /**
-        * This method removes the resource of the given type
-        * \param type The type of resource to be removed from the set.
+    * This method removes the resource of the given type
+    * \param type The type of resource to be removed from the set.
     */
     void deleteResource(ResourceType type);
 
@@ -225,9 +226,9 @@ public:
     bool contains(ResourceType type) const;
 
     /**
-         * Checks if this \ref ResourceSet is connected to the policy manager.
-         * @return true if this \ref ResourceSet is connected to the manager.
-     */
+    * Checks if this \ref ResourceSet is connected to the policy manager.
+    * @return true if this \ref ResourceSet is connected to the manager.
+    */
     bool isConnectedToManager() const;
 
     /**
@@ -238,8 +239,8 @@ public:
     bool contains(const QList<ResourceType> &types) const;
 
     /**
-        * Returns the unique identifier of this ResourceSet.
-        * @return the unique identifier of this ResourceSet.
+    * Returns the unique identifier of this ResourceSet.
+    * @return the unique identifier of this ResourceSet.
     */
     quint32 id() const;
 
@@ -249,20 +250,20 @@ public:
     QString applicationClass();
 
     /**
-         * Initializes and connects the ResourceSet. This method can be used before \ref acquire()
-         * if one wants to decrease the delay for the initial acquire() (i.e. if not connected, acquire()
-         * will call initAndConnect()). In order to avoid an \ref update() after adding resources,
-         * add the resources before calling initAndConnect(), and then call \ref acquire().
-     * \return true if the method succeeds without encountering errors.
-     */
+    * Initializes and connects the ResourceSet. This method can be used before \ref acquire()
+    * if one wants to decrease the delay for the initial acquire() (i.e. if not connected, acquire()
+    * will call initAndConnect()). In order to avoid an \ref update() after adding resources,
+    * add the resources before calling initAndConnect(), and then call \ref acquire().
+    * \return true if the method succeeds without encountering errors.
+    */
     bool initAndConnect();
 
     /**
-        * Try to acquire the resources in this \ref ResourceSet. The resourcesGranted() (or
-        * resourcesDenied() if \ref setAlwaysReply() has been called) signal will be emitted depending on whether the
-        * requested resources could be acquired or not. Note that regardless of whether setAlwaysReply() has been called,
-        * you will receive the resourcesGranted() signal when the resources could be acquired for you (this could be a long time),
-        * and thus you do not have to re-acquire in this case.
+    * Try to acquire the resources in this \ref ResourceSet. The resourcesGranted() (or
+    * resourcesDenied() if \ref setAlwaysReply() has been called) signal will be emitted depending on whether the
+    * requested resources could be acquired or not. Note that regardless of whether setAlwaysReply() has been called,
+    * you will receive the resourcesGranted() signal when the resources could be acquired for you (this could be a long time),
+    * and thus you do not have to re-acquire in this case.
     */
     bool acquire();
 
@@ -273,21 +274,21 @@ public:
 
     /**
     * Commits changes to the \ref ResourcePolicy::ResourceSet. Remember to call update()
-        * after adding and/or removing resources. Note that, if you do not have resources acquired when
-        * calling update() then this method only informs the policy manager of which resources you are
-        * interested in, and this request is acknowledged with a \ref updateOK() signal (if alwaysReply is on by calling
-        * \ref setAlwaysReply()).
-        * If you do have resources granted then the application will be acknowledged with a \ref resourcesGranted()
-        * or \ref lostResources() signal if you lose the resources (in this case you will receive the resources back when possible).
+    * after adding and/or removing resources. Note that, if you do not have resources acquired when
+    * calling update() then this method only informs the policy manager of which resources you are
+    * interested in, and this request is acknowledged with a \ref updateOK() signal (if alwaysReply is on by calling
+    * \ref setAlwaysReply()).
+    * If you do have resources granted then the application will be acknowledged with a \ref resourcesGranted()
+    * or \ref lostResources() signal if you lose the resources (in this case you will receive the resources back when possible).
     */
     bool update();
 
     /**
     * Sets the auto-release. When loosing the resources due to another
-        * application with a higher priority preempting us, the default is that we automatically
-        * re-gain our resources without having to re-acquire them. However if the AutoRelease is set,
-        * the resources are released and we need to re-acquire them when the preempting application
-        * has released its resources (i.e. when the resourcesBecameAvailable() signal is received).
+    * application with a higher priority preempting us, the default is that we automatically
+    * re-gain our resources without having to re-acquire them. However if the AutoRelease is set,
+    * the resources are released and we need to re-acquire them when the preempting application
+    * has released its resources (i.e. when the resourcesBecameAvailable() signal is received).
     *
     * This feature is by default disabled.
     *
@@ -303,82 +304,86 @@ public:
     bool willAutoRelease();
 
     /**
-        * Assures that the resourcesGranted() signal is emitted even if we already
-        * have those requested resources granted (i.e. the set does not change). By default
-        * this feature is off, and note that in that case you will not receive the
-        * ref\ updateOK() nor the \ref resourcesDenied() signal. This flag should be set
-        * once only before calling anything else (excluding setAutoRelease()) and cannot be unset.
+    * Assures that the resourcesGranted() signal is emitted even if we already
+    * have those requested resources granted (i.e. the set does not change). By default
+    * this feature is off, and note that in that case you will not receive the
+    * ref\ updateOK() nor the \ref resourcesDenied() signal. This flag should be set
+    * once only before calling anything else (excluding setAutoRelease()) and cannot be unset.
     */
     bool setAlwaysReply();
 
     /**
-        * Checks whether the always-get-reply flag has been set with \ref setAlwaysReply()
+    * Checks whether the always-get-reply flag has been set with \ref setAlwaysReply()
     * \return true if we will always get a reply (even if there is no change).
     */
     bool alwaysGetReply();
 
     /**
-        * ref\ hasResourcesGranted() returns true if this set has any granted resources.
+    * ref\ hasResourcesGranted() returns true if this set has any granted resources.
     */
-    bool hasResourcesGranted() { return inAcquireMode; }
+    bool hasResourcesGranted();
 
 signals:
     /**
-        * This signal is emitted when the Resource Policy Manager notifies that the given
-        * non-granted resources \param availableResources have become available. These are such resources
-        * that the application has shown interest in before. \param availableResources A list of available resources.
+    * This signal is emitted when the Resource Policy Manager notifies that the given
+    * non-granted resources \param availableResources have become available. These are such resources
+    * that the application has shown interest in before. \param availableResources A list of available resources.
     */
     void resourcesBecameAvailable(const QList<ResourcePolicy::ResourceType> &availableResources);
 
     /**
-        * This signal is emitted as a response to the acquire() request (also for the update() request
-        * when already granted and updating a modified resource set). Thus, this signal informs  of currently
-        * granted resources. \param grantedOptionalResources The list of granted optional
-        * resources. All the mandatory resources have also been acquired. Note that this signal
-        * is also received after an application with higher priority stopped using the resources
-        * that were preempted from you with the lostResources() signal (for this autoRelease must be off, see \ref setAutoRelease() ).
+    * This signal is emitted as a response to the acquire() request (also for the update() request
+    * when already granted and updating a modified resource set). Thus, this signal informs  of currently
+    * granted resources. \param grantedOptionalResources The list of granted optional
+    * resources. All the mandatory resources have also been acquired. Note that this signal
+    * is also received after an application with higher priority stopped using the resources
+    * that were preempted from you with the lostResources() signal (for this autoRelease must be off, see \ref setAutoRelease() ).
     */
     void resourcesGranted(const QList<ResourcePolicy::ResourceType> &grantedOptionalResources);
 
     /**
-        * This signal is emitted as a response to the update() request if the application did not have
-        * resources granted while updating. Note that a reply to an update() request may also be
-        * resourcesLost() if the update request is denied (i.e. trying to add a mandatory resource that is granted to another application
-        * with higher priority).
+    * This signal is emitted as a response to the update() request if the application did not have
+    * resources granted while updating. Note that a reply to an update() request may also be
+    * resourcesLost() if the update request is denied (i.e. trying to add a mandatory resource that is granted to another application
+    * with higher priority).
     */
     void updateOK();
 
     /**
-        * This signal is emitted as a response to the acquire() request, in the case where \ref setAlwaysReply()
-        * has been called and or more of the mandatory resources were not available.
+    * This signal is emitted as a response to the acquire() request, in the case where \ref setAlwaysReply()
+    * has been called and or more of the mandatory resources were not available.
     */
     void resourcesDenied();
 
     /**
-        * This signal is emitted as a response to the release() request. Note that the manager can release as well
-        * (i.e. \ref resourcesReleasedByManager()). In that case the application will not
-        * receive resources automatically anymore, but has to re-acquire them.
+    * This signal is emitted as a response to the release() request. Note that the manager can release as well
+    * (i.e. \ref resourcesReleasedByManager()). In that case the application will not
+    * receive resources automatically anymore, but has to re-acquire them.
     */
     void resourcesReleased();
 
     /**
-        * This signal is emitted when the manager releases the acquired resources, so that you have to re-acquire them again when you wish to use them.
-        * Use this signal to implement permanent playback stopping logic in situations where you do not want playback to continue automatically (in contrast to waiting
-        * for resourcesGranted() in order to continue playback after a lostResources() signal emission) after your application's resources are preempted because of some other event.
-        * Note that when autoRelease is used, you will not receive the resourcesReleasedByManager() ever, but rather you should interpret the
-        * resourcesLost() also as an implicit resourcesReleasedByManager().
+    * This signal is emitted when the manager releases the acquired resources, so that you have to re-acquire
+    * them again when you wish to use them.
+    * Use this signal to implement permanent playback stopping logic in situations where you do not want
+    * playback to continue automatically (in contrast to waiting
+    * for resourcesGranted() in order to continue playback after a lostResources() signal emission) after
+    * your application's resources are preempted because of some other event.
+    * Note that when autoRelease is used, you will not receive the resourcesReleasedByManager() ever,
+    * but rather you should interpret the
+    * resourcesLost() also as an implicit resourcesReleasedByManager().
     */
     void resourcesReleasedByManager();
 
     /**
-        * This signal is emitted when some other application with a higher priority
-        * supersedes your application, and as a result you loose all our resources temporarily.
+    * This signal is emitted when some other application with a higher priority
+    * supersedes your application, and as a result you loose all our resources temporarily.
     * It is very important to connect to this signal as it is signaling when
-        * the acquired resources shouldn't be used. When resourcesGranted() is
-        * is emitted then the resources can be used again. Note that, when autoRelease mode is used,
-        * this signal also signifies that the resources are lost permanently in the sense that they have to be
-        * re-acquired when indicated available by the resourcesBecameAvailable() signal  (i.e. they are not granted back
-        * automatically when freed by an other application in this case).
+    * the acquired resources shouldn't be used. When resourcesGranted() is
+    * is emitted then the resources can be used again. Note that, when autoRelease mode is used,
+    * this signal also signifies that the resources are lost permanently in the sense that they have to be
+    * re-acquired when indicated available by the resourcesBecameAvailable() signal  (i.e. they are not granted back
+    * automatically when freed by an other application in this case).
     */
     void lostResources();
 
@@ -389,38 +394,17 @@ signals:
     void errorCallback(quint32, const char*);
 
     /**
-        * This signals that the manager has started and is available. This signal was called connectedToManager() before,
-        * but that name is now changed to managerIsUp() as that better describes that the manager has booted.
-        */
+    * This signals that the manager has started and is available. This signal was called connectedToManager() before,
+    * but that name is now changed to managerIsUp() as that better describes that the manager has booted.
+    */
     void managerIsUp();
 
-
 private:
-    enum requestType { Acquire=0, Update, Release } ;
-
-    quint32 identifier;
-    const QString resourceClass;
-    Resource* resourceSet[NumberOfTypes];
-    ResourceEngine* resourceEngine;
-    AudioResource* audioResource;
-    VideoResource* videoResource;
-    bool autoRelease;
-    bool alwaysReply;
-    bool initialized;
-    bool pendingAcquire;
-    bool pendingUpdate;
-    bool pendingAudioProperties;
-    bool pendingVideoProperties;
-    bool haveAudioProperties;
-    bool inAcquireMode;
-    QList<requestType> requestQ;
-    QMutex reqMutex;
-    bool ignoreQ;
     ResourceSetPrivate* d;
+
     bool initialize();
     void registerAudioProperties();
     void registerVideoProperties();
-    bool proceedIfImFirst(requestType theRequest);
     void executeNextRequest();
 
 private slots:
@@ -434,9 +418,7 @@ private slots:
     void handleUpdateOK(bool resend);
     void handleAudioPropertiesChanged(const QString &group, quint32 pid, const QString &name, const QString &value);
     void handleVideoPropertiesChanged(quint32 pid);
-
 };
 }
 
 #endif
-

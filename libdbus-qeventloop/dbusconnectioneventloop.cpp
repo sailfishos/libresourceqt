@@ -26,7 +26,7 @@ USA.
 
 #include "dbusconnectioneventloop.h"
 
-Q_GLOBAL_STATIC(DBUSConnectionEventLoop, classInstance);
+Q_GLOBAL_STATIC(DBUSConnectionEventLoop, classInstance)
 
 bool DBUSConnectionEventLoop::addConnection(DBusConnection* conn)
 {
@@ -149,7 +149,7 @@ dbus_bool_t DBUSConnectionEventLoop::addWatch(DBusWatch *watch, void *data)
         loop->connect(watcher.write, SIGNAL(activated(int)), SLOT(writeSocket(int)));
     }
 
-    loop->watchers.insertMulti(fd, watcher);
+    loop->watchers.insert(fd, watcher);
 
     return true;
 }

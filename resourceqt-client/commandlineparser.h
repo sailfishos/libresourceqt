@@ -21,6 +21,7 @@ USA.
 
 #ifndef COMMANDLINEPARSER_H
 #define COMMANDLINEPARSER_H
+
 #include <QString>
 #include <QList>
 #include <QSet>
@@ -69,5 +70,5 @@ private:
     void usage();
 
 };
-#endif
 
+#endif

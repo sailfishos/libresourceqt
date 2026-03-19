@@ -68,7 +68,6 @@ class QTimerEvent;
 class DBUSConnectionEventLoop : public QObject
 {
     Q_OBJECT
-private:
     Q_DISABLE_COPY(DBUSConnectionEventLoop)
 
 public:
@@ -92,16 +91,20 @@ private:
     class Watcher
     {
     public:
-        Watcher() : watch(0), read(0), write(0) {}
+        Watcher()
+            : watch(nullptr)
+            , read(nullptr)
+            , write(nullptr)
+        {}
 
-        DBusWatch* 			watch;
-        QSocketNotifier*	read;
-        QSocketNotifier*	write;
+        DBusWatch *watch;
+        QSocketNotifier *read;
+        QSocketNotifier *write;
     };
 
-    typedef QMultiHash<int, Watcher> 	Watchers;
-    typedef QHash<int, DBusTimeout*> 	Timeouts;
-    typedef QList<DBusConnection*>		Connections;
+    typedef QMultiHash<int, Watcher> Watchers;
+    typedef QHash<int, DBusTimeout*> Timeouts;
+    typedef QList<DBusConnection*> Connections;
 
     /**
      * DBusWatcher objects

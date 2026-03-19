@@ -39,6 +39,7 @@ public:
     CommandListArgs(const QString &arguments, const QString &helpText);
     CommandListArgs();
     ~CommandListArgs();
+
     QString args;
     QString help;
 };
@@ -88,9 +89,7 @@ private:
     inline void stopTimer();
 };
 
-QTextStream & operator<< (QTextStream &output,
-                          const QList<ResourcePolicy::Resource*>resources);
-QTextStream & operator<< (QTextStream &output,
-                          const QList<ResourcePolicy::ResourceType>resources);
-#endif
+QTextStream & operator<<(QTextStream &output, const QList<ResourcePolicy::Resource*>resources);
+QTextStream & operator<<(QTextStream &output, const QList<ResourcePolicy::ResourceType>resources);
 
+#endif
